@@ -61,7 +61,7 @@ class Reporter
     {
         $services = $this->buildServicesFromConfiguration();
         foreach ($services as $service) {
-            $service->report($result);
+            $service->report($result, $this->io);
         }
     }
 
