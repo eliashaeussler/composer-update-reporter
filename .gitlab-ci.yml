@@ -1,0 +1,21 @@
+variables:
+  COMPOSER_CACHE_DIR: "/cache/composer"
+  COMPOSER_ALLOW_SUPERUSER: "1"
+  COMPOSER_NO_INTERACTION: "1"
+
+before_script:
+  - composer self-update
+  - composer global require hirak/prestissimo --no-progress
+
+stages:
+  - test
+
+test:
+  stage: test
+  image: composer:1
+  script:
+    - composer install --no-progress
+    - composer test -- --colors=never --coverage-text --testdox
+  coverage: '/^\s*Lines:\s*\d+.\d+\%/'
+  only:
+    - branches
