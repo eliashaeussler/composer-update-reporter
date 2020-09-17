@@ -99,6 +99,15 @@ class Mattermost implements ServiceInterface
         return new self($uri, $channelName, $username);
     }
 
+    public static function isEnabled(array $configuration): bool
+    {
+        if (getenv('MATTERMOST_ENABLE') !== false && (bool)getenv('MATTERMOST_ENABLE')) {
+            return true;
+        }
+        $extra = $configuration['mattermost'] ?? null;
+        return is_array($extra) && (bool)($extra['enable'] ?? false);
+    }
+
     public function report(UpdateCheckResult $result, IOInterface $io): bool
     {
         $outdatedPackages = $result->getOutdatedPackages();

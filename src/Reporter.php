@@ -74,8 +74,11 @@ class Reporter
             Mattermost::class,
         ];
         $services = [];
+        /** @var ServiceInterface $registeredService */
         foreach ($registeredServices as $registeredService) {
-            $services[] = call_user_func([$registeredService, 'fromConfiguration'], $this->configuration);
+            if ($registeredService::isEnabled($this->configuration)) {
+                $services[] = $registeredService::fromConfiguration($this->configuration);
+            }
         }
         return $services;
     }
