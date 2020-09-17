@@ -21,12 +21,14 @@ namespace EliasHaeussler\ComposerUpdateReporter\Service;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+use Composer\IO\IOInterface;
 use EliasHaeussler\ComposerUpdateCheck\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\UriInterface;
+use Spatie\Emoji\Emoji;
 
 /**
  * Mattermost
@@ -97,13 +99,14 @@ class Mattermost implements ServiceInterface
         return new self($uri, $channelName, $username);
     }
 
-    public function report(UpdateCheckResult $result): bool
+    public function report(UpdateCheckResult $result, IOInterface $io): bool
     {
         $outdatedPackages = $result->getOutdatedPackages();
         $client = new Client(['base_uri' => $this->uri]);
 
         // Do not send report if packages are up to date
         if ($outdatedPackages === []) {
+            $io->write(Emoji::crossMark() . '  Skipped Mattermost report.');
             return true;
         }
 
@@ -122,8 +125,18 @@ class Mattermost implements ServiceInterface
         }
 
         // Send report
+        $io->write(Emoji::rocket() . ' Sending report to Mattermost...');
         $response = $client->post('', [RequestOptions::JSON => $json]);
-        return $response->getStatusCode() < 400;
+        $successful = $response->getStatusCode() < 400;
+
+        // Print report state
+        if ($successful) {
+            $io->write(Emoji::checkMark() . ' Mattermost report was successful.');
+        } else {
+            $io->writeError(Emoji::crossMark() . '  Error during Mattermost report.');
+        }
+
+        return $successful;
     }
 
     /**

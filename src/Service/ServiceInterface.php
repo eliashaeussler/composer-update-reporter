@@ -21,6 +21,7 @@ namespace EliasHaeussler\ComposerUpdateReporter\Service;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+use Composer\IO\IOInterface;
 use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
 
 /**
@@ -39,7 +40,8 @@ interface ServiceInterface
 
     /**
      * @param UpdateCheckResult $result
+     * @param IOInterface $io
      * @return bool
      */
-    public function report(UpdateCheckResult $result): bool;
+    public function report(UpdateCheckResult $result, IOInterface $io): bool;
 }
