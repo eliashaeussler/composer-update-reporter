@@ -1,7 +1,7 @@
 # Composer update reporter plugin
 
 > Composer Plugin to report outdated packages to several external services,
-> based on the Plugin "eliashaeussler/composer-update-report"
+> based on the Plugin "eliashaeussler/composer-update-check"
 
 ## Installation
 
