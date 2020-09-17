@@ -13,7 +13,8 @@
   "require": {
     "composer-plugin-api": "^1.0",
     "eliashaeussler/composer-update-check": "^0.1",
-    "guzzlehttp/guzzle": "^6.0 || ^7.0"
+    "guzzlehttp/guzzle": "^6.0 || ^7.0",
+    "spatie/emoji": "^2.1"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.0"
