@@ -13,6 +13,7 @@ composer req --dev eliashaeussler/composer-update-reporter
 
 ```bash
 # Define Mattermost configuration
+export MATTERMOST_ENABLE=1
 export MATTERMOST_URL=https://mattermost.example.org/hooks/5scqqjpgw3dzipuawi8fp19acy
 export MATTERMOST_CHANNEL=alerts
 

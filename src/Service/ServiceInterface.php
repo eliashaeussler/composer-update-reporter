@@ -39,6 +39,12 @@ interface ServiceInterface
     public static function fromConfiguration(array $configuration): self;
 
     /**
+     * @param array $configuration
+     * @return bool
+     */
+    public static function isEnabled(array $configuration): bool;
+
+    /**
      * @param UpdateCheckResult $result
      * @param IOInterface $io
      * @return bool
