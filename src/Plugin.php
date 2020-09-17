@@ -77,7 +77,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     private function loadDependencies(Composer $composer): void
     {
         $vendorDir = $composer->getConfig()->get('vendor-dir');
-        /** @noinspection PhpIncludeInspection */
-        require $vendorDir . '/autoload.php';
+        $autoloadFile = $vendorDir . '/autoload.php';
+        if (file_exists($autoloadFile)) {
+            /** @noinspection PhpIncludeInspection */
+            require $vendorDir . '/autoload.php';
+        }
     }
 }
