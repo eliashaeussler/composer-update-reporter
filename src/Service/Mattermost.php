@@ -115,7 +115,7 @@ class Mattermost implements ServiceInterface
 
         // Do not send report if packages are up to date
         if ($outdatedPackages === []) {
-            $io->write(Emoji::crossMark() . '  Skipped Mattermost report.');
+            $io->write(Emoji::crossMark() . ' Skipped Mattermost report.');
             return true;
         }
 
@@ -142,7 +142,7 @@ class Mattermost implements ServiceInterface
         if ($successful) {
             $io->write(Emoji::checkMark() . ' Mattermost report was successful.');
         } else {
-            $io->writeError(Emoji::crossMark() . '  Error during Mattermost report.');
+            $io->writeError(Emoji::crossMark() . ' Error during Mattermost report.');
         }
 
         return $successful;
