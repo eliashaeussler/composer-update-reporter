@@ -5,7 +5,7 @@ namespace EliasHaeussler\ComposerUpdateReporter\Service;
 /*
  * This file is part of the Composer package "eliashaeussler/composer-update-reporter".
  *
- * Copyright (C) 2020 Elias Häußler <e.haeussler@familie-redlich.de>
+ * Copyright (C) 2020 Elias Häußler <elias@haeussler.dev>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
 /**
  * ServiceInterface
  *
- * @author Elias Häußler <e.haeussler@familie-redlich.de>
+ * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
 interface ServiceInterface
