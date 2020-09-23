@@ -60,6 +60,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     public function onPostUpdateCheck(CommandEvent $event): void
     {
         if ($event instanceof PostUpdateCheckEvent) {
+            if ($event->getInput()->hasOption('json')) {
+                $this->reporter->setJson($event->getInput()->getOption('json'));
+            }
             $this->reporter->report($event->getUpdateCheckResult());
         }
     }

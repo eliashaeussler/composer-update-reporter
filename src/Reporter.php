@@ -46,14 +46,26 @@ class Reporter
     private $io;
 
     /**
+     * @var bool
+     */
+    private $json;
+
+    /**
+     * @var string[]
+     */
+    private $registeredServices;
+
+    /**
      * @var array
      */
     private $configuration;
 
-    public function __construct(Composer $composer, IOInterface $io)
+    public function __construct(Composer $composer, IOInterface $io, bool $json = false)
     {
         $this->composer = $composer;
         $this->io = $io;
+        $this->json = $json;
+        $this->registeredServices = $this->getDefaultServices();
         $this->configuration = $this->resolveConfiguration();
     }
 
@@ -61,6 +73,7 @@ class Reporter
     {
         $services = $this->buildServicesFromConfiguration();
         foreach ($services as $service) {
+            $service->setJson($this->json);
             $service->report($result, $this->io);
         }
     }
@@ -70,17 +83,35 @@ class Reporter
      */
     private function buildServicesFromConfiguration(): array
     {
-        $registeredServices = [
-            Mattermost::class,
-        ];
         $services = [];
         /** @var ServiceInterface $registeredService */
-        foreach ($registeredServices as $registeredService) {
+        foreach ($this->registeredServices as $registeredService) {
+            if (!in_array(ServiceInterface::class, class_implements($registeredService), true)) {
+                throw new \InvalidArgumentException(
+                    sprintf('Service "%s" must implement "%s".', $registeredService, ServiceInterface::class),
+                    1600814017
+                );
+            }
             if ($registeredService::isEnabled($this->configuration)) {
-                $services[] = $registeredService::fromConfiguration($this->configuration);
+                $service = $registeredService::fromConfiguration($this->configuration);
+                $service->setJson($this->json);
+                $services[] = $service;
             }
         }
         return $services;
+    }
+
+    public function setJson(bool $json): self
+    {
+        $this->json = $json;
+        return $this;
+    }
+
+    private function getDefaultServices(): array
+    {
+        return [
+            Mattermost::class,
+        ];
     }
 
     private function resolveConfiguration(): array

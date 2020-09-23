@@ -50,4 +50,10 @@ interface ServiceInterface
      * @return bool
      */
     public function report(UpdateCheckResult $result, IOInterface $io): bool;
+
+    /**
+     * @param bool $json
+     * @return static
+     */
+    public function setJson(bool $json): self;
 }

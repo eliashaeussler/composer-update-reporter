@@ -53,6 +53,11 @@ class Mattermost implements ServiceInterface
      */
     private $username;
 
+    /**
+     * @var bool
+     */
+    private $json = false;
+
     public function __construct(UriInterface $uri, string $channelName, string $username = null)
     {
         $this->uri = $uri;
@@ -115,12 +120,14 @@ class Mattermost implements ServiceInterface
 
         // Do not send report if packages are up to date
         if ($outdatedPackages === []) {
-            $io->write(Emoji::crossMark() . ' Skipped Mattermost report.');
+            if (!$this->json) {
+                $io->write(Emoji::crossMark() . ' Skipped Mattermost report.');
+            }
             return true;
         }
 
-        // Build JSON
-        $json = [
+        // Build JSON payload
+        $payload = [
             'channel' => $this->channelName,
             'attachments' => [
                 [
@@ -130,19 +137,21 @@ class Mattermost implements ServiceInterface
             ],
         ];
         if ($this->username !== null) {
-            $json['username'] = $this->username;
+            $payload['username'] = $this->username;
         }
 
         // Send report
-        $io->write(Emoji::rocket() . ' Sending report to Mattermost...');
-        $response = $client->post('', [RequestOptions::JSON => $json]);
+        if (!$this->json) {
+            $io->write(Emoji::rocket() . ' Sending report to Mattermost...');
+        }
+        $response = $this->client->post('', [RequestOptions::JSON => $payload]);
         $successful = $response->getStatusCode() < 400;
 
         // Print report state
-        if ($successful) {
-            $io->write(Emoji::checkMark() . ' Mattermost report was successful.');
-        } else {
+        if (!$successful) {
             $io->writeError(Emoji::crossMark() . ' Error during Mattermost report.');
+        } else if (!$this->json) {
+            $io->write(Emoji::checkMark() . ' Mattermost report was successful.');
         }
 
         return $successful;
@@ -170,5 +179,11 @@ class Mattermost implements ServiceInterface
             );
         }
         return implode(PHP_EOL, $textParts);
+    }
+
+    public function setJson(bool $json): ServiceInterface
+    {
+        $this->json = $json;
+        return $this;
     }
 }
