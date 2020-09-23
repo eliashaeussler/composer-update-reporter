@@ -108,6 +108,12 @@ class Reporter
         return $this;
     }
 
+    public function setRegisteredServices(array $registeredServices): self
+    {
+        $this->registeredServices = $registeredServices;
+        return $this;
+    }
+
     private function getDefaultServices(): array
     {
         return [
