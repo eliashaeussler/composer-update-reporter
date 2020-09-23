@@ -104,7 +104,9 @@ services using the dispatched event.
 composer update-check
 ```
 
-## Run tests
+## Development
+
+### Preparation
 
 ```bash
 # Clone repository
@@ -113,9 +115,41 @@ cd composer-update-reporter
 
 # Install Composer dependencies
 composer install
+```
 
-# Run all tests
+### Run tests
+
+Unit tests of this plugin can be executed using the provided Composer
+script `test`. You can pass all available arguments to PHPUnit.
+
+```bash
+# Run tests
 composer test
+
+# Run tests and print coverage result
+composer test -- --coverage-text
+```
+
+### Simulate application
+
+A Composer script `simulate` exists which lets you test the update
+check reporter, which is provided by this plugin. All parameters
+passed to the script will be redirected to the relevant Composer
+command `update-check`.
+
+```bash
+# Run "composer update-check" command without parameters
+composer simulate
+
+# Pass parameters to "composer update-check" command
+composer simulate -- -i "composer/*"
+composer simulate -- --no-dev
+```
+
+Alternatively, this script can be called without Composer context:
+
+```bash
+./bin/simulate-application.sh
 ```
 
 ## License

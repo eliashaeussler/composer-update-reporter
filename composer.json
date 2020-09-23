@@ -17,7 +17,9 @@
     "spatie/emoji": "^2.0"
   },
   "require-dev": {
-    "phpunit/phpunit": "^9.0"
+    "composer/composer": "^1.0",
+    "phpunit/phpunit": "^7.0 || ^8.0 || ^9.0",
+    "phpspec/prophecy-phpunit": "^2.0"
   },
   "extra": {
     "class": "EliasHaeussler\\ComposerUpdateReporter\\Plugin"
@@ -33,6 +35,8 @@
     }
   },
   "scripts": {
-    "test": "phpunit -c phpunit.xml"
+    "test": "phpunit -c phpunit.xml",
+    "test:ci": "@php -d pcov.enabled=1 -d pcov.directory=src -d memory_limit=-1 vendor/bin/phpunit -c phpunit.ci.xml",
+    "simulate": "bin/simulate-application.sh"
   }
 }

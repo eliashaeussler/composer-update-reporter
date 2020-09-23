@@ -1,0 +1,21 @@
+{
+  "require-dev": {
+    "eliashaeussler/composer-update-check": "^0.3",
+    "phpunit/phpunit": "^5.0"
+  },
+  "extra": {
+    "update-check": {
+      "gitlab": {
+        "enable": true,
+        "url": "https://gitlab.example.org/vendor/project/alerts/notify.json",
+        "authKey": "5scqqjpgw3dzipuawi8fp19acy"
+      },
+      "mattermost": {
+        "enable": true,
+        "url": "https://mattermost.example.org/hooks/5scqqjpgw3dzipuawi8fp19acy",
+        "channel": "alerts",
+        "username": "alertbot"
+      }
+    }
+  }
+}

@@ -54,6 +54,11 @@ class Mattermost implements ServiceInterface
     private $username;
 
     /**
+     * @var Client
+     */
+    private $client;
+
+    /**
      * @var bool
      */
     private $json = false;
@@ -63,6 +68,7 @@ class Mattermost implements ServiceInterface
         $this->uri = $uri;
         $this->channelName = $channelName;
         $this->username = $username;
+        $this->client = new Client(['base_uri' => (string) $this->uri]);
 
         $this->validateUri();
         $this->validateChannelName();
@@ -119,7 +125,6 @@ class Mattermost implements ServiceInterface
     public function report(UpdateCheckResult $result, IOInterface $io): bool
     {
         $outdatedPackages = $result->getOutdatedPackages();
-        $client = new Client(['base_uri' => $this->uri]);
 
         // Do not send report if packages are up to date
         if ($outdatedPackages === []) {
@@ -182,6 +187,21 @@ class Mattermost implements ServiceInterface
             );
         }
         return implode(PHP_EOL, $textParts);
+    }
+
+    public function getUri(): UriInterface
+    {
+        return $this->uri;
+    }
+
+    public function getChannelName(): string
+    {
+        return $this->channelName;
+    }
+
+    public function getUsername(): ?string
+    {
+        return $this->username;
     }
 
     public function setJson(bool $json): ServiceInterface
