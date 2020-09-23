@@ -63,6 +63,9 @@ class Mattermost implements ServiceInterface
         $this->uri = $uri;
         $this->channelName = $channelName;
         $this->username = $username;
+
+        $this->validateUri();
+        $this->validateChannelName();
     }
 
     public static function fromConfiguration(array $configuration): ServiceInterface
@@ -185,5 +188,23 @@ class Mattermost implements ServiceInterface
     {
         $this->json = $json;
         return $this;
+    }
+
+    private function validateUri(): void
+    {
+        $uri = (string) $this->uri;
+        if (trim($uri) === '') {
+            throw new \InvalidArgumentException('Mattermost URL must not be empty.', 1600793015);
+        }
+        if (filter_var($uri, FILTER_VALIDATE_URL) === false) {
+            throw new \InvalidArgumentException('Mattermost URL is no valid URL.', 1600792942);
+        }
+    }
+
+    private function validateChannelName(): void
+    {
+        if (trim($this->channelName) === '') {
+            throw new \InvalidArgumentException('Mattermost channel name must not be empty.', 1600793071);
+        }
     }
 }
