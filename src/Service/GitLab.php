@@ -29,6 +29,7 @@ use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\UriInterface;
 use Spatie\Emoji\Emoji;
+use Spatie\Emoji\Exceptions\UnknownCharacter;
 
 /**
  * GitLab
@@ -142,7 +143,12 @@ class GitLab implements ServiceInterface
         if (!$successful) {
             $io->writeError(Emoji::crossMark() . ' Error during GitLab report.');
         } else if (!$this->json) {
-            $io->write(Emoji::checkMark() . ' GitLab report was successful.');
+            try {
+                $checkMark = Emoji::checkMark();
+            } /** @noinspection PhpRedundantCatchClauseInspection */ catch (UnknownCharacter $e) {
+                $checkMark = Emoji::heavyCheckMark();
+            }
+            $io->write($checkMark . ' GitLab report was successful.');
         }
 
         return $successful;
