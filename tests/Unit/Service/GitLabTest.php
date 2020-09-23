@@ -32,7 +32,6 @@ use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\RequestOptions;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * GitLabTest
@@ -42,7 +41,6 @@ use Prophecy\PhpUnit\ProphecyTrait;
  */
 class GitLabTest extends TestCase
 {
-    use ProphecyTrait;
     use TestEnvironmentTrait;
 
     /**

@@ -33,7 +33,6 @@ use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\RequestOptions;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * MattermostTest
@@ -43,7 +42,6 @@ use Prophecy\PhpUnit\ProphecyTrait;
  */
 class MattermostTest extends TestCase
 {
-    use ProphecyTrait;
     use TestEnvironmentTrait;
 
     /**

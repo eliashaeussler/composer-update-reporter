@@ -28,7 +28,6 @@ use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateReporter\Reporter;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\Fixtures\Service\DummyService;
 use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * ReporterTest
@@ -38,7 +37,6 @@ use Prophecy\PhpUnit\ProphecyTrait;
  */
 class ReporterTest extends TestCase
 {
-    use ProphecyTrait;
     use TestApplicationTrait;
 
     /**
