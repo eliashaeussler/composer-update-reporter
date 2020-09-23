@@ -1,3 +1,6 @@
+[![Pipeline](https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter/badges/master/pipeline.svg)](https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter/-/pipelines)
+[![Coverage](https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter/badges/master/coverage.svg)](https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter/-/pipelines)
+
 # Composer update reporter plugin
 
 > Composer Plugin to report outdated packages to several external services,
