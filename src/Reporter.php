@@ -24,6 +24,7 @@ namespace EliasHaeussler\ComposerUpdateReporter;
 use Composer\Composer;
 use Composer\IO\IOInterface;
 use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
+use EliasHaeussler\ComposerUpdateReporter\Service\GitLab;
 use EliasHaeussler\ComposerUpdateReporter\Service\Mattermost;
 use EliasHaeussler\ComposerUpdateReporter\Service\ServiceInterface;
 
@@ -110,6 +111,7 @@ class Reporter
     private function getDefaultServices(): array
     {
         return [
+            GitLab::class,
             Mattermost::class,
         ];
     }

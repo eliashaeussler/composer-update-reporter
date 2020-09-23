@@ -11,6 +11,7 @@ composer req --dev eliashaeussler/composer-update-reporter
 
 ## Supported services
 
+* [GitLab](#gitlab)
 * [Mattermost](#mattermost)
 
 ## Configuration
@@ -33,7 +34,21 @@ section like follows:
 }
 ```
 
+### GitLab
+
+Learn more about GitLab Alerts in the
+[official documentation](https://docs.gitlab.com/ee/operations/incident_management/generic_alerts.html).
+
+| `composer.json` config key | Environment variable | Type | Required |
+| -------------------------- | -------------------- | ---- | -------- |
+| `gitlab.enable` | `GITLAB_ENABLE` | `bool` | yes |
+| `gitlab.url` | `GITLAB_URL` | `string` | yes |
+| `gitlab.authKey` | `GITLAB_AUTH_KEY` | `string` | yes |
+
 ### Mattermost
+
+Learn more about Mattermost webhooks in the
+[offical documentation](https://docs.mattermost.com/developer/webhooks-incoming.html).
 
 | `composer.json` config key | Environment variable | Type | Required |
 | -------------------------- | -------------------- | ---- | -------- |
@@ -50,6 +65,11 @@ Example configuration in `composer.json`:
 {
   "extra": {
     "update-check": {
+      "gitlab": {
+        "enable": true,
+        "url": "https://gitlab.example.org/vendor/project/alerts/notify.json",
+        "authKey": "5scqqjpgw3dzipuawi8fp19acy"
+      },
       "mattermost": {
         "enable": true,
         "url": "https://mattermost.example.org/hooks/5scqqjpgw3dzipuawi8fp19acy",
@@ -64,6 +84,10 @@ Example configuration in `composer.json`:
 Example configuration using environment variables:
 
 ```bash
+GITLAB_ENABLE=1
+GITLAB_URL="https://gitlab.example.org/vendor/project/alerts/notify.json"
+GITLAB_AUTH_KEY="5scqqjpgw3dzipuawi8fp19acy"
+
 MATTERMOST_ENABLE=1
 MATTERMOST_URL="https://mattermost.example.org/hooks/5scqqjpgw3dzipuawi8fp19acy"
 MATTERMOST_CHANNEL="alerts"
