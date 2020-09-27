@@ -315,4 +315,10 @@ class GitLabTest extends AbstractTestCase
             ],
         ];
     }
+
+    protected function tearDown(): void
+    {
+        $this->restoreEnvironmentVariables();
+        parent::tearDown();
+    }
 }
