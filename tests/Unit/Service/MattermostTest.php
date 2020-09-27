@@ -25,13 +25,13 @@ use Composer\IO\BufferIO;
 use EliasHaeussler\ComposerUpdateCheck\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateReporter\Service\Mattermost;
+use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\TestEnvironmentTrait;
 use EliasHaeussler\ComposerUpdateReporter\Util;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\RequestOptions;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 
 /**
@@ -40,14 +40,14 @@ use Prophecy\Argument;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class MattermostTest extends TestCase
+class MattermostTest extends AbstractTestCase
 {
     use TestEnvironmentTrait;
 
     /**
      * @var Mattermost
      */
-    private $subject;
+    protected $subject;
 
     protected function setUp(): void
     {
@@ -341,5 +341,6 @@ class MattermostTest extends TestCase
     protected function tearDown(): void
     {
         $this->restoreEnvironmentVariables();
+        parent::tearDown();
     }
 }

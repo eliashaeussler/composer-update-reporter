@@ -22,7 +22,6 @@ namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit;
  */
 
 use EliasHaeussler\ComposerUpdateReporter\Util;
-use PHPUnit\Framework\TestCase;
 
 /**
  * UtilTest
@@ -30,7 +29,7 @@ use PHPUnit\Framework\TestCase;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class UtilTest extends TestCase
+class UtilTest extends AbstractTestCase
 {
     /**
      * @test

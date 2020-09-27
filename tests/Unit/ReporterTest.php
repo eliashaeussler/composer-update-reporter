@@ -27,7 +27,6 @@ use Composer\IO\NullIO;
 use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateReporter\Reporter;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\Fixtures\Service\DummyService;
-use PHPUnit\Framework\TestCase;
 
 /**
  * ReporterTest
@@ -35,19 +34,19 @@ use PHPUnit\Framework\TestCase;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class ReporterTest extends TestCase
+class ReporterTest extends AbstractTestCase
 {
     use TestApplicationTrait;
 
     /**
      * @var Reporter
      */
-    private $subject;
+    protected $subject;
 
     /**
      * @var Composer
      */
-    private $composer;
+    protected $composer;
 
     protected function setUp(): void
     {
@@ -113,5 +112,7 @@ class ReporterTest extends TestCase
         DummyService::$enabled = true;
         DummyService::$reportWasExecuted = false;
         DummyService::$json = false;
+
+        parent::tearDown();
     }
 }

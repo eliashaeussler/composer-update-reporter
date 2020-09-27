@@ -25,12 +25,12 @@ use Composer\IO\BufferIO;
 use EliasHaeussler\ComposerUpdateCheck\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateReporter\Service\GitLab;
+use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\TestEnvironmentTrait;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\RequestOptions;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 
 /**
@@ -39,14 +39,14 @@ use Prophecy\Argument;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class GitLabTest extends TestCase
+class GitLabTest extends AbstractTestCase
 {
     use TestEnvironmentTrait;
 
     /**
      * @var GitLab
      */
-    private $subject;
+    protected $subject;
 
     protected function setUp(): void
     {
