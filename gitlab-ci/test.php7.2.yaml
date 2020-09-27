@@ -1,0 +1,17 @@
+test:php7.2:v0.1:
+  <<: *test-template
+  variables:
+    PHP_VERSION: "7.2"
+    UPDATE_CHECK_VERSION: "^0.1"
+
+test:php7.2:v0.2:
+  <<: *test-template
+  variables:
+    PHP_VERSION: "7.2"
+    UPDATE_CHECK_VERSION: "^0.2"
+
+test:php7.2:v0.3:
+  <<: *test-template
+  variables:
+    PHP_VERSION: "7.2"
+    UPDATE_CHECK_VERSION: "^0.3"

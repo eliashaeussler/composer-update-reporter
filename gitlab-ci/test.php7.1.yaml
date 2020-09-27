@@ -1,0 +1,20 @@
+test:php7.1:v0.1:
+  <<: *test-template
+  variables:
+    TEST_COMPATIBILITY: "1"
+    PHP_VERSION: "7.1"
+    UPDATE_CHECK_VERSION: "^0.1"
+
+test:php7.1:v0.2:
+  <<: *test-template
+  variables:
+    TEST_COMPATIBILITY: "1"
+    PHP_VERSION: "7.1"
+    UPDATE_CHECK_VERSION: "^0.2"
+
+test:php7.1:v0.3:
+  <<: *test-template
+  variables:
+    TEST_COMPATIBILITY: "1"
+    PHP_VERSION: "7.1"
+    UPDATE_CHECK_VERSION: "^0.3"
