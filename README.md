@@ -106,6 +106,11 @@ Example configuration in `composer.json`:
 Example configuration using environment variables:
 
 ```bash
+EMAIL_ENABLE=1
+EMAIL_DSN="smtp://foo:baz@smtp.example.com:25"
+EMAIL_RECEIVERS="john@example.org, marc@example.org"
+EMAIL_SENDER="alerts@example.org"
+
 GITLAB_ENABLE=1
 GITLAB_URL="https://gitlab.example.org/vendor/project/alerts/notify.json"
 GITLAB_AUTH_KEY="5scqqjpgw3dzipuawi8fp19acy"
