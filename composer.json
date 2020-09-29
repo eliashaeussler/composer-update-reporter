@@ -15,11 +15,14 @@
     "composer-plugin-api": "^1.0",
     "eliashaeussler/composer-update-check": "^0.1 || ^0.2 || ^0.3",
     "guzzlehttp/guzzle": "^6.0 || ^7.0",
-    "spatie/emoji": "^2.0"
+    "spatie/emoji": "^2.0",
+    "symfony/mailer": "^4.4 || ^5.0"
   },
   "require-dev": {
     "composer/composer": "^1.0",
-    "phpunit/phpunit": "^7.0 || ^8.0 || ^9.0"
+    "phpunit/phpunit": "^7.0 || ^8.0 || ^9.0",
+    "rpkamp/mailhog-client": "^0.3 || ^0.4 || ^0.5",
+    "nyholm/psr7": "^1.3"
   },
   "extra": {
     "class": "EliasHaeussler\\ComposerUpdateReporter\\Plugin"
@@ -35,7 +38,11 @@
     }
   },
   "scripts": {
-    "test": "phpunit -c phpunit.xml",
+    "test": [
+      "docker-compose -f tests/Build/docker-compose.yml up -d",
+      "phpunit -c phpunit.xml",
+      "docker-compose -f tests/Build/docker-compose.yml down"
+    ],
     "test:ci": "@php -d pcov.enabled=1 -d pcov.directory=src -d memory_limit=-1 vendor/bin/phpunit -c phpunit.ci.xml",
     "simulate": "bin/simulate-application.sh"
   }

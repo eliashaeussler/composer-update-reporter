@@ -5,6 +5,12 @@
   },
   "extra": {
     "update-check": {
+      "email": {
+        "enable": true,
+        "dsn": "smtp://foo:baz@smtp.example.com:25",
+        "receiver": "john@example.org",
+        "sender": "alerts@example.org"
+      },
       "gitlab": {
         "enable": true,
         "url": "https://gitlab.example.org/vendor/project/alerts/notify.json",

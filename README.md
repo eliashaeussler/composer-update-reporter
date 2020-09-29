@@ -14,6 +14,7 @@ composer req --dev eliashaeussler/composer-update-reporter
 
 ## Supported services
 
+* [Email](#email)
 * [GitLab](#gitlab)
 * [Mattermost](#mattermost)
 
@@ -36,6 +37,18 @@ section like follows:
   }
 }
 ```
+
+### Email
+
+Email reports are being processed using the [Symfony Mailer](https://packagist.org/packages/symfony/mailer).
+Consult the [official documentation](https://symfony.com/doc/current/mailer.html) for help regarding DSN.
+
+| `composer.json` config key | Environment variable | Type | Required |
+| -------------------------- | -------------------- | ---- | -------- |
+| `email.enable` | `EMAIL_ENABLE` | `bool` | yes |
+| `email.dsn` | `EMAIL_DSN` | `string` | yes |
+| `email.receiver` | `EMAIL_RECEIVER` | `string` | yes |
+| `email.sender` | `EMAIL_SENDER` | `string` | yes |
 
 ### GitLab
 
@@ -68,6 +81,12 @@ Example configuration in `composer.json`:
 {
   "extra": {
     "update-check": {
+      "email": {
+        "enable": true,
+        "dsn": "smtp://foo:baz@smtp.example.com:25",
+        "receiver": "john@example.org",
+        "sender": "alerts@example.org"
+      },
       "gitlab": {
         "enable": true,
         "url": "https://gitlab.example.org/vendor/project/alerts/notify.json",
@@ -108,6 +127,10 @@ composer update-check
 ```
 
 ## Development
+
+### Requirements
+
+* [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/)
 
 ### Preparation
 

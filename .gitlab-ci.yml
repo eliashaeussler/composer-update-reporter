@@ -14,10 +14,16 @@ stages:
 .test: &test-template
   stage: test
   image: webdevops/php:${PHP_VERSION}
+  services:
+    - name: mailhog/mailhog
+      alias: mailhog
   before_script:
     - pecl install pcov
     - docker-php-ext-enable pcov
   script:
+    - export MAILHOG_HOST=mailhog
+    - export MAILHOG_SMTP_PORT=1025
+    - export MAILHOG_API_PORT=8025
     - >
       if [[ $TEST_COMPATIBILITY ]]; then
         composer require --dev pcov/clobber
