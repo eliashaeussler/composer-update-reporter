@@ -8,7 +8,7 @@
       "email": {
         "enable": true,
         "dsn": "smtp://foo:baz@smtp.example.com:25",
-        "receiver": "john@example.org",
+        "receivers": "john@example.org, marc@example.org",
         "sender": "alerts@example.org"
       },
       "gitlab": {

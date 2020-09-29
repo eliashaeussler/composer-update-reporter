@@ -47,7 +47,7 @@ Consult the [official documentation](https://symfony.com/doc/current/mailer.html
 | -------------------------- | -------------------- | ---- | -------- |
 | `email.enable` | `EMAIL_ENABLE` | `bool` | yes |
 | `email.dsn` | `EMAIL_DSN` | `string` | yes |
-| `email.receiver` | `EMAIL_RECEIVER` | `string` | yes |
+| `email.receivers` | `EMAIL_RECEIVERS` | `string` (comma-separated list) | yes |
 | `email.sender` | `EMAIL_SENDER` | `string` | yes |
 
 ### GitLab
@@ -84,7 +84,7 @@ Example configuration in `composer.json`:
       "email": {
         "enable": true,
         "dsn": "smtp://foo:baz@smtp.example.com:25",
-        "receiver": "john@example.org",
+        "receivers": "john@example.org, marc@example.org",
         "sender": "alerts@example.org"
       },
       "gitlab": {

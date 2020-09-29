@@ -44,9 +44,9 @@ class Email implements ServiceInterface
     private $transport;
 
     /**
-     * @var string
+     * @var array
      */
-    private $receiver;
+    private $receivers;
 
     /**
      * @var string
@@ -58,13 +58,13 @@ class Email implements ServiceInterface
      */
     private $json = false;
 
-    public function __construct(string $dsn, string $receiver, string $sender)
+    public function __construct(string $dsn, array $receivers, string $sender)
     {
         $this->transport = Transport::fromDsn($dsn);
-        $this->receiver = $receiver;
+        $this->receivers = $receivers;
         $this->sender = $sender;
 
-        $this->validateReceiver();
+        $this->validateReceivers();
         $this->validateSender();
     }
 
@@ -84,14 +84,14 @@ class Email implements ServiceInterface
             );
         }
 
-        // Parse Email receiver
-        if (is_array($extra) && array_key_exists('receiver', $extra)) {
-            $receiver = (string)$extra['receiver'];
-        } else if (getenv('EMAIL_RECEIVER') !== false) {
-            $receiver = getenv('EMAIL_RECEIVER');
+        // Parse Email receivers
+        if (is_array($extra) && array_key_exists('receivers', $extra)) {
+            $receivers = explode(',', (string)$extra['receivers']);
+        } else if (getenv('EMAIL_RECEIVERS') !== false) {
+            $receivers = explode(',', getenv('EMAIL_RECEIVERS'));
         } else {
             throw new \RuntimeException(
-                'Email receiver is not defined. Define it either in composer.json or as $EMAIL_RECEIVER.',
+                'Email receivers are not defined. Define it either in composer.json or as $EMAIL_RECEIVERS.',
                 1601391943
             );
         }
@@ -108,7 +108,7 @@ class Email implements ServiceInterface
             );
         }
 
-        return new self($dsn, $receiver, $sender);
+        return new self($dsn, array_map('trim', array_filter($receivers)), $sender);
     }
 
     public static function isEnabled(array $configuration): bool
@@ -143,7 +143,7 @@ class Email implements ServiceInterface
         // Send email
         $email = (new SymfonyEmail())
             ->from($this->sender)
-            ->to($this->receiver)
+            ->to(...$this->receivers)
             ->subject($subject)
             ->text($body)
             ->html($html);
@@ -226,9 +226,9 @@ class Email implements ServiceInterface
         return $this->transport;
     }
 
-    public function getReceiver(): string
+    public function getReceivers(): array
     {
-        return $this->receiver;
+        return $this->receivers;
     }
 
     public function getSender(): string
@@ -242,13 +242,18 @@ class Email implements ServiceInterface
         return $this;
     }
 
-    private function validateReceiver(): void
+    private function validateReceivers(): void
     {
-        if (trim($this->receiver) === '') {
-            throw new \InvalidArgumentException('Email receiver must not be empty.', 1601395103);
+        if ($this->receivers === []) {
+            throw new \InvalidArgumentException('Email receivers must not be empty.', 1601395103);
         }
-        if (filter_var($this->receiver, FILTER_VALIDATE_EMAIL) === false) {
-            throw new \InvalidArgumentException('Email receiver is no valid email address.', 1601395301);
+        foreach ($this->receivers as $receiver) {
+            if (filter_var($receiver, FILTER_VALIDATE_EMAIL) === false) {
+                throw new \InvalidArgumentException(
+                    sprintf('Email receiver "%s" is no valid email address.', $receiver),
+                    1601395301
+                );
+            }
         }
     }
 

@@ -72,19 +72,19 @@ class EmailTest extends AbstractTestCase
 
     protected function setUp(): void
     {
-        $this->subject = new Email(static::$mailhogSmtp, 'foo@example.org', 'baz@example.org');
+        $this->subject = new Email(static::$mailhogSmtp, ['foo@example.org'], 'baz@example.org');
         $this->mailhog = new MailhogClient(new HttplugClient(), new HttplugClient(), static::$mailhogApi);
     }
 
     /**
      * @test
      */
-    public function constructorThrowsExceptionIfReceiverIsEmpty(): void
+    public function constructorThrowsExceptionIfReceiversAreEmpty(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionCode(1601395103);
 
-        new Email(static::$mailhogSmtp, '', 'foo');
+        new Email(static::$mailhogSmtp, [], 'foo');
     }
 
     /**
@@ -95,7 +95,7 @@ class EmailTest extends AbstractTestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionCode(1601395301);
 
-        new Email(static::$mailhogSmtp, 'foo', 'foo');
+        new Email(static::$mailhogSmtp, ['foo'], 'foo');
     }
 
     /**
@@ -106,7 +106,7 @@ class EmailTest extends AbstractTestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionCode(1601395109);
 
-        new Email(static::$mailhogSmtp, 'foo@foo.com', '');
+        new Email(static::$mailhogSmtp, ['foo@foo.com'], '');
     }
 
     /**
@@ -117,7 +117,7 @@ class EmailTest extends AbstractTestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionCode(1601395313);
 
-        new Email(static::$mailhogSmtp, 'foo@foo.com', 'foo');
+        new Email(static::$mailhogSmtp, ['foo@foo.com'], 'foo');
     }
 
     /**
@@ -138,9 +138,9 @@ class EmailTest extends AbstractTestCase
     /**
      * @test
      */
-    public function fromConfigurationThrowsExceptionIfEmailReceiverIsNotSet(): void
+    public function fromConfigurationThrowsExceptionIfEmailReceiversAreNotSet(): void
     {
-        $this->modifyEnvironmentVariable('EMAIL_RECEIVER');
+        $this->modifyEnvironmentVariable('EMAIL_RECEIVERS');
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionCode(1601391943);
@@ -166,7 +166,7 @@ class EmailTest extends AbstractTestCase
         $configuration = [
             'email' => [
                 'dsn' => static::$mailhogSmtp,
-                'receiver' => 'foo@foo.com',
+                'receivers' => 'foo@foo.com',
             ],
         ];
         Email::fromConfiguration($configuration);
@@ -178,13 +178,13 @@ class EmailTest extends AbstractTestCase
     public function fromConfigurationReadsConfigurationFromComposerJson(): void
     {
         $this->modifyEnvironmentVariable('EMAIL_DSN');
-        $this->modifyEnvironmentVariable('EMAIL_RECEIVER');
+        $this->modifyEnvironmentVariable('EMAIL_RECEIVERS');
         $this->modifyEnvironmentVariable('EMAIL_SENDER');
 
         $configuration = [
             'email' => [
                 'dsn' => static::$mailhogSmtp,
-                'receiver' => 'foo@foo.com',
+                'receivers' => 'foo@foo.com, foo@another-foo.com',
                 'sender' => 'baz@baz.com',
             ],
         ];
@@ -198,7 +198,7 @@ class EmailTest extends AbstractTestCase
         static::assertSame('', $transport->getPassword());
         static::assertSame(static::$mailhogHost, $transport->getStream()->getHost());
         static::assertSame(static::$mailhogSmtpPort, $transport->getStream()->getPort());
-        static::assertSame('foo@foo.com', $subject->getReceiver());
+        static::assertSame(['foo@foo.com', 'foo@another-foo.com'], $subject->getReceivers());
         static::assertSame('baz@baz.com', $subject->getSender());
     }
 
@@ -208,7 +208,7 @@ class EmailTest extends AbstractTestCase
     public function fromConfigurationReadsConfigurationFromEnvironmentVariables(): void
     {
         $this->modifyEnvironmentVariable('EMAIL_DSN', static::$mailhogSmtp);
-        $this->modifyEnvironmentVariable('EMAIL_RECEIVER', 'foo@foo.com');
+        $this->modifyEnvironmentVariable('EMAIL_RECEIVERS', 'foo@foo.com, foo@another-foo.com');
         $this->modifyEnvironmentVariable('EMAIL_SENDER', 'baz@baz.com');
 
         /** @var Email $subject */
@@ -221,7 +221,7 @@ class EmailTest extends AbstractTestCase
         static::assertSame('', $transport->getPassword());
         static::assertSame(static::$mailhogHost, $transport->getStream()->getHost());
         static::assertSame(static::$mailhogSmtpPort, $transport->getStream()->getPort());
-        static::assertSame('foo@foo.com', $subject->getReceiver());
+        static::assertSame(['foo@foo.com', 'foo@another-foo.com'], $subject->getReceivers());
         static::assertSame('baz@baz.com', $subject->getSender());
     }
 
@@ -329,7 +329,7 @@ class EmailTest extends AbstractTestCase
                 [
                     'email' => [
                         'sender' => 'foo',
-                        'receiver' => 'baz',
+                        'receivers' => 'baz',
                     ],
                 ],
             ],
