@@ -163,6 +163,7 @@ class Mattermost implements ServiceInterface
             try {
                 $checkMark = Emoji::checkMark();
             } /** @noinspection PhpRedundantCatchClauseInspection */ catch (UnknownCharacter $e) {
+                /** @noinspection PhpUndefinedMethodInspection */
                 $checkMark = Emoji::heavyCheckMark();
             }
             $io->write($checkMark . ' Mattermost report was successful.');
@@ -184,11 +185,16 @@ class Mattermost implements ServiceInterface
             '|:------- |:--------------- |:----------- |',
         ];
         foreach ($outdatedPackages as $outdatedPackage) {
+            $insecure = '';
+            if (method_exists($outdatedPackage, 'isInsecure') && $outdatedPackage->isInsecure()) {
+                $insecure = ' :warning: **`insecure`**';
+            }
             $textParts[] = sprintf(
-                '| [%s](https://packagist.org/packages/%s) | %s | **%s** |',
+                '| [%s](https://packagist.org/packages/%s) | %s%s | **%s** |',
                 $outdatedPackage->getName(),
                 $outdatedPackage->getName(),
                 $outdatedPackage->getOutdatedVersion(),
+                $insecure,
                 $outdatedPackage->getNewVersion()
             );
         }

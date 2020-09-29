@@ -146,6 +146,7 @@ class GitLab implements ServiceInterface
             try {
                 $checkMark = Emoji::checkMark();
             } /** @noinspection PhpRedundantCatchClauseInspection */ catch (UnknownCharacter $e) {
+                /** @noinspection PhpUndefinedMethodInspection */
                 $checkMark = Emoji::heavyCheckMark();
             }
             $io->write($checkMark . ' GitLab report was successful.');
@@ -162,9 +163,14 @@ class GitLab implements ServiceInterface
     {
         $payload = [];
         foreach ($outdatedPackages as $outdatedPackage) {
+            $insecure = '';
+            if (method_exists($outdatedPackage, 'isInsecure') && $outdatedPackage->isInsecure()) {
+                $insecure = ' (insecure)';
+            }
             $payload[$outdatedPackage->getName()] = sprintf(
-                'Outdated version: %s, new version: %s',
+                'Outdated version: %s%s, new version: %s',
                 $outdatedPackage->getOutdatedVersion(),
+                $insecure,
                 $outdatedPackage->getNewVersion()
             );
         }
