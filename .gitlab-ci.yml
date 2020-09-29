@@ -18,6 +18,7 @@ stages:
     - name: mailhog/mailhog
       alias: mailhog
   before_script:
+    - pecl channel-update pecl.php.net
     - pecl install pcov
     - docker-php-ext-enable pcov
   script:
