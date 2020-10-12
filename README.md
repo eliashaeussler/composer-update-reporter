@@ -17,6 +17,7 @@ composer req --dev eliashaeussler/composer-update-reporter
 * [Email](#email)
 * [GitLab](#gitlab)
 * [Mattermost](#mattermost)
+* [Slack](#slack)
 
 ## Configuration
 
@@ -73,6 +74,16 @@ Learn more about Mattermost webhooks in the
 | `mattermost.channel` | `MATTERMOST_CHANNEL` | `string` | yes |
 | `mattermost.username` | `MATTERMOST_USERNAME` | `string` | no |
 
+### Slack
+
+Learn more about Incoming Webhooks in the
+[offical Slack documentation](https://api.slack.com/messaging/webhooks).
+
+| `composer.json` config key | Environment variable | Type | Required |
+| -------------------------- | -------------------- | ---- | -------- |
+| `slack.enable` | `SLACK_ENABLE` | `bool` | yes |
+| `slack.url` | `SLACK_URL` | `string` | yes |
+
 ### Example
 
 Example configuration in `composer.json`:
@@ -97,6 +108,10 @@ Example configuration in `composer.json`:
         "url": "https://mattermost.example.org/hooks/5scqqjpgw3dzipuawi8fp19acy",
         "channel": "alerts",
         "username": "alertbot"
+      },
+      "slack": {
+        "enable": true,
+        "url": "https://hooks.slack.com/services/TU5C6A7/B01J/ZG5AR77F/5scqqjpgw3dzipuawi8fp19acy"
       }
     }
   }
@@ -119,6 +134,9 @@ MATTERMOST_ENABLE=1
 MATTERMOST_URL="https://mattermost.example.org/hooks/5scqqjpgw3dzipuawi8fp19acy"
 MATTERMOST_CHANNEL="alerts"
 MATTERMOST_USERNAME="alertbot"
+
+SLACK_ENABLE=1
+SLACK_URL="https://hooks.slack.com/services/TU5C6A7/B01J/ZG5AR77F/5scqqjpgw3dzipuawi8fp19acy"
 ```
 
 ## Usage

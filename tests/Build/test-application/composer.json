@@ -21,6 +21,10 @@
         "url": "https://mattermost.example.org/hooks/5scqqjpgw3dzipuawi8fp19acy",
         "channel": "alerts",
         "username": "alertbot"
+      },
+      "slack": {
+        "enable": true,
+        "url": "https://hooks.slack.com/services/TU5C6A7/B01J/ZG5AR77F/5scqqjpgw3dzipuawi8fp19acy"
       }
     }
   }
