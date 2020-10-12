@@ -28,6 +28,7 @@ use EliasHaeussler\ComposerUpdateReporter\Service\GitLab;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\TestEnvironmentTrait;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\RequestOptions;
@@ -185,11 +186,16 @@ class GitLabTest extends AbstractTestCase
 
     /**
      * @test
+     * @dataProvider reportSendsUpdateReportSuccessfullyDataProvider
+     * @param bool $insecure
+     * @param string $expectedSecurityNotice
+     * @throws GuzzleException
+     * @throws \ReflectionException
      */
-    public function reportSendsUpdateReportSuccessfully(): void
+    public function reportSendsUpdateReportSuccessfully(bool $insecure, string $expectedSecurityNotice): void
     {
         $result = new UpdateCheckResult([
-            new OutdatedPackage('foo/foo', '1.0.0', '1.0.5'),
+            new OutdatedPackage('foo/foo', '1.0.0', '1.0.5', $insecure),
         ]);
         $io = new BufferIO();
 
@@ -198,7 +204,7 @@ class GitLabTest extends AbstractTestCase
         $clientProphecy->post('', [
             RequestOptions::JSON => [
                 'title' => '1 outdated package',
-                'foo/foo' => 'Outdated version: 1.0.0, new version: 1.0.5',
+                'foo/foo' => 'Outdated version: 1.0.0' . $expectedSecurityNotice . ', new version: 1.0.5',
             ],
         ])->willReturn(new Response())->shouldBeCalledOnce();
 
@@ -312,6 +318,20 @@ class GitLabTest extends AbstractTestCase
                 [],
                 '1',
                 true,
+            ],
+        ];
+    }
+
+    public function reportSendsUpdateReportSuccessfullyDataProvider(): array
+    {
+        return [
+            'secure package' => [
+                false,
+                '',
+            ],
+            'insecure package' => [
+                true,
+                ' (insecure)',
             ],
         ];
     }

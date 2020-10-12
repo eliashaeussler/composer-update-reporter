@@ -253,11 +253,14 @@ class EmailTest extends AbstractTestCase
 
     /**
      * @test
+     * @dataProvider reportSendsUpdateReportSuccessfullyDataProvider
+     * @param bool $insecure
+     * @param string $expectedSecurityNotice
      */
-    public function reportSendsUpdateReportSuccessfully(): void
+    public function reportSendsUpdateReportSuccessfully(bool $insecure, string $expectedSecurityNotice): void
     {
         $result = new UpdateCheckResult([
-            new OutdatedPackage('foo/foo', '1.0.0', '1.0.5'),
+            new OutdatedPackage('foo/foo', '1.0.0', '1.0.5', $insecure),
         ]);
         $io = new BufferIO();
 
@@ -280,7 +283,7 @@ class EmailTest extends AbstractTestCase
             '</tr>',
             '<tr>',
             '<td><a href="https://packagist.org/packages/foo/foo">foo/foo</a></td>',
-            '<td>1.0.0</td>',
+            '<td>1.0.0' . $expectedSecurityNotice . '</td>',
             '<td><strong>1.0.5</strong></td>',
             '</tr>',
             '</table>',
@@ -389,6 +392,20 @@ class EmailTest extends AbstractTestCase
                 [],
                 '1',
                 true,
+            ],
+        ];
+    }
+
+    public function reportSendsUpdateReportSuccessfullyDataProvider(): array
+    {
+        return [
+            'secure package' => [
+                false,
+                '',
+            ],
+            'insecure package' => [
+                true,
+                ' <strong style="color: red;">(insecure)</strong>',
             ],
         ];
     }

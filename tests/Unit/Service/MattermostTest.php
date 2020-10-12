@@ -29,6 +29,7 @@ use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\TestEnvironmentTrait;
 use EliasHaeussler\ComposerUpdateReporter\Util;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\RequestOptions;
@@ -191,11 +192,16 @@ class MattermostTest extends AbstractTestCase
 
     /**
      * @test
+     * @dataProvider reportSendsUpdateReportSuccessfullyDataProvider
+     * @param bool $insecure
+     * @param string $expectedSecurityNotice
+     * @throws GuzzleException
+     * @throws \ReflectionException
      */
-    public function reportSendsUpdateReportSuccessfully(): void
+    public function reportSendsUpdateReportSuccessfully(bool $insecure, string $expectedSecurityNotice): void
     {
         $result = new UpdateCheckResult([
-            new OutdatedPackage('foo/foo', '1.0.0', '1.0.5'),
+            new OutdatedPackage('foo/foo', '1.0.0', '1.0.5', $insecure),
         ]);
         $io = new BufferIO();
 
@@ -216,9 +222,9 @@ class MattermostTest extends AbstractTestCase
                     ],
                 ], $argument) === [];
             }),
-            Argument::that(function (array $argument) {
+            Argument::that(function (array $argument) use ($expectedSecurityNotice) {
                 $text = $argument[RequestOptions::JSON]['attachments'][0]['text'] ?? null;
-                $expected = '[foo/foo](https://packagist.org/packages/foo/foo) | 1.0.0 | **1.0.5**';
+                $expected = '[foo/foo](https://packagist.org/packages/foo/foo) | 1.0.0' . $expectedSecurityNotice . ' | **1.0.5**';
                 static::assertStringContainsString($expected, $text);
                 return true;
             })
@@ -334,6 +340,20 @@ class MattermostTest extends AbstractTestCase
                 [],
                 '1',
                 true,
+            ],
+        ];
+    }
+
+    public function reportSendsUpdateReportSuccessfullyDataProvider(): array
+    {
+        return [
+            'secure package' => [
+                false,
+                '',
+            ],
+            [
+                true,
+                ' :warning: **`insecure`**'
             ],
         ];
     }
