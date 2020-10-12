@@ -22,8 +22,8 @@ namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit\Service;
  */
 
 use Composer\IO\BufferIO;
-use EliasHaeussler\ComposerUpdateCheck\OutdatedPackage;
-use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
+use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
+use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateReporter\Service\Email;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\TestEnvironmentTrait;
@@ -31,6 +31,7 @@ use Prophecy\Argument;
 use rpkamp\Mailhog\MailhogClient;
 use rpkamp\Mailhog\Message\Contact;
 use Symfony\Component\HttpClient\HttplugClient;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Email as SymfonyEmail;
@@ -194,9 +195,13 @@ class EmailTest extends AbstractTestCase
 
         static::assertInstanceOf(Email::class, $subject);
         static::assertInstanceOf(EsmtpTransport::class, $transport);
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         static::assertSame('', $transport->getUsername());
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         static::assertSame('', $transport->getPassword());
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         static::assertSame(static::$mailhogHost, $transport->getStream()->getHost());
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         static::assertSame(static::$mailhogSmtpPort, $transport->getStream()->getPort());
         static::assertSame(['foo@foo.com', 'foo@another-foo.com'], $subject->getReceivers());
         static::assertSame('baz@baz.com', $subject->getSender());
@@ -217,9 +222,13 @@ class EmailTest extends AbstractTestCase
 
         static::assertInstanceOf(Email::class, $subject);
         static::assertInstanceOf(EsmtpTransport::class, $transport);
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         static::assertSame('', $transport->getUsername());
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         static::assertSame('', $transport->getPassword());
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         static::assertSame(static::$mailhogHost, $transport->getStream()->getHost());
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         static::assertSame(static::$mailhogSmtpPort, $transport->getStream()->getPort());
         static::assertSame(['foo@foo.com', 'foo@another-foo.com'], $subject->getReceivers());
         static::assertSame('baz@baz.com', $subject->getSender());
@@ -241,6 +250,7 @@ class EmailTest extends AbstractTestCase
 
     /**
      * @test
+     * @throws TransportExceptionInterface
      */
     public function reportSkipsReportIfNoPackagesAreOutdated(): void
     {
@@ -256,6 +266,7 @@ class EmailTest extends AbstractTestCase
      * @dataProvider reportSendsUpdateReportSuccessfullyDataProvider
      * @param bool $insecure
      * @param string $expectedSecurityNotice
+     * @throws TransportExceptionInterface
      */
     public function reportSendsUpdateReportSuccessfully(bool $insecure, string $expectedSecurityNotice): void
     {
@@ -293,6 +304,8 @@ class EmailTest extends AbstractTestCase
 
     /**
      * @test
+     * @throws TransportExceptionInterface
+     * @throws \ReflectionException
      */
     public function reportsPrintsErrorOnErroneousReport(): void
     {

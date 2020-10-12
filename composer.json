@@ -13,7 +13,7 @@
   "require": {
     "php": ">= 7.1 < 7.5",
     "composer-plugin-api": "^1.0",
-    "eliashaeussler/composer-update-check": "^0.1 || ^0.2 || ^0.3",
+    "eliashaeussler/composer-update-check": "^0.4",
     "guzzlehttp/guzzle": "^6.0 || ^7.0",
     "spatie/emoji": "^2.0",
     "symfony/mailer": "^4.4 || ^5.0"

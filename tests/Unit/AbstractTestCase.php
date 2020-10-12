@@ -31,6 +31,9 @@ use PHPUnit\Framework\TestCase;
  */
 abstract class AbstractTestCase extends TestCase
 {
+    /**
+     * @throws \ReflectionException
+     */
     protected function tearDown(): void
     {
         $reflection = new \ReflectionClass($this);

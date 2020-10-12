@@ -22,10 +22,11 @@ namespace EliasHaeussler\ComposerUpdateReporter\Service;
  */
 
 use Composer\IO\IOInterface;
-use EliasHaeussler\ComposerUpdateCheck\OutdatedPackage;
-use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
+use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
+use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use Spatie\Emoji\Emoji;
 use Spatie\Emoji\Exceptions\UnknownCharacter;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Email as SymfonyEmail;
@@ -120,6 +121,10 @@ class Email implements ServiceInterface
         return is_array($extra) && (bool)($extra['enable'] ?? false);
     }
 
+    /**
+     * @inheritDoc
+     * @throws TransportExceptionInterface
+     */
     public function report(UpdateCheckResult $result, IOInterface $io): bool
     {
         $outdatedPackages = $result->getOutdatedPackages();

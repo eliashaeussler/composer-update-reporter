@@ -23,7 +23,7 @@ namespace EliasHaeussler\ComposerUpdateReporter;
 
 use Composer\Composer;
 use Composer\IO\IOInterface;
-use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
+use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateReporter\Service\Email;
 use EliasHaeussler\ComposerUpdateReporter\Service\GitLab;
 use EliasHaeussler\ComposerUpdateReporter\Service\Mattermost;

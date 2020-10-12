@@ -24,7 +24,7 @@ namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit;
 use Composer\Composer;
 use Composer\Factory;
 use Composer\IO\NullIO;
-use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
+use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateReporter\Reporter;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\Fixtures\Service\DummyService;
 

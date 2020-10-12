@@ -22,8 +22,8 @@ namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit\Service;
  */
 
 use Composer\IO\BufferIO;
-use EliasHaeussler\ComposerUpdateCheck\OutdatedPackage;
-use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
+use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
+use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateReporter\Service\Slack;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\TestEnvironmentTrait;
@@ -141,6 +141,7 @@ class SlackTest extends AbstractTestCase
 
     /**
      * @test
+     * @throws GuzzleException
      */
     public function reportSkipsReportIfNoPackagesAreOutdated(): void
     {
@@ -233,6 +234,8 @@ class SlackTest extends AbstractTestCase
 
     /**
      * @test
+     * @throws GuzzleException
+     * @throws \ReflectionException
      */
     public function reportsPrintsErrorOnErroneousReport(): void
     {

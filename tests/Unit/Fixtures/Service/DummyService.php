@@ -22,7 +22,7 @@ namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit\Fixtures\Service;
  */
 
 use Composer\IO\IOInterface;
-use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
+use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateReporter\Service\ServiceInterface;
 
 /**

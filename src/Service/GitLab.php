@@ -22,9 +22,10 @@ namespace EliasHaeussler\ComposerUpdateReporter\Service;
  */
 
 use Composer\IO\IOInterface;
-use EliasHaeussler\ComposerUpdateCheck\OutdatedPackage;
-use EliasHaeussler\ComposerUpdateCheck\UpdateCheckResult;
+use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
+use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\UriInterface;
@@ -114,6 +115,10 @@ class GitLab implements ServiceInterface
         return is_array($extra) && (bool)($extra['enable'] ?? false);
     }
 
+    /**
+     * @inheritDoc
+     * @throws GuzzleException
+     */
     public function report(UpdateCheckResult $result, IOInterface $io): bool
     {
         $outdatedPackages = $result->getOutdatedPackages();
