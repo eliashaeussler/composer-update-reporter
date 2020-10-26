@@ -185,7 +185,7 @@ class Slack implements ServiceInterface
                     ],
                 ],
             ];
-            if (method_exists($outdatedPackage, 'isInsecure') && $outdatedPackage->isInsecure()) {
+            if ($outdatedPackage->isInsecure()) {
                 $block['fields'][] = [
                     'type' => 'mrkdwn',
                     'text' => '*Security state*',

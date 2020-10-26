@@ -169,7 +169,7 @@ class GitLab implements ServiceInterface
         $payload = [];
         foreach ($outdatedPackages as $outdatedPackage) {
             $insecure = '';
-            if (method_exists($outdatedPackage, 'isInsecure') && $outdatedPackage->isInsecure()) {
+            if ($outdatedPackage->isInsecure()) {
                 $insecure = ' (insecure)';
             }
             $payload[$outdatedPackage->getName()] = sprintf(

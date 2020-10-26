@@ -180,7 +180,7 @@ class Email implements ServiceInterface
         $textParts = [];
         foreach ($outdatedPackages as $outdatedPackage) {
             $insecure = '';
-            if (method_exists($outdatedPackage, 'isInsecure') && $outdatedPackage->isInsecure()) {
+            if ($outdatedPackage->isInsecure()) {
                 $insecure = ' (insecure)';
             }
             $textParts[] = sprintf(
@@ -209,7 +209,7 @@ class Email implements ServiceInterface
         $html[] =   '</tr>';
         foreach ($outdatedPackages as $outdatedPackage) {
             $insecure = '';
-            if (method_exists($outdatedPackage, 'isInsecure') && $outdatedPackage->isInsecure()) {
+            if ($outdatedPackage->isInsecure()) {
                 $insecure = ' <strong style="color: red;">(insecure)</strong>';
             }
             $html[] = '<tr>';

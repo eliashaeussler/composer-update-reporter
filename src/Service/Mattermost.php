@@ -191,7 +191,7 @@ class Mattermost implements ServiceInterface
         ];
         foreach ($outdatedPackages as $outdatedPackage) {
             $insecure = '';
-            if (method_exists($outdatedPackage, 'isInsecure') && $outdatedPackage->isInsecure()) {
+            if ($outdatedPackage->isInsecure()) {
                 $insecure = ' :warning: **`insecure`**';
             }
             $textParts[] = sprintf(
