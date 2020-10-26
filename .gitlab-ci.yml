@@ -4,7 +4,7 @@ variables:
   COMPOSER_NO_INTERACTION: "1"
 
 before_script:
-  - composer self-update
+  - composer self-update --1
   - composer global require hirak/prestissimo --no-progress
 
 stages:
@@ -17,11 +17,10 @@ stages:
   services:
     - name: mailhog/mailhog
       alias: mailhog
-  before_script:
+  script:
     - pecl channel-update pecl.php.net
     - pecl install pcov
     - docker-php-ext-enable pcov
-  script:
     - export MAILHOG_HOST=mailhog
     - export MAILHOG_SMTP_PORT=1025
     - export MAILHOG_API_PORT=8025
