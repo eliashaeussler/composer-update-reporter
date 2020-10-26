@@ -24,6 +24,7 @@ namespace EliasHaeussler\ComposerUpdateReporter\Service;
 use Composer\IO\IOInterface;
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
+use EliasHaeussler\ComposerUpdateReporter\Traits\PackageProviderLinkTrait;
 use Spatie\Emoji\Emoji;
 use Spatie\Emoji\Exceptions\UnknownCharacter;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -39,6 +40,8 @@ use Symfony\Component\Mime\Email as SymfonyEmail;
  */
 class Email implements ServiceInterface
 {
+    use PackageProviderLinkTrait;
+
     /**
      * @var TransportInterface
      */
@@ -213,9 +216,10 @@ class Email implements ServiceInterface
                 $insecure = ' <strong style="color: red;">(insecure)</strong>';
             }
             $html[] = '<tr>';
+            /** @noinspection HtmlUnknownTarget */
             $html[] =   sprintf(
-                '<td><a href="https://packagist.org/packages/%s">%s</a></td>',
-                $outdatedPackage->getName(),
+                '<td><a href="%s">%s</a></td>',
+                $this->getProviderLink($outdatedPackage),
                 $outdatedPackage->getName()
             );
             $html[] =   '<td>' . $outdatedPackage->getOutdatedVersion() . $insecure . '</td>';

@@ -24,6 +24,7 @@ namespace EliasHaeussler\ComposerUpdateReporter\Service;
 use Composer\IO\IOInterface;
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
+use EliasHaeussler\ComposerUpdateReporter\Traits\PackageProviderLinkTrait;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Uri;
@@ -40,6 +41,8 @@ use Spatie\Emoji\Exceptions\UnknownCharacter;
  */
 class Slack implements ServiceInterface
 {
+    use PackageProviderLinkTrait;
+
     /**
      * @var UriInterface
      */
@@ -162,8 +165,8 @@ class Slack implements ServiceInterface
                     [
                         'type' => 'mrkdwn',
                         'text' => sprintf(
-                            '<https://packagist.org/packages/%s|%s>',
-                            $outdatedPackage->getName(),
+                            '<%s|%s>',
+                            $this->getProviderLink($outdatedPackage),
                             $outdatedPackage->getName()
                         ),
                     ],
