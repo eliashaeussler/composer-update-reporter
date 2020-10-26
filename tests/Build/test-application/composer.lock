@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4e89f9dbf25b8b147ce5611f2e811627",
+    "content-hash": "68686c6647cf0e7335cd241dcf662b30",
     "packages": [],
     "packages-dev": [
         {
@@ -79,11 +79,11 @@
         },
         {
             "name": "eliashaeussler/composer-update-check",
-            "version": "0.3.0",
+            "version": "0.4.2",
             "source": {
                 "type": "git",
                 "url": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check",
-                "reference": "32a88241f20f536b99018483be90fec55e58edc5"
+                "reference": "a8491c550dea70d412455c50784813102e119929"
             },
             "require": {
                 "composer-plugin-api": "^1.0",
@@ -119,7 +119,7 @@
             ],
             "description": "Composer Plugin to check outdated packages, based on their requirements",
             "homepage": "https://haeussler.dev",
-            "time": "2020-09-22T15:42:28+00:00"
+            "time": "2020-10-10T20:52:41+00:00"
         },
         {
             "name": "myclabs/deep-copy",
