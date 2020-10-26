@@ -225,7 +225,7 @@ class MattermostTest extends AbstractTestCase
             }),
             Argument::that(function (array $argument) use ($expectedSecurityNotice) {
                 $text = $argument[RequestOptions::JSON]['attachments'][0]['text'] ?? null;
-                $expected = '[foo/foo](https://packagist.org/packages/foo/foo) | 1.0.0' . $expectedSecurityNotice . ' | **1.0.5**';
+                $expected = '[foo/foo](https://packagist.org/packages/foo/foo#1.0.5) | 1.0.0' . $expectedSecurityNotice . ' | **1.0.5**';
                 static::assertStringContainsString($expected, $text);
                 return true;
             })

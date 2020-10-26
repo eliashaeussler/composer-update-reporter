@@ -293,7 +293,7 @@ class EmailTest extends AbstractTestCase
             '<th>New version</th>',
             '</tr>',
             '<tr>',
-            '<td><a href="https://packagist.org/packages/foo/foo">foo/foo</a></td>',
+            '<td><a href="https://packagist.org/packages/foo/foo#1.0.5">foo/foo</a></td>',
             '<td>1.0.0' . $expectedSecurityNotice . '</td>',
             '<td><strong>1.0.5</strong></td>',
             '</tr>',

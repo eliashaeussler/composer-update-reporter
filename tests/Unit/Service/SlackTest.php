@@ -178,7 +178,7 @@ class SlackTest extends AbstractTestCase
                 ],
                 [
                     'type' => 'mrkdwn',
-                    'text' => '<https://packagist.org/packages/foo/foo|foo/foo>',
+                    'text' => '<https://packagist.org/packages/foo/foo#1.0.5|foo/foo>',
                 ],
                 [
                     'type' => 'mrkdwn',
