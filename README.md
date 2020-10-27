@@ -56,7 +56,7 @@ Consult the [official documentation](https://symfony.com/doc/current/mailer.html
 ### GitLab
 
 Learn more about GitLab Alerts in the
-[official documentation](https://docs.gitlab.com/ee/operations/incident_management/generic_alerts.html).
+[official documentation](https://docs.gitlab.com/ee/operations/incident_management/alert_integrations.html#generic-http-endpoint).
 
 | `composer.json` config key | Environment variable | Type | Required |
 | -------------------------- | -------------------- | ---- | -------- |
