@@ -12,14 +12,14 @@
   }],
   "require": {
     "php": ">= 7.1 < 7.5",
-    "composer-plugin-api": "^1.0",
-    "eliashaeussler/composer-update-check": "^0.4",
+    "composer-plugin-api": "^1.0 || ^2.0",
+    "eliashaeussler/composer-update-check": "^0.4 || ^0.5",
     "guzzlehttp/guzzle": "^6.0 || ^7.0",
     "spatie/emoji": "^2.0",
     "symfony/mailer": "^4.4 || ^5.0"
   },
   "require-dev": {
-    "composer/composer": "^1.0",
+    "composer/composer": "^1.0 || ^2.0",
     "phpunit/phpunit": "^7.0 || ^8.0 || ^9.0",
     "rpkamp/mailhog-client": "^0.3 || ^0.4 || ^0.5",
     "nyholm/psr7": "^1.3"
