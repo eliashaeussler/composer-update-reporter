@@ -49,6 +49,16 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         $this->reporter = new Reporter($composer, $io);
     }
 
+    public function deactivate(Composer $composer, IOInterface $io)
+    {
+        // Nothing to do here. Just go ahead :)
+    }
+
+    public function uninstall(Composer $composer, IOInterface $io)
+    {
+        // Nothing to do here. Just go ahead :)
+    }
+
     public static function getSubscribedEvents(): array
     {
         return [
