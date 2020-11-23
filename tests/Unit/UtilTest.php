@@ -43,6 +43,45 @@ class UtilTest extends AbstractTestCase
         static::assertSame($expected, Util::arrayDiffRecursive($array1, $array2));
     }
 
+    /**
+     * @test
+     * @dataProvider trimExplodeReturnsArrayOfExplodedTrimmedItemsDataProvider
+     * @param string $string
+     * @param array $expected
+     */
+    public function trimExplodeReturnsArrayOfExplodedTrimmedItems(string $string, array $expected): void
+    {
+        static::assertSame($expected, Util::trimExplode(',', $string));
+    }
+
+    /**
+     * @test
+     */
+    public function trimExplodeReturnsLimitedExplodedArray(): void
+    {
+        $string = ' foo   ,  baz, boo';
+        $expected = [
+            'foo',
+            'baz, boo',
+        ];
+        static::assertSame($expected, Util::trimExplode(',', $string, 2));
+    }
+
+    /**
+     * @test
+     */
+    public function trimExplodeFillsArrayWithNullValues(): void
+    {
+        $string = 'foo, baz';
+        $expected = [
+            'foo',
+            'baz',
+            null,
+            null,
+        ];
+        static::assertSame($expected, Util::trimExplode(',', $string, 4, true));
+    }
+
     public function arrayDiffRecursiveReturnsDiffBetweenArraysDataProvider(): array
     {
         return [
@@ -75,6 +114,24 @@ class UtilTest extends AbstractTestCase
                 ['foo' => ['baz' => 'bummer']],
                 ['foo' => ['baz' => 'bummer']],
                 [],
+            ],
+        ];
+    }
+
+    public function trimExplodeReturnsArrayOfExplodedTrimmedItemsDataProvider(): array
+    {
+        return [
+            'empty string' => [
+                '',
+                [''],
+            ],
+            'whitespaces only' => [
+                '      ',
+                [''],
+            ],
+            'string with whitespaced items' => [
+                ' foo  ,  baz  ,   ',
+                ['foo', 'baz', ''],
             ],
         ];
     }

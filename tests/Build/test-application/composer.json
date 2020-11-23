@@ -5,6 +5,15 @@
   },
   "extra": {
     "update-check": {
+      "betterUptime": {
+        "enable": true,
+        "authToken": "5scqqjpgw3dzipuawi8fp19acy",
+        "requester": "foo@example.org",
+        "options": {
+          "foo": "baz"
+        },
+        "url": "https://betteruptime.com/api/v1/incident"
+      },
       "email": {
         "enable": true,
         "dsn": "smtp://foo:baz@smtp.example.com:25",

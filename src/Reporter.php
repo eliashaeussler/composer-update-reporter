@@ -24,6 +24,7 @@ namespace EliasHaeussler\ComposerUpdateReporter;
 use Composer\Composer;
 use Composer\IO\IOInterface;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
+use EliasHaeussler\ComposerUpdateReporter\Service\BetterUptime;
 use EliasHaeussler\ComposerUpdateReporter\Service\Email;
 use EliasHaeussler\ComposerUpdateReporter\Service\GitLab;
 use EliasHaeussler\ComposerUpdateReporter\Service\Mattermost;
@@ -119,6 +120,7 @@ class Reporter
     private function getDefaultServices(): array
     {
         return [
+            BetterUptime::class,
             Email::class,
             GitLab::class,
             Mattermost::class,

@@ -16,6 +16,7 @@ composer req --dev eliashaeussler/composer-update-reporter
 
 ## Supported services
 
+* [BetterUptime](#betteruptime)
 * [Email](#email)
 * [GitLab](#gitlab)
 * [Mattermost](#mattermost)
@@ -40,6 +41,20 @@ section like follows:
   }
 }
 ```
+
+### BetterUptime
+
+Learn more about BetterUptime incidents in the
+[API documentation](https://docs.betteruptime.com/features/incidents/create-incident-via-api#creating-a-new-incident)
+and [official documentation](https://betteruptime.com/api/v1).
+
+| `composer.json` config key | Environment variable | Type | Required |
+| -------------------------- | -------------------- | ---- | -------- |
+| `betterUptime.enable` | `BETTER_UPTIME_ENABLE` | `bool` | yes |
+| `betterUptime.authToken` | `BETTER_UPTIME_AUTH_TOKEN` | `string` | yes |
+| `betterUptime.requester` | `BETTER_UPTIME_REQUESTER` | `string` | yes |
+| `betterUptime.options` | `BETTER_UPTIME_OPTIONS` | `object` or `string` | no |
+| `betterUptime.url` | `BETTER_UPTIME_URL` | `string` | no |
 
 ### Email
 
@@ -94,6 +109,15 @@ Example configuration in `composer.json`:
 {
   "extra": {
     "update-check": {
+      "betterUptime": {
+        "enable": true,
+        "authToken": "5scqqjpgw3dzipuawi8fp19acy",
+        "requester": "foo@example.org",
+        "options": {
+          "foo": "baz"
+        },
+        "url": "https://betteruptime.com/api/v1/incident"
+      },
       "email": {
         "enable": true,
         "dsn": "smtp://foo:baz@smtp.example.com:25",
@@ -123,6 +147,12 @@ Example configuration in `composer.json`:
 Example configuration using environment variables:
 
 ```bash
+BETTER_UPTIME_ENABLE=1
+BETTER_UPTIME_AUTH_TOKEN="5scqqjpgw3dzipuawi8fp19acy"
+BETTER_UPTIME_REQUESTER="foo@example.org"
+BETTER_UPTIME_OPTIONS="foo=baz"
+BETTER_UPTIME_URL="https://betteruptime.com/api/v1/incident"
+
 EMAIL_ENABLE=1
 EMAIL_DSN="smtp://foo:baz@smtp.example.com:25"
 EMAIL_RECEIVERS="john@example.org, marc@example.org"

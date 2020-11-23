@@ -44,4 +44,18 @@ class Util
         }
         return $difference;
     }
+
+    public static function trimExplode(string $delimiter, string $string, int $limit = null, bool $fillArray = false): array
+    {
+        if ($limit !== null) {
+            $explodedArray = explode($delimiter, $string, $limit);
+        } else {
+            $explodedArray = explode($delimiter, $string);
+        }
+        $result = array_map('trim', $explodedArray);
+        if ($fillArray && $limit > count($result)) {
+            return array_pad($result, $limit, null);
+        }
+        return $result;
+    }
 }
