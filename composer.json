@@ -10,6 +10,14 @@
     "homepage": "https://haeussler.dev",
     "role": "Maintainer"
   }],
+  "support": {
+    "issues": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter/-/issues",
+    "source": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter",
+    "rss": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter.atom"
+  },
+  "config": {
+    "sort-packages": true
+  },
   "require": {
     "php": "^7.1",
     "composer-plugin-api": "^1.0 || ^2.0",
