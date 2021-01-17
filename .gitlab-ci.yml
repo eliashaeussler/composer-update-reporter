@@ -4,11 +4,23 @@ variables:
   COMPOSER_NO_INTERACTION: "1"
   GIT_CLONE_PATH: $CI_BUILDS_DIR/$CI_JOB_ID/$CI_PROJECT_PATH
 
+workflow:
+  rules:
+    - if: '$CI_COMMIT_BRANCH'
+
 stages:
+  - lint
   - test-v1
   - test-v2
 
-# Test template
+lint:php:
+  image: webdevops/php:7.4
+  stage: lint
+  before_script:
+    - composer install --no-progress
+  script:
+    - composer lint -- --dry-run
+
 .test: &test-template
   image: webdevops/php:${PHP_VERSION}
   services:
@@ -46,9 +58,6 @@ stages:
   artifacts:
     reports:
       junit: .build/coverage/junit.xml
-  rules:
-    - if: '$CI_COMMIT_BRANCH'
-      when: on_success
 
 test-v1:
   <<: *test-template

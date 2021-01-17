@@ -28,9 +28,10 @@
   },
   "require-dev": {
     "composer/composer": "^1.0 || ^2.0",
+    "friendsofphp/php-cs-fixer": "^2.17",
+    "nyholm/psr7": "^1.3",
     "phpunit/phpunit": "^7.0 || ^8.0 || ^9.0",
-    "rpkamp/mailhog-client": "^0.3 || ^0.4 || ^0.5",
-    "nyholm/psr7": "^1.3"
+    "rpkamp/mailhog-client": "^0.3 || ^0.4 || ^0.5"
   },
   "extra": {
     "class": "EliasHaeussler\\ComposerUpdateReporter\\Plugin"
@@ -46,6 +47,7 @@
     }
   },
   "scripts": {
+    "lint": "php-cs-fixer fix",
     "test": [
       "@test:docker:start",
       "@test:run",
