@@ -26,7 +26,7 @@ stages:
     - composer self-update --${COMPOSER_VERSION}
     - composer --version
     - php --version
-    - composer req --dev "composer/composer:^${COMPOSER_VERSION-2}.0" --no-progress
+    - composer req --dev "composer/composer:^${COMPOSER_VERSION}.0" --no-progress
     - >
       if [[ $TEST_COMPATIBILITY ]]; then
         composer require --dev pcov/clobber
@@ -45,69 +45,32 @@ stages:
   artifacts:
     reports:
       junit: .build/coverage/junit.xml
-  only:
-    - branches
+  rules:
+    - if: '$CI_COMMIT_BRANCH'
+      when: on_success
 
-# Test v1 template
-.test-v1: &test-v1-template
+test-v1:
   <<: *test-template
   stage: test-v1
-  before_script:
-    - export COMPOSER_VERSION=1
+  variables:
+    COMPOSER_VERSION: "1"
+  parallel:
+    matrix:
+      - PHP_VERSION: "7.1"
+        TEST_COMPATIBILITY: "1"
+      - PHP_VERSION: "7.2"
+      - PHP_VERSION: "7.3"
+      - PHP_VERSION: "7.4"
 
-# Test v2 template
-.test-v2: &test-v2-template
+test-v2:
   <<: *test-template
   stage: test-v2
-  before_script:
-    - export COMPOSER_VERSION=2
-
-# Test v1: PHP 7.1
-test-v1:php7.1:
-  <<: *test-v1-template
   variables:
-    PHP_VERSION: "7.1"
-    TEST_COMPATIBILITY: "1"
-
-# Test v1: PHP 7.2
-test-v1:php7.2:
-  <<: *test-v1-template
-  variables:
-    PHP_VERSION: "7.2"
-
-# Test v1: PHP 7.3
-test-v1:php7.3:
-  <<: *test-v1-template
-  variables:
-    PHP_VERSION: "7.3"
-
-# Test v1: PHP 7.4
-test-v1:php7.4:
-  <<: *test-v1-template
-  variables:
-    PHP_VERSION: "7.4"
-
-# Test v2: PHP 7.1
-test-v2:php7.1:
-  <<: *test-v2-template
-  variables:
-    PHP_VERSION: "7.1"
-    TEST_COMPATIBILITY: "1"
-
-# Test v2: PHP 7.2
-test-v2:php7.2:
-  <<: *test-v2-template
-  variables:
-    PHP_VERSION: "7.2"
-
-# Test v2: PHP 7.3
-test-v2:php7.3:
-  <<: *test-v2-template
-  variables:
-    PHP_VERSION: "7.3"
-
-# Test v2: PHP 7.4
-test-v2:php7.4:
-  <<: *test-v2-template
-  variables:
-    PHP_VERSION: "7.4"
+    COMPOSER_VERSION: "2"
+  parallel:
+    matrix:
+      - PHP_VERSION: "7.1"
+        TEST_COMPATIBILITY: "1"
+      - PHP_VERSION: "7.2"
+      - PHP_VERSION: "7.3"
+      - PHP_VERSION: "7.4"
