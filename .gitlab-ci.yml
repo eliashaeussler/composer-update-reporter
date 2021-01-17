@@ -20,19 +20,21 @@ lint:php:
     - composer install --no-progress
   script:
     - composer lint -- --dry-run
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "pipeline"'
+      when: never
+    - when: on_success
 
 .test: &test-template
   image: webdevops/php:${PHP_VERSION}
   services:
     - name: mailhog/mailhog
       alias: mailhog
-  script:
-    # Prepare Mailhog environment
+  before_script:
     - export MAILHOG_HOST=mailhog
     - export MAILHOG_SMTP_PORT=1025
     - export MAILHOG_API_PORT=8025
-
-    # Prepare testing environment
+  script:
     - pecl channel-update pecl.php.net
     - pecl install pcov
     - docker-php-ext-enable pcov
@@ -41,13 +43,15 @@ lint:php:
     - php --version
     - composer req --dev "composer/composer:^${COMPOSER_VERSION}.0" --no-progress
     - >
+      if [ $UPDATE_CHECK_REF ]; then
+        composer req "eliashaeussler/composer-update-check:dev-master#$UPDATE_CHECK_REF"
+      fi
+    - >
       if [[ $TEST_COMPATIBILITY ]]; then
         composer require --dev pcov/clobber
         vendor/bin/pcov clobber
       fi
     - composer install --no-progress
-
-    # Run tests
     - COMPOSER_PROCESS_TIMEOUT=1000 composer test:ci -- --testdox
   retry:
     max: 2
