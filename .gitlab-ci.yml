@@ -2,6 +2,7 @@ variables:
   COMPOSER_CACHE_DIR: "/cache/composer"
   COMPOSER_ALLOW_SUPERUSER: "1"
   COMPOSER_NO_INTERACTION: "1"
+  GIT_CLONE_PATH: $CI_BUILDS_DIR/$CI_JOB_ID/$CI_PROJECT_PATH
 
 stages:
   - test-v1
