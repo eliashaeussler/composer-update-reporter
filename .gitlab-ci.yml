@@ -10,8 +10,7 @@ workflow:
 
 stages:
   - lint
-  - test-v1
-  - test-v2
+  - test
 
 lint:php:
   image: webdevops/php:7.4
@@ -27,64 +26,51 @@ lint:php:
 
 .test: &test-template
   image: webdevops/php:${PHP_VERSION}
+  stage: test
   services:
     - name: mailhog/mailhog
       alias: mailhog
-  before_script:
+  script:
     - export MAILHOG_HOST=mailhog
     - export MAILHOG_SMTP_PORT=1025
     - export MAILHOG_API_PORT=8025
-  script:
-    - pecl channel-update pecl.php.net
-    - pecl install pcov
-    - docker-php-ext-enable pcov
     - composer self-update --${COMPOSER_VERSION}
     - composer --version
     - php --version
-    - composer req --dev "composer/composer:^${COMPOSER_VERSION}.0" --no-progress
+    - composer require --dev "composer/composer:^${COMPOSER_VERSION}.0" --no-progress
     - >
       if [ $UPDATE_CHECK_REF ]; then
-        composer req "eliashaeussler/composer-update-check:dev-master#$UPDATE_CHECK_REF"
+        composer require "eliashaeussler/composer-update-check:dev-master#$UPDATE_CHECK_REF"
       fi
-    - >
-      if [[ $TEST_COMPATIBILITY ]]; then
-        composer require --dev pcov/clobber
-        vendor/bin/pcov clobber
-      fi
-    - composer install --no-progress
-    - COMPOSER_PROCESS_TIMEOUT=1000 composer test:ci -- --testdox
   retry:
     max: 2
     when:
       - runner_system_failure
       - stuck_or_timeout_failure
-  coverage: '/^\s*Lines:\s*\d+.\d+\%/'
   artifacts:
     reports:
       junit: .build/coverage/junit.xml
 
-test-v1:
+test:
   <<: *test-template
-  stage: test-v1
-  variables:
-    COMPOSER_VERSION: "1"
+  after_script:
+    - composer test -- --testdox
   parallel:
     matrix:
-      - PHP_VERSION: "7.1"
-        TEST_COMPATIBILITY: "1"
-      - PHP_VERSION: "7.2"
-      - PHP_VERSION: "7.3"
+      - PHP_VERSION: ["7.1", "7.2", "7.3"]
+        COMPOSER_VERSION: ["1", "2"]
       - PHP_VERSION: "7.4"
+        COMPOSER_VERSION: "1"
 
-test-v2:
+test:coverage:
   <<: *test-template
-  stage: test-v2
   variables:
+    PHP_VERSION: "7.4"
     COMPOSER_VERSION: "2"
-  parallel:
-    matrix:
-      - PHP_VERSION: "7.1"
-        TEST_COMPATIBILITY: "1"
-      - PHP_VERSION: "7.2"
-      - PHP_VERSION: "7.3"
-      - PHP_VERSION: "7.4"
+  before_script:
+    - pecl channel-update pecl.php.net
+    - pecl install pcov
+    - docker-php-ext-enable pcov
+  after_script:
+    - COMPOSER_PROCESS_TIMEOUT=1000 composer test:ci -- --testdox
+  coverage: '/^\s*Lines:\s*\d+.\d+\%/'
