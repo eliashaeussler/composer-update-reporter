@@ -73,7 +73,7 @@ class Slack implements ServiceInterface
         // Parse Slack URL
         if (is_array($extra) && array_key_exists('url', $extra)) {
             $uri = new Uri((string)$extra['url']);
-        } else if (getenv('SLACK_URL') !== false) {
+        } elseif (getenv('SLACK_URL') !== false) {
             $uri = new Uri(getenv('SLACK_URL'));
         } else {
             throw new \RuntimeException(
@@ -125,7 +125,7 @@ class Slack implements ServiceInterface
         // Print report state
         if (!$successful) {
             $io->writeError(Emoji::crossMark() . ' Error during Slack report.');
-        } else if (!$this->json) {
+        } elseif (!$this->json) {
             try {
                 $checkMark = Emoji::checkMark();
             } /** @noinspection PhpRedundantCatchClauseInspection */ catch (UnknownCharacter $e) {

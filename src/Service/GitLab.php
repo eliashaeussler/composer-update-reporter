@@ -4,19 +4,19 @@ namespace EliasHaeussler\ComposerUpdateReporter\Service;
 
 /*
  * This file is part of the Composer package "eliashaeussler/composer-update-reporter".
- * 
+ *
  * Copyright (C) 2020 Elias Häußler <elias@haeussler.dev>
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -82,7 +82,7 @@ class GitLab implements ServiceInterface
         // Parse GitLab URL
         if (is_array($extra) && array_key_exists('url', $extra)) {
             $uri = new Uri((string)$extra['url']);
-        } else if (getenv('GITLAB_URL') !== false) {
+        } elseif (getenv('GITLAB_URL') !== false) {
             $uri = new Uri(getenv('GITLAB_URL'));
         } else {
             throw new \RuntimeException(
@@ -94,7 +94,7 @@ class GitLab implements ServiceInterface
         // Parse GitLab authorization key
         if (is_array($extra) && array_key_exists('authKey', $extra)) {
             $authKey = (string)$extra['authKey'];
-        } else if (getenv('GITLAB_AUTH_KEY') !== false) {
+        } elseif (getenv('GITLAB_AUTH_KEY') !== false) {
             $authKey = getenv('GITLAB_AUTH_KEY');
         } else {
             throw new \RuntimeException(
@@ -147,7 +147,7 @@ class GitLab implements ServiceInterface
         // Print report state
         if (!$successful) {
             $io->writeError(Emoji::crossMark() . ' Error during GitLab report.');
-        } else if (!$this->json) {
+        } elseif (!$this->json) {
             try {
                 $checkMark = Emoji::checkMark();
             } /** @noinspection PhpRedundantCatchClauseInspection */ catch (UnknownCharacter $e) {
