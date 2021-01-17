@@ -14,13 +14,14 @@ TEMP_PATH="${TEMP_DIR}/update-reporter-test"
 
 # Define cleanup function for several signals
 function cleanup() {
-  exitCode=$?
+  local exitCode=$?
   rm -rf "${TEMP_PATH}"
   exit $exitCode
 }
 trap cleanup INT ERR EXIT
 
 # Prepare temporary application
+rm -rf "${TEMP_PATH}"
 cp -r "${APP_PATH}" "${TEMP_PATH}"
 rm -rf "${TEMP_PATH}/vendor"
 composer config --working-dir "${TEMP_PATH}" repositories.local path "${ROOT_PATH}"
