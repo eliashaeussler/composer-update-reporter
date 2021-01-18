@@ -32,10 +32,10 @@ class Util
     public static function arrayDiffRecursive(array $array1, array $array2): array
     {
         $difference = [];
-        foreach($array1 as $key => $value) {
+        foreach ($array1 as $key => $value) {
             if (!array_key_exists($key, $array2)) {
                 $difference[$key] = $value;
-            } else if (is_array($value) && is_array($array2[$key])) {
+            } elseif (is_array($value) && is_array($array2[$key])) {
                 $recursiveDiff = static::arrayDiffRecursive($value, $array2[$key]);
                 if (!empty($recursiveDiff)) {
                     $difference[$key] = $recursiveDiff;

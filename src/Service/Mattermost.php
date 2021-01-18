@@ -86,7 +86,7 @@ class Mattermost implements ServiceInterface
         // Parse Mattermost URL
         if (is_array($extra) && array_key_exists('url', $extra)) {
             $uri = new Uri((string)$extra['url']);
-        } else if (getenv('MATTERMOST_URL') !== false) {
+        } elseif (getenv('MATTERMOST_URL') !== false) {
             $uri = new Uri(getenv('MATTERMOST_URL'));
         } else {
             throw new \RuntimeException(
@@ -98,7 +98,7 @@ class Mattermost implements ServiceInterface
         // Parse Mattermost channel name
         if (is_array($extra) && array_key_exists('channel', $extra)) {
             $channelName = (string)$extra['channel'];
-        } else if (getenv('MATTERMOST_CHANNEL') !== false) {
+        } elseif (getenv('MATTERMOST_CHANNEL') !== false) {
             $channelName = getenv('MATTERMOST_CHANNEL');
         } else {
             throw new \RuntimeException(
@@ -111,7 +111,7 @@ class Mattermost implements ServiceInterface
         $username = null;
         if (is_array($extra) && array_key_exists('username', $extra)) {
             $username = (string)$extra['username'];
-        } else if (getenv('MATTERMOST_USERNAME') !== false) {
+        } elseif (getenv('MATTERMOST_USERNAME') !== false) {
             $username = getenv('MATTERMOST_USERNAME');
         }
 
@@ -167,7 +167,7 @@ class Mattermost implements ServiceInterface
         // Print report state
         if (!$successful) {
             $io->writeError(Emoji::crossMark() . ' Error during Mattermost report.');
-        } else if (!$this->json) {
+        } elseif (!$this->json) {
             try {
                 $checkMark = Emoji::checkMark();
             } /** @noinspection PhpRedundantCatchClauseInspection */ catch (UnknownCharacter $e) {

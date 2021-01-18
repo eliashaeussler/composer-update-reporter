@@ -79,7 +79,7 @@ class Email implements ServiceInterface
         // Parse Email DSN
         if (is_array($extra) && array_key_exists('dsn', $extra)) {
             $dsn = (string)$extra['dsn'];
-        } else if (getenv('EMAIL_DSN') !== false) {
+        } elseif (getenv('EMAIL_DSN') !== false) {
             $dsn = getenv('EMAIL_DSN');
         } else {
             throw new \RuntimeException(
@@ -91,7 +91,7 @@ class Email implements ServiceInterface
         // Parse Email receivers
         if (is_array($extra) && array_key_exists('receivers', $extra)) {
             $receivers = explode(',', (string)$extra['receivers']);
-        } else if (getenv('EMAIL_RECEIVERS') !== false) {
+        } elseif (getenv('EMAIL_RECEIVERS') !== false) {
             $receivers = explode(',', getenv('EMAIL_RECEIVERS'));
         } else {
             throw new \RuntimeException(
@@ -103,7 +103,7 @@ class Email implements ServiceInterface
         // Parse Email sender
         if (is_array($extra) && array_key_exists('sender', $extra)) {
             $sender = (string)$extra['sender'];
-        } else if (getenv('EMAIL_SENDER') !== false) {
+        } elseif (getenv('EMAIL_SENDER') !== false) {
             $sender = getenv('EMAIL_SENDER');
         } else {
             throw new \RuntimeException(
@@ -161,7 +161,7 @@ class Email implements ServiceInterface
         // Print report state
         if (!$successful) {
             $io->writeError(Emoji::crossMark() . ' Error during Email report.');
-        } else if (!$this->json) {
+        } elseif (!$this->json) {
             try {
                 $checkMark = Emoji::checkMark();
             } /** @noinspection PhpRedundantCatchClauseInspection */ catch (UnknownCharacter $e) {

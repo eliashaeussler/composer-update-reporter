@@ -1,6 +1,6 @@
 /composer.lock
 /vendor
+/.php_cs.cache
 /.phpunit.result.cache
 /.build
 /tests/Build/test-application/vendor
-

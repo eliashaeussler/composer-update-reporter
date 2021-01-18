@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 # Resolve variables
 ROOT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." >/dev/null 2>&1 && pwd)"
@@ -11,6 +12,14 @@ if [ ! -w "${TEMP_DIR}" ]; then
 fi
 TEMP_PATH="${TEMP_DIR}/update-reporter-test"
 
+# Define cleanup function for several signals
+function cleanup() {
+  exitCode=$?
+  rm -rf "${TEMP_PATH}"
+  exit $exitCode
+}
+trap cleanup INT ERR EXIT
+
 # Prepare temporary application
 cp -r "${APP_PATH}" "${TEMP_PATH}"
 rm -rf "${TEMP_PATH}/vendor"
@@ -19,6 +28,3 @@ composer require --working-dir "${TEMP_PATH}" --quiet --dev "eliashaeussler/comp
 
 # Run update check
 composer update-check --working-dir "${TEMP_PATH}" --ansi "$@"
-
-# Clear temporary application
-rm -rf "${TEMP_PATH}"

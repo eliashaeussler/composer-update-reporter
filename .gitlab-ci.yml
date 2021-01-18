@@ -2,112 +2,75 @@ variables:
   COMPOSER_CACHE_DIR: "/cache/composer"
   COMPOSER_ALLOW_SUPERUSER: "1"
   COMPOSER_NO_INTERACTION: "1"
+  GIT_CLONE_PATH: $CI_BUILDS_DIR/$CI_JOB_ID/$CI_PROJECT_PATH
+
+workflow:
+  rules:
+    - if: '$CI_COMMIT_BRANCH'
 
 stages:
-  - test-v1
-  - test-v2
+  - lint
+  - test
 
-# Test template
+lint:php:
+  image: webdevops/php:7.4
+  stage: lint
+  before_script:
+    - composer install --no-progress
+  script:
+    - composer lint -- --dry-run
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "pipeline"'
+      when: never
+    - when: on_success
+
 .test: &test-template
   image: webdevops/php:${PHP_VERSION}
+  stage: test
   services:
     - name: mailhog/mailhog
       alias: mailhog
   script:
-    # Prepare Mailhog environment
     - export MAILHOG_HOST=mailhog
     - export MAILHOG_SMTP_PORT=1025
     - export MAILHOG_API_PORT=8025
-
-    # Prepare testing environment
-    - pecl channel-update pecl.php.net
-    - pecl install pcov
-    - docker-php-ext-enable pcov
     - composer self-update --${COMPOSER_VERSION}
     - composer --version
     - php --version
-    - composer req --dev "composer/composer:^${COMPOSER_VERSION-2}.0" --no-progress
+    - composer require --dev "composer/composer:^${COMPOSER_VERSION}.0" --no-progress
     - >
-      if [[ $TEST_COMPATIBILITY ]]; then
-        composer require --dev pcov/clobber
-        vendor/bin/pcov clobber
+      if [ $UPDATE_CHECK_REF ]; then
+        composer require "eliashaeussler/composer-update-check:dev-master#$UPDATE_CHECK_REF"
       fi
-    - composer install --no-progress
-
-    # Run tests
-    - COMPOSER_PROCESS_TIMEOUT=1000 composer test:ci -- --testdox
   retry:
     max: 2
     when:
       - runner_system_failure
       - stuck_or_timeout_failure
-  coverage: '/^\s*Lines:\s*\d+.\d+\%/'
   artifacts:
     reports:
       junit: .build/coverage/junit.xml
-  only:
-    - branches
 
-# Test v1 template
-.test-v1: &test-v1-template
+test:
   <<: *test-template
-  stage: test-v1
-  before_script:
-    - export COMPOSER_VERSION=1
+  after_script:
+    - composer test -- --testdox
+  parallel:
+    matrix:
+      - PHP_VERSION: ["7.1", "7.2", "7.3"]
+        COMPOSER_VERSION: ["1", "2"]
+      - PHP_VERSION: "7.4"
+        COMPOSER_VERSION: "1"
 
-# Test v2 template
-.test-v2: &test-v2-template
+test:coverage:
   <<: *test-template
-  stage: test-v2
-  before_script:
-    - export COMPOSER_VERSION=2
-
-# Test v1: PHP 7.1
-test-v1:php7.1:
-  <<: *test-v1-template
-  variables:
-    PHP_VERSION: "7.1"
-    TEST_COMPATIBILITY: "1"
-
-# Test v1: PHP 7.2
-test-v1:php7.2:
-  <<: *test-v1-template
-  variables:
-    PHP_VERSION: "7.2"
-
-# Test v1: PHP 7.3
-test-v1:php7.3:
-  <<: *test-v1-template
-  variables:
-    PHP_VERSION: "7.3"
-
-# Test v1: PHP 7.4
-test-v1:php7.4:
-  <<: *test-v1-template
   variables:
     PHP_VERSION: "7.4"
-
-# Test v2: PHP 7.1
-test-v2:php7.1:
-  <<: *test-v2-template
-  variables:
-    PHP_VERSION: "7.1"
-    TEST_COMPATIBILITY: "1"
-
-# Test v2: PHP 7.2
-test-v2:php7.2:
-  <<: *test-v2-template
-  variables:
-    PHP_VERSION: "7.2"
-
-# Test v2: PHP 7.3
-test-v2:php7.3:
-  <<: *test-v2-template
-  variables:
-    PHP_VERSION: "7.3"
-
-# Test v2: PHP 7.4
-test-v2:php7.4:
-  <<: *test-v2-template
-  variables:
-    PHP_VERSION: "7.4"
+    COMPOSER_VERSION: "2"
+  before_script:
+    - pecl channel-update pecl.php.net
+    - pecl install pcov
+    - docker-php-ext-enable pcov
+  after_script:
+    - COMPOSER_PROCESS_TIMEOUT=1000 composer test:ci -- --testdox
+  coverage: '/^\s*Lines:\s*\d+.\d+\%/'
