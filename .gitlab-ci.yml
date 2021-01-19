@@ -54,7 +54,7 @@ lint:php:
 test:
   <<: *test-template
   after_script:
-    - composer test -- --testdox
+    - composer test:run -- --testdox
   parallel:
     matrix:
       - PHP_VERSION: ["7.1", "7.2", "7.3"]
