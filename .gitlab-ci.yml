@@ -6,6 +6,7 @@ variables:
   MAILHOG_HOST: mailhog
   MAILHOG_SMTP_PORT: "1025"
   MAILHOG_API_PORT: "8025"
+  PHP_MEMORY_LIMIT: "-1"
 
 workflow:
   rules:
@@ -27,12 +28,19 @@ lint:php:
       when: never
     - when: on_success
 
-.test: &test-template
+test:
   image: webdevops/php:${PHP_VERSION}
   stage: test
   services:
     - name: mailhog/mailhog
       alias: mailhog
+  before_script:
+    - >
+      if [ "$COVERAGE" == "1" ]; then
+        pecl channel-update pecl.php.net
+        pecl install pcov
+        docker-php-ext-enable pcov
+      fi
   script:
     - composer self-update --${COMPOSER_VERSION}
     - composer --version
@@ -42,35 +50,27 @@ lint:php:
       if [ $UPDATE_CHECK_REF ]; then
         composer require "eliashaeussler/composer-update-check:dev-master#$UPDATE_CHECK_REF"
       fi
-  retry:
-    max: 2
-    when:
-      - runner_system_failure
-      - stuck_or_timeout_failure
-  artifacts:
-    reports:
-      junit: .build/coverage/junit.xml
-
-test:
-  <<: *test-template
-  after_script:
-    - composer test:run -- --testdox
+    - >
+      if [ "$COVERAGE" == "1" ]; then
+        COMPOSER_PROCESS_TIMEOUT=1000 composer test:ci -- --testdox
+      else
+        composer test:run -- --testdox
+      fi
   parallel:
     matrix:
       - PHP_VERSION: ["7.1", "7.2", "7.3"]
         COMPOSER_VERSION: ["1", "2"]
       - PHP_VERSION: "7.4"
         COMPOSER_VERSION: "1"
-
-test:coverage:
-  <<: *test-template
-  variables:
-    PHP_VERSION: "7.4"
-    COMPOSER_VERSION: "2"
-  before_script:
-    - pecl channel-update pecl.php.net
-    - pecl install pcov
-    - docker-php-ext-enable pcov
-  after_script:
-    - COMPOSER_PROCESS_TIMEOUT=1000 composer test:ci -- --testdox
+      - PHP_VERSION: "7.4"
+        COMPOSER_VERSION: "2"
+        COVERAGE: "1"
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
   coverage: '/^\s*Lines:\s*\d+.\d+\%/'
+  artifacts:
+    reports:
+      junit: .build/coverage/junit.xml
