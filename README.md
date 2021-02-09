@@ -20,6 +20,7 @@ composer req --dev eliashaeussler/composer-update-reporter
 * [GitLab](#gitlab)
 * [Mattermost](#mattermost)
 * [Slack](#slack)
+* [MS Teams](#ms-teams)
 
 ## Configuration
 
@@ -86,6 +87,16 @@ Learn more about Incoming Webhooks in the
 | `slack.enable` | `SLACK_ENABLE` | `bool` | yes |
 | `slack.url` | `SLACK_URL` | `string` | yes |
 
+### MS Teams
+
+Learn more about Incoming Webhooks in the
+[offical documentation](https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook).
+
+| `composer.json` config key | Environment variable | Type | Required |
+| -------------------------- | -------------------- | ---- | -------- |
+| `teams.enable` | `TEAMS_ENABLE` | `bool` | yes |
+| `teams.url` | `TEAMS_URL` | `string` | yes |
+
 ### Example
 
 Example configuration in `composer.json`:
@@ -114,6 +125,10 @@ Example configuration in `composer.json`:
       "slack": {
         "enable": true,
         "url": "https://hooks.slack.com/services/TU5C6A7/B01J/ZG5AR77F/5scqqjpgw3dzipuawi8fp19acy"
+      },
+      "teams": {
+        "enable": true,
+        "url": "https://my-team.webhook.office.com/webhookb2/5scqqjpgw3dzipuawi8fp19acy/IncomingWebhook/5scqqjpgw3dzipuawi8fp19acy/5scqqjpgw3dzipuawi8fp19acy"
       }
     }
   }
@@ -139,6 +154,9 @@ MATTERMOST_USERNAME="alertbot"
 
 SLACK_ENABLE=1
 SLACK_URL="https://hooks.slack.com/services/TU5C6A7/B01J/ZG5AR77F/5scqqjpgw3dzipuawi8fp19acy"
+
+TEAMS_ENABLE=1
+TEAMS_URL="https://my-team.webhook.office.com/webhookb2/5scqqjpgw3dzipuawi8fp19acy/IncomingWebhook/5scqqjpgw3dzipuawi8fp19acy/5scqqjpgw3dzipuawi8fp19acy"
 ```
 
 ## Usage
