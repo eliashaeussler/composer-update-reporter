@@ -5,7 +5,7 @@ namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit\Service;
 /*
  * This file is part of the Composer package "eliashaeussler/composer-update-reporter".
  *
- * Copyright (C) 2020 Elias Häußler <elias@haeussler.dev>
+ * Copyright (C) 2021 Elias Häußler <elias@haeussler.dev>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,35 +24,35 @@ namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit\Service;
 use Composer\IO\BufferIO;
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
-use EliasHaeussler\ComposerUpdateReporter\Service\Mattermost;
+use EliasHaeussler\ComposerUpdateReporter\Service\Teams;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\TestEnvironmentTrait;
-use EliasHaeussler\ComposerUpdateReporter\Util;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\RequestOptions;
 use Prophecy\Argument;
+use Spatie\Emoji\Emoji;
 
 /**
- * MattermostTest
+ * TeamsTest
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class MattermostTest extends AbstractTestCase
+class TeamsTest extends AbstractTestCase
 {
     use TestEnvironmentTrait;
 
     /**
-     * @var Mattermost
+     * @var Teams
      */
     protected $subject;
 
     protected function setUp(): void
     {
-        $this->subject = new Mattermost(new Uri('https://example.org'), 'foo', 'baz');
+        $this->subject = new Teams(new Uri('https://example.org'));
     }
 
     /**
@@ -61,9 +61,9 @@ class MattermostTest extends AbstractTestCase
     public function constructorThrowsExceptionIfUriIsEmpty(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionCode(1600793015);
+        $this->expectExceptionCode(1612865642);
 
-        new Mattermost(new Uri(''), 'foo');
+        new Teams(new Uri(''));
     }
 
     /**
@@ -72,53 +72,24 @@ class MattermostTest extends AbstractTestCase
     public function constructorThrowsExceptionIfUriIsInvalid(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionCode(1600792942);
+        $this->expectExceptionCode(1612865646);
 
-        new Mattermost(new Uri('foo'), 'foo');
+        new Teams(new Uri('foo'));
     }
 
     /**
      * @test
-     */
-    public function constructorThrowsExceptionIfChannelNameIsInvalid(): void
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionCode(1600793071);
-
-        new Mattermost(new Uri('https://example.org'), '');
-    }
-
-    /**
-     * @test
-     * @dataProvider fromConfigurationThrowsExceptionIfMattermostUrlIsNotSetDataProvider
+     * @dataProvider fromConfigurationThrowsExceptionIfTeamsUrlIsNotSetDataProvider
      * @param array $configuration
      */
-    public function fromConfigurationThrowsExceptionIfMattermostUrlIsNotSet(array $configuration): void
+    public function fromConfigurationThrowsExceptionIfTeamsUrlIsNotSet(array $configuration): void
     {
-        $this->modifyEnvironmentVariable('MATTERMOST_URL');
+        $this->modifyEnvironmentVariable('TEAMS_URL');
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionCode(1600283681);
+        $this->expectExceptionCode(1612865679);
 
-        Mattermost::fromConfiguration($configuration);
-    }
-
-    /**
-     * @test
-     */
-    public function fromConfigurationThrowsExceptionIfChannelNameIsNotSet(): void
-    {
-        $this->modifyEnvironmentVariable('MATTERMOST_CHANNEL');
-
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionCode(1600284246);
-
-        $configuration = [
-            'mattermost' => [
-                'url' => 'https://example.org',
-            ],
-        ];
-        Mattermost::fromConfiguration($configuration);
+        Teams::fromConfiguration($configuration);
     }
 
     /**
@@ -126,24 +97,18 @@ class MattermostTest extends AbstractTestCase
      */
     public function fromConfigurationReadsConfigurationFromComposerJson(): void
     {
-        $this->modifyEnvironmentVariable('MATTERMOST_URL');
-        $this->modifyEnvironmentVariable('MATTERMOST_CHANNEL');
-        $this->modifyEnvironmentVariable('MATTERMOST_USERNAME');
+        $this->modifyEnvironmentVariable('TEAMS_URL');
 
         $configuration = [
-            'mattermost' => [
+            'teams' => [
                 'url' => 'https://example.org',
-                'channel' => 'foo',
-                'username' => 'baz',
             ],
         ];
-        /** @var Mattermost $subject */
-        $subject = Mattermost::fromConfiguration($configuration);
+        /** @var Teams $subject */
+        $subject = Teams::fromConfiguration($configuration);
 
-        static::assertInstanceOf(Mattermost::class, $subject);
+        static::assertInstanceOf(Teams::class, $subject);
         static::assertSame('https://example.org', (string)$subject->getUri());
-        static::assertSame('foo', $subject->getChannelName());
-        static::assertSame('baz', $subject->getUsername());
     }
 
     /**
@@ -151,17 +116,13 @@ class MattermostTest extends AbstractTestCase
      */
     public function fromConfigurationReadsConfigurationFromEnvironmentVariables(): void
     {
-        $this->modifyEnvironmentVariable('MATTERMOST_URL', 'https://example.org');
-        $this->modifyEnvironmentVariable('MATTERMOST_CHANNEL', 'foo');
-        $this->modifyEnvironmentVariable('MATTERMOST_USERNAME', 'baz');
+        $this->modifyEnvironmentVariable('TEAMS_URL', 'https://example.org');
 
-        /** @var Mattermost $subject */
-        $subject = Mattermost::fromConfiguration([]);
+        /** @var Teams $subject */
+        $subject = Teams::fromConfiguration([]);
 
-        static::assertInstanceOf(Mattermost::class, $subject);
+        static::assertInstanceOf(Teams::class, $subject);
         static::assertSame('https://example.org', (string)$subject->getUri());
-        static::assertSame('foo', $subject->getChannelName());
-        static::assertSame('baz', $subject->getUsername());
     }
 
     /**
@@ -173,14 +134,13 @@ class MattermostTest extends AbstractTestCase
      */
     public function isEnabledReturnsStateOfAvailability(array $configuration, $environmentVariable, bool $expected): void
     {
-        $this->modifyEnvironmentVariable('MATTERMOST_ENABLE', $environmentVariable);
+        $this->modifyEnvironmentVariable('TEAMS_ENABLE', $environmentVariable);
 
-        static::assertSame($expected, Mattermost::isEnabled($configuration));
+        static::assertSame($expected, Teams::isEnabled($configuration));
     }
 
     /**
      * @test
-     * @throws GuzzleException
      */
     public function reportSkipsReportIfNoPackagesAreOutdated(): void
     {
@@ -188,7 +148,7 @@ class MattermostTest extends AbstractTestCase
         $io = new BufferIO();
 
         static::assertTrue($this->subject->report($result, $io));
-        static::assertStringContainsString('Skipped Mattermost report.', $io->getOutput());
+        static::assertStringContainsString('Skipped MS Teams report.', $io->getOutput());
     }
 
     /**
@@ -197,7 +157,6 @@ class MattermostTest extends AbstractTestCase
      * @param bool $insecure
      * @param string $expectedSecurityNotice
      * @throws GuzzleException
-     * @throws \ReflectionException
      */
     public function reportSendsUpdateReportSuccessfully(bool $insecure, string $expectedSecurityNotice): void
     {
@@ -209,26 +168,22 @@ class MattermostTest extends AbstractTestCase
         // Prophesize Client
         $clientProphecy = $this->prophesize(Client::class);
         /** @noinspection PhpParamsInspection */
-        $clientProphecy->post('', Argument::allOf(
-            Argument::that(function (array $argument) {
-                return Util::arrayDiffRecursive([
-                    RequestOptions::JSON => [
-                        'channel' => 'foo',
-                        'attachments' => [
-                            [
-                                'color' => '#EE0000',
-                            ],
-                        ],
-                        'username' => 'baz',
-                    ],
-                ], $argument) === [];
-            }),
-            Argument::that(function (array $argument) use ($expectedSecurityNotice) {
-                $text = $argument[RequestOptions::JSON]['attachments'][0]['text'] ?? null;
-                $expected = '[foo/foo](https://packagist.org/packages/foo/foo#1.0.5) | 1.0.0' . $expectedSecurityNotice . ' | **1.0.5**';
-                static::assertStringContainsString($expected, $text);
+        $clientProphecy->post('', Argument::that(
+            function (array $argument) use ($expectedSecurityNotice) {
+                $json = $argument[RequestOptions::JSON];
+
+                static::assertSame(sprintf('%s 1 outdated package', Emoji::policeCarLight()), $json['title']);
+                static::assertSame('1 package is outdated', $json['summary']);
+
+                $text = $json['sections'][0]['text'];
+                $expected = implode(PHP_EOL . PHP_EOL, [
+                    '# [foo/foo](https://packagist.org/packages/foo/foo#1.0.5)',
+                    'Current version: **1.0.0**' . $expectedSecurityNotice,
+                    'New version: **1.0.5**',
+                ]);
+                static::assertSame($expected, $text);
                 return true;
-            })
+            }
         ))->willReturn(new Response())->shouldBeCalledOnce();
 
         // Inject client prophecy into subject
@@ -238,7 +193,7 @@ class MattermostTest extends AbstractTestCase
         $clientProperty->setValue($this->subject, $clientProphecy->reveal());
 
         static::assertTrue($this->subject->report($result, $io));
-        static::assertStringContainsString('Mattermost report was successful.', $io->getOutput());
+        static::assertStringContainsString('MS Teams report was successful.', $io->getOutput());
     }
 
     /**
@@ -266,10 +221,10 @@ class MattermostTest extends AbstractTestCase
         $clientProperty->setValue($this->subject, $clientProphecy->reveal());
 
         static::assertFalse($this->subject->report($result, $io));
-        static::assertStringContainsString('Error during Mattermost report.', $io->getOutput());
+        static::assertStringContainsString('Error during MS Teams report.', $io->getOutput());
     }
 
-    public function fromConfigurationThrowsExceptionIfMattermostUrlIsNotSetDataProvider(): array
+    public function fromConfigurationThrowsExceptionIfTeamsUrlIsNotSetDataProvider(): array
     {
         return [
             'no service configuration' => [
@@ -277,13 +232,13 @@ class MattermostTest extends AbstractTestCase
             ],
             'available service configuration' => [
                 [
-                    'mattermost' => [],
+                    'teams' => [],
                 ],
             ],
             'missing URL configuration' => [
                 [
-                    'mattermost' => [
-                        'channel' => 'foo',
+                    'teams' => [
+                        'foo' => 'baz',
                     ],
                 ],
             ],
@@ -300,14 +255,14 @@ class MattermostTest extends AbstractTestCase
             ],
             'empty configuration and no environment variable' => [
                 [
-                    'mattermost' => [],
+                    'teams' => [],
                 ],
                 null,
                 false,
             ],
             'truthy configuration and no environment variable' => [
                 [
-                    'mattermost' => [
+                    'teams' => [
                         'enable' => true,
                     ],
                 ],
@@ -316,7 +271,7 @@ class MattermostTest extends AbstractTestCase
             ],
             'truthy configuration and falsy environment variable' => [
                 [
-                    'mattermost' => [
+                    'teams' => [
                         'enable' => true,
                     ],
                 ],
@@ -325,7 +280,7 @@ class MattermostTest extends AbstractTestCase
             ],
             'falsy configuration and truthy environment variable' => [
                 [
-                    'mattermost' => [
+                    'teams' => [
                         'enable' => false,
                     ],
                 ],
@@ -334,7 +289,7 @@ class MattermostTest extends AbstractTestCase
             ],
             'empty configuration and truthy environment variable' => [
                 [
-                    'mattermost' => [],
+                    'teams' => [],
                 ],
                 '1',
                 true,
@@ -356,7 +311,7 @@ class MattermostTest extends AbstractTestCase
             ],
             'insecure package' => [
                 true,
-                ' :warning: **`insecure`**'
+                sprintf(' (%s insecure)', Emoji::warning()),
             ],
         ];
     }

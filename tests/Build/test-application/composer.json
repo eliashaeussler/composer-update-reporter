@@ -1,6 +1,6 @@
 {
   "require-dev": {
-    "eliashaeussler/composer-update-check": "^0.4",
+    "eliashaeussler/composer-update-check": "~0.7",
     "phpunit/phpunit": "^5.0"
   },
   "extra": {
@@ -25,6 +25,10 @@
       "slack": {
         "enable": true,
         "url": "https://hooks.slack.com/services/TU5C6A7/B01J/ZG5AR77F/5scqqjpgw3dzipuawi8fp19acy"
+      },
+      "teams": {
+        "enable": true,
+        "url": "https://my-team.webhook.office.com/webhookb2/5scqqjpgw3dzipuawi8fp19acy/IncomingWebhook/5scqqjpgw3dzipuawi8fp19acy/5scqqjpgw3dzipuawi8fp19acy"
       }
     }
   }

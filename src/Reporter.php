@@ -29,6 +29,7 @@ use EliasHaeussler\ComposerUpdateReporter\Service\GitLab;
 use EliasHaeussler\ComposerUpdateReporter\Service\Mattermost;
 use EliasHaeussler\ComposerUpdateReporter\Service\ServiceInterface;
 use EliasHaeussler\ComposerUpdateReporter\Service\Slack;
+use EliasHaeussler\ComposerUpdateReporter\Service\Teams;
 
 /**
  * Reporter
@@ -123,6 +124,7 @@ class Reporter
             GitLab::class,
             Mattermost::class,
             Slack::class,
+            Teams::class,
         ];
     }
 
