@@ -25,12 +25,14 @@ use Composer\IO\IOInterface;
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateReporter\Traits\PackageProviderLinkTrait;
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Uri;
-use GuzzleHttp\RequestOptions;
+use EliasHaeussler\ComposerUpdateReporter\Traits\RemoteServiceTrait;
+use Nyholm\Psr7\Factory\Psr17Factory;
+use Nyholm\Psr7\Uri;
+use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\UriInterface;
 use Spatie\Emoji\Emoji;
 use Spatie\Emoji\Exceptions\UnknownCharacter;
+use Symfony\Component\HttpClient\Psr18Client;
 
 /**
  * Teams
@@ -41,16 +43,12 @@ use Spatie\Emoji\Exceptions\UnknownCharacter;
 class Teams implements ServiceInterface
 {
     use PackageProviderLinkTrait;
+    use RemoteServiceTrait;
 
     /**
      * @var UriInterface
      */
     private $uri;
-
-    /**
-     * @var Client
-     */
-    private $client;
 
     /**
      * @var bool
@@ -60,7 +58,8 @@ class Teams implements ServiceInterface
     public function __construct(UriInterface $uri)
     {
         $this->uri = $uri;
-        $this->client = new Client(['base_uri' => (string)$this->uri]);
+        $this->requestFactory = new Psr17Factory();
+        $this->client = new Psr18Client();
 
         $this->validateUri();
     }
@@ -93,6 +92,10 @@ class Teams implements ServiceInterface
         return is_array($extra) && (bool)($extra['enable'] ?? false);
     }
 
+    /**
+     * @inheritDoc
+     * @throws ClientExceptionInterface
+     */
     public function report(UpdateCheckResult $result, IOInterface $io): bool
     {
         $outdatedPackages = $result->getOutdatedPackages();
@@ -118,7 +121,7 @@ class Teams implements ServiceInterface
         if (!$this->json) {
             $io->write(Emoji::rocket() . ' Sending report to MS Teams...');
         }
-        $response = $this->client->post('', [RequestOptions::JSON => $payload]);
+        $response = $this->sendRequest($payload);
         $successful = $response->getStatusCode() < 400;
 
         // Print report state

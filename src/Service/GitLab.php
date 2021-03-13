@@ -24,13 +24,14 @@ namespace EliasHaeussler\ComposerUpdateReporter\Service;
 use Composer\IO\IOInterface;
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Uri;
-use GuzzleHttp\RequestOptions;
+use EliasHaeussler\ComposerUpdateReporter\Traits\RemoteServiceTrait;
+use Nyholm\Psr7\Factory\Psr17Factory;
+use Nyholm\Psr7\Uri;
+use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\UriInterface;
 use Spatie\Emoji\Emoji;
 use Spatie\Emoji\Exceptions\UnknownCharacter;
+use Symfony\Component\HttpClient\Psr18Client;
 
 /**
  * GitLab
@@ -40,6 +41,8 @@ use Spatie\Emoji\Exceptions\UnknownCharacter;
  */
 class GitLab implements ServiceInterface
 {
+    use RemoteServiceTrait;
+
     /**
      * @var UriInterface
      */
@@ -51,11 +54,6 @@ class GitLab implements ServiceInterface
     private $authorizationKey;
 
     /**
-     * @var Client
-     */
-    private $client;
-
-    /**
      * @var bool
      */
     private $json = false;
@@ -64,12 +62,8 @@ class GitLab implements ServiceInterface
     {
         $this->uri = $uri;
         $this->authorizationKey = $authorizationKey;
-        $this->client = new Client([
-            'base_uri' => (string) $this->uri,
-            RequestOptions::HEADERS => [
-                'Authorization' => 'Bearer ' . $this->authorizationKey,
-            ],
-        ]);
+        $this->requestFactory = new Psr17Factory();
+        $this->client = new Psr18Client();
 
         $this->validateUri();
         $this->validateAuthorizationKey();
@@ -117,7 +111,7 @@ class GitLab implements ServiceInterface
 
     /**
      * @inheritDoc
-     * @throws GuzzleException
+     * @throws ClientExceptionInterface
      */
     public function report(UpdateCheckResult $result, IOInterface $io): bool
     {
@@ -141,7 +135,7 @@ class GitLab implements ServiceInterface
         if (!$this->json) {
             $io->write(Emoji::rocket() . ' Sending report to GitLab...');
         }
-        $response = $this->client->post('', [RequestOptions::JSON => $payload]);
+        $response = $this->sendRequest($payload, ['Authorization' => 'Bearer ' . $this->authorizationKey,]);
         $successful = $response->getStatusCode() < 400;
 
         // Print report state

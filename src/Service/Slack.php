@@ -25,13 +25,14 @@ use Composer\IO\IOInterface;
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateReporter\Traits\PackageProviderLinkTrait;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Uri;
-use GuzzleHttp\RequestOptions;
+use EliasHaeussler\ComposerUpdateReporter\Traits\RemoteServiceTrait;
+use Nyholm\Psr7\Factory\Psr17Factory;
+use Nyholm\Psr7\Uri;
+use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\UriInterface;
 use Spatie\Emoji\Emoji;
 use Spatie\Emoji\Exceptions\UnknownCharacter;
+use Symfony\Component\HttpClient\Psr18Client;
 
 /**
  * Slack
@@ -42,16 +43,12 @@ use Spatie\Emoji\Exceptions\UnknownCharacter;
 class Slack implements ServiceInterface
 {
     use PackageProviderLinkTrait;
+    use RemoteServiceTrait;
 
     /**
      * @var UriInterface
      */
     private $uri;
-
-    /**
-     * @var Client
-     */
-    private $client;
 
     /**
      * @var bool
@@ -61,7 +58,8 @@ class Slack implements ServiceInterface
     public function __construct(UriInterface $uri)
     {
         $this->uri = $uri;
-        $this->client = new Client(['base_uri' => (string) $this->uri]);
+        $this->requestFactory = new Psr17Factory();
+        $this->client = new Psr18Client();
 
         $this->validateUri();
     }
@@ -96,7 +94,7 @@ class Slack implements ServiceInterface
 
     /**
      * @inheritDoc
-     * @throws GuzzleException
+     * @throws ClientExceptionInterface
      */
     public function report(UpdateCheckResult $result, IOInterface $io): bool
     {
@@ -119,7 +117,7 @@ class Slack implements ServiceInterface
         if (!$this->json) {
             $io->write(Emoji::rocket() . ' Sending report to Slack...');
         }
-        $response = $this->client->post('', [RequestOptions::JSON => $payload]);
+        $response = $this->sendRequest($payload);
         $successful = $response->getStatusCode() < 400;
 
         // Print report state

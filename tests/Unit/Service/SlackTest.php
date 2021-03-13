@@ -26,14 +26,11 @@ use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateReporter\Service\Slack;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\AbstractTestCase;
+use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\ClientMockTrait;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\TestEnvironmentTrait;
-use EliasHaeussler\ComposerUpdateReporter\Util;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Psr7\Uri;
-use GuzzleHttp\RequestOptions;
-use Prophecy\Argument;
+use Nyholm\Psr7\Response;
+use Nyholm\Psr7\Uri;
+use Psr\Http\Client\ClientExceptionInterface;
 
 /**
  * SlackTest
@@ -43,6 +40,7 @@ use Prophecy\Argument;
  */
 class SlackTest extends AbstractTestCase
 {
+    use ClientMockTrait;
     use TestEnvironmentTrait;
 
     /**
@@ -141,7 +139,7 @@ class SlackTest extends AbstractTestCase
 
     /**
      * @test
-     * @throws GuzzleException
+     * @throws ClientExceptionInterface
      */
     public function reportSkipsReportIfNoPackagesAreOutdated(): void
     {
@@ -157,8 +155,7 @@ class SlackTest extends AbstractTestCase
      * @test
      * @param bool $insecure
      * @param array|null $expectedSecurityPayload
-     * @throws GuzzleException
-     * @throws \ReflectionException
+     * @throws ClientExceptionInterface
      */
     public function reportSendsUpdateReportSuccessfully(bool $insecure, ?array $expectedSecurityPayload): void
     {
@@ -167,75 +164,65 @@ class SlackTest extends AbstractTestCase
         ]);
         $io = new BufferIO();
 
-        // Prophesize Client
-        $clientProphecy = $this->prophesize(Client::class);
-        /** @noinspection PhpParamsInspection */
-        $clientProphecy->post('', Argument::that(function (array $argument) use ($expectedSecurityPayload) {
-            $expectedFields = [
-                [
-                    'type' => 'mrkdwn',
-                    'text' => '*Package*',
-                ],
-                [
-                    'type' => 'mrkdwn',
-                    'text' => '<https://packagist.org/packages/foo/foo#1.0.5|foo/foo>',
-                ],
-                [
-                    'type' => 'mrkdwn',
-                    'text' => '*Current version*',
-                ],
-                [
-                    'type' => 'mrkdwn',
-                    'text' => '`1.0.0`',
-                ],
-                [
-                    'type' => 'mrkdwn',
-                    'text' => '*New version*',
-                ],
-                [
-                    'type' => 'mrkdwn',
-                    'text' => '*`1.0.5`*',
-                ],
-            ];
-            if ($expectedSecurityPayload !== null) {
-                $expectedFields = array_merge($expectedFields, $expectedSecurityPayload);
-            }
-            return Util::arrayDiffRecursive([
-                RequestOptions::JSON => [
-                    'blocks' => [
-                        [
-                            'type' => 'header',
-                            'text' => [
-                                'type' => 'plain_text',
-                                'text' => '1 outdated package',
-                            ],
-                        ],
-                        [
-                            'type' => 'divider',
-                        ],
-                        [
-                            'type' => 'section',
-                            'fields' => $expectedFields,
-                        ],
-                    ],
-                ],
-            ], $argument) === [];
-        }))->willReturn(new Response())->shouldBeCalledOnce();
-
-        // Inject client prophecy into subject
-        $reflectionClass = new \ReflectionClass($this->subject);
-        $clientProperty = $reflectionClass->getProperty('client');
-        $clientProperty->setAccessible(true);
-        $clientProperty->setValue($this->subject, $clientProphecy->reveal());
+        $expectedFields = [
+            [
+                'type' => 'mrkdwn',
+                'text' => '*Package*',
+            ],
+            [
+                'type' => 'mrkdwn',
+                'text' => '<https://packagist.org/packages/foo/foo#1.0.5|foo/foo>',
+            ],
+            [
+                'type' => 'mrkdwn',
+                'text' => '*Current version*',
+            ],
+            [
+                'type' => 'mrkdwn',
+                'text' => '`1.0.0`',
+            ],
+            [
+                'type' => 'mrkdwn',
+                'text' => '*New version*',
+            ],
+            [
+                'type' => 'mrkdwn',
+                'text' => '*`1.0.5`*',
+            ],
+        ];
+        if ($expectedSecurityPayload !== null) {
+            $expectedFields = array_merge($expectedFields, $expectedSecurityPayload);
+        }
+        $this->subject->setClient($this->getClient());
+        $this->mockHandler->append(new Response());
 
         static::assertTrue($this->subject->report($result, $io));
         static::assertStringContainsString('Slack report was successful.', $io->getOutput());
+
+        $expectedPayloadSubset = [
+            'blocks' => [
+                [
+                    'type' => 'header',
+                    'text' => [
+                        'type' => 'plain_text',
+                        'text' => '1 outdated package',
+                    ],
+                ],
+                [
+                    'type' => 'divider',
+                ],
+                [
+                    'type' => 'section',
+                    'fields' => $expectedFields,
+                ],
+            ],
+        ];
+        $this->assertPayloadOfLastRequestContainsSubset($expectedPayloadSubset);
     }
 
     /**
      * @test
-     * @throws GuzzleException
-     * @throws \ReflectionException
+     * @throws ClientExceptionInterface
      */
     public function reportsPrintsErrorOnErroneousReport(): void
     {
@@ -244,17 +231,8 @@ class SlackTest extends AbstractTestCase
         ]);
         $io = new BufferIO();
 
-        // Prophesize Client
-        $clientProphecy = $this->prophesize(Client::class);
-        $clientProphecy->post('', Argument::type('array'))
-            ->willReturn(new Response(404))
-            ->shouldBeCalledOnce();
-
-        // Inject client prophecy into subject
-        $reflectionClass = new \ReflectionClass($this->subject);
-        $clientProperty = $reflectionClass->getProperty('client');
-        $clientProperty->setAccessible(true);
-        $clientProperty->setValue($this->subject, $clientProphecy->reveal());
+        $this->subject->setClient($this->getClient());
+        $this->mockHandler->append(new Response(404));
 
         static::assertFalse($this->subject->report($result, $io));
         static::assertStringContainsString('Error during Slack report.', $io->getOutput());

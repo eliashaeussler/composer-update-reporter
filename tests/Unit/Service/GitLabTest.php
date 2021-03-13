@@ -26,13 +26,11 @@ use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateReporter\Service\GitLab;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\AbstractTestCase;
+use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\ClientMockTrait;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\TestEnvironmentTrait;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Psr7\Uri;
-use GuzzleHttp\RequestOptions;
-use Prophecy\Argument;
+use Nyholm\Psr7\Response;
+use Nyholm\Psr7\Uri;
+use Psr\Http\Client\ClientExceptionInterface;
 
 /**
  * GitLabTest
@@ -42,6 +40,7 @@ use Prophecy\Argument;
  */
 class GitLabTest extends AbstractTestCase
 {
+    use ClientMockTrait;
     use TestEnvironmentTrait;
 
     /**
@@ -174,7 +173,7 @@ class GitLabTest extends AbstractTestCase
 
     /**
      * @test
-     * @throws GuzzleException
+     * @throws ClientExceptionInterface
      */
     public function reportSkipsReportIfNoPackagesAreOutdated(): void
     {
@@ -190,8 +189,7 @@ class GitLabTest extends AbstractTestCase
      * @dataProvider reportSendsUpdateReportSuccessfullyDataProvider
      * @param bool $insecure
      * @param string $expectedSecurityNotice
-     * @throws GuzzleException
-     * @throws \ReflectionException
+     * @throws ClientExceptionInterface
      */
     public function reportSendsUpdateReportSuccessfully(bool $insecure, string $expectedSecurityNotice): void
     {
@@ -200,29 +198,22 @@ class GitLabTest extends AbstractTestCase
         ]);
         $io = new BufferIO();
 
-        // Prophesize Client
-        $clientProphecy = $this->prophesize(Client::class);
-        $clientProphecy->post('', [
-            RequestOptions::JSON => [
-                'title' => '1 outdated package',
-                'foo/foo' => 'Outdated version: 1.0.0' . $expectedSecurityNotice . ', new version: 1.0.5',
-            ],
-        ])->willReturn(new Response())->shouldBeCalledOnce();
-
-        // Inject client prophecy into subject
-        $reflectionClass = new \ReflectionClass($this->subject);
-        $clientProperty = $reflectionClass->getProperty('client');
-        $clientProperty->setAccessible(true);
-        $clientProperty->setValue($this->subject, $clientProphecy->reveal());
+        $this->subject->setClient($this->getClient());
+        $this->mockHandler->append(new Response());
 
         static::assertTrue($this->subject->report($result, $io));
         static::assertStringContainsString('GitLab report was successful.', $io->getOutput());
+
+        $expectedPayloadSubset = [
+            'title' => '1 outdated package',
+            'foo/foo' => 'Outdated version: 1.0.0' . $expectedSecurityNotice . ', new version: 1.0.5',
+        ];
+        $this->assertPayloadOfLastRequestContainsSubset($expectedPayloadSubset);
     }
 
     /**
      * @test
-     * @throws GuzzleException
-     * @throws \ReflectionException
+     * @throws ClientExceptionInterface
      */
     public function reportsPrintsErrorOnErroneousReport(): void
     {
@@ -231,17 +222,8 @@ class GitLabTest extends AbstractTestCase
         ]);
         $io = new BufferIO();
 
-        // Prophesize Client
-        $clientProphecy = $this->prophesize(Client::class);
-        $clientProphecy->post('', Argument::type('array'))
-            ->willReturn(new Response(404))
-            ->shouldBeCalledOnce();
-
-        // Inject client prophecy into subject
-        $reflectionClass = new \ReflectionClass($this->subject);
-        $clientProperty = $reflectionClass->getProperty('client');
-        $clientProperty->setAccessible(true);
-        $clientProperty->setValue($this->subject, $clientProphecy->reveal());
+        $this->subject->setClient($this->getClient());
+        $this->mockHandler->append(new Response(404));
 
         static::assertFalse($this->subject->report($result, $io));
         static::assertStringContainsString('Error during GitLab report.', $io->getOutput());
