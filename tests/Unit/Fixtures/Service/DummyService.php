@@ -62,6 +62,16 @@ class DummyService extends AbstractService
      */
     public static $customOptions;
 
+    public static function getIdentifier(): string
+    {
+        return 'dummy';
+    }
+
+    protected static function getName(): string
+    {
+        return 'Dummy';
+    }
+
     public static function fromConfiguration(array $configuration): ServiceInterface
     {
         return new self();
@@ -125,15 +135,5 @@ class DummyService extends AbstractService
     public function getOptions(): Options
     {
         return $this->options;
-    }
-
-    protected static function getIdentifier(): string
-    {
-        return 'dummy';
-    }
-
-    protected static function getName(): string
-    {
-        return 'Dummy';
     }
 }

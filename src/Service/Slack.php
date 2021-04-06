@@ -57,6 +57,16 @@ class Slack extends AbstractService
         $this->validateUri();
     }
 
+    public static function getIdentifier(): string
+    {
+        return 'slack';
+    }
+
+    protected static function getName(): string
+    {
+        return 'Slack';
+    }
+
     public static function fromConfiguration(array $configuration): ServiceInterface
     {
         $extra = $configuration['slack'] ?? null;
@@ -71,16 +81,6 @@ class Slack extends AbstractService
         }
 
         return new self($uri);
-    }
-
-    protected static function getIdentifier(): string
-    {
-        return 'slack';
-    }
-
-    protected static function getName(): string
-    {
-        return 'Slack';
     }
 
     /**

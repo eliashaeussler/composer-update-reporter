@@ -64,6 +64,16 @@ class GitLab extends AbstractService
         $this->validateAuthorizationKey();
     }
 
+    public static function getIdentifier(): string
+    {
+        return 'gitlab';
+    }
+
+    protected static function getName(): string
+    {
+        return 'GitLab';
+    }
+
     public static function fromConfiguration(array $configuration): ServiceInterface
     {
         $extra = $configuration['gitlab'] ?? null;
@@ -87,16 +97,6 @@ class GitLab extends AbstractService
         }
 
         return new self($uri, $authKey);
-    }
-
-    protected static function getIdentifier(): string
-    {
-        return 'gitlab';
-    }
-
-    protected static function getName(): string
-    {
-        return 'GitLab';
     }
 
     /**

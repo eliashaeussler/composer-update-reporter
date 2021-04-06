@@ -67,6 +67,16 @@ class Email extends AbstractService
         $this->validateSender();
     }
 
+    public static function getIdentifier(): string
+    {
+        return 'email';
+    }
+
+    protected static function getName(): string
+    {
+        return 'E-mail';
+    }
+
     public static function fromConfiguration(array $configuration): ServiceInterface
     {
         $extra = $configuration['email'] ?? null;
@@ -99,16 +109,6 @@ class Email extends AbstractService
         }
 
         return new self($dsn, array_map('trim', array_filter($receivers)), $sender);
-    }
-
-    protected static function getIdentifier(): string
-    {
-        return 'email';
-    }
-
-    protected static function getName(): string
-    {
-        return 'E-mail';
     }
 
     /**

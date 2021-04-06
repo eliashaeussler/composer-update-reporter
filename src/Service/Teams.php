@@ -57,6 +57,16 @@ class Teams extends AbstractService
         $this->validateUri();
     }
 
+    public static function getIdentifier(): string
+    {
+        return 'teams';
+    }
+
+    protected static function getName(): string
+    {
+        return 'MS Teams';
+    }
+
     public static function fromConfiguration(array $configuration): ServiceInterface
     {
         $extra = $configuration['teams'] ?? null;
@@ -71,16 +81,6 @@ class Teams extends AbstractService
         }
 
         return new self($uri);
-    }
-
-    protected static function getIdentifier(): string
-    {
-        return 'teams';
-    }
-
-    protected static function getName(): string
-    {
-        return 'MS Teams';
     }
 
     /**

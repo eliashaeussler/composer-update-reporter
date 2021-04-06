@@ -70,6 +70,16 @@ class Mattermost extends AbstractService
         $this->validateChannelName();
     }
 
+    public static function getIdentifier(): string
+    {
+        return 'mattermost';
+    }
+
+    protected static function getName(): string
+    {
+        return 'Mattermost';
+    }
+
     public static function fromConfiguration(array $configuration): ServiceInterface
     {
         $extra = $configuration['mattermost'] ?? null;
@@ -101,16 +111,6 @@ class Mattermost extends AbstractService
         }
 
         return new self($uri, $channelName, $username);
-    }
-
-    protected static function getIdentifier(): string
-    {
-        return 'mattermost';
-    }
-
-    protected static function getName(): string
-    {
-        return 'Mattermost';
     }
 
     /**

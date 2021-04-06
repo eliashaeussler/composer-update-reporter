@@ -66,8 +66,6 @@ abstract class AbstractService implements ServiceInterface
         return is_array($extra) && (bool) ($extra['enable'] ?? false);
     }
 
-    abstract protected static function getIdentifier(): string;
-
     abstract protected static function getName(): string;
 
     public function report(UpdateCheckResult $result): bool

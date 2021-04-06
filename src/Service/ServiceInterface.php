@@ -35,6 +35,8 @@ use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
  */
 interface ServiceInterface
 {
+    public static function getIdentifier(): string;
+
     /**
      * @param array<string, mixed> $configuration
      */
