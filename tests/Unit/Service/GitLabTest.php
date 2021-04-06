@@ -92,6 +92,8 @@ class GitLabTest extends AbstractTestCase
     /**
      * @test
      * @dataProvider fromConfigurationThrowsExceptionIfGitLabUrlIsNotSetDataProvider
+     *
+     * @param array<string, mixed> $configuration
      */
     public function fromConfigurationThrowsExceptionIfGitLabUrlIsNotSet(array $configuration): void
     {
@@ -182,6 +184,9 @@ class GitLabTest extends AbstractTestCase
         $this->assertPayloadOfLastRequestContainsSubset($expectedPayloadSubset);
     }
 
+    /**
+     * @return array<string, array>
+     */
     public function fromConfigurationThrowsExceptionIfGitLabUrlIsNotSetDataProvider(): array
     {
         return [
@@ -203,6 +208,9 @@ class GitLabTest extends AbstractTestCase
         ];
     }
 
+    /**
+     * @return array<string, array>
+     */
     public function reportSendsUpdateReportSuccessfullyDataProvider(): array
     {
         return [

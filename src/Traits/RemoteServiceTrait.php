@@ -48,6 +48,9 @@ trait RemoteServiceTrait
     private $client;
 
     /**
+     * @param mixed[]              $payload
+     * @param array<string, mixed> $headers
+     *
      * @throws ClientExceptionInterface
      */
     protected function sendRequest(array $payload, array $headers = []): ResponseInterface

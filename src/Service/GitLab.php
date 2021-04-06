@@ -125,6 +125,8 @@ class GitLab extends AbstractService
 
     /**
      * @param OutdatedPackage[] $outdatedPackages
+     *
+     * @return array<string, string>
      */
     private function getPackagesPayload(array $outdatedPackages): array
     {

@@ -36,6 +36,9 @@ trait TestEnvironmentTrait
      */
     protected $backedUpEnvironmentVariables = [];
 
+    /**
+     * @param mixed $value
+     */
     protected function modifyEnvironmentVariable(string $environmentVariable, $value = null): void
     {
         $this->backedUpEnvironmentVariables[$environmentVariable] = getenv($environmentVariable);

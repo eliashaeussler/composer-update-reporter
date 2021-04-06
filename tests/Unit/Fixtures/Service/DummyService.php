@@ -37,10 +37,29 @@ use EliasHaeussler\ComposerUpdateReporter\Service\ServiceInterface;
  */
 class DummyService extends AbstractService
 {
+    /**
+     * @var bool|null
+     */
     public static $enabled;
+
+    /**
+     * @var bool
+     */
     public static $successful = true;
+
+    /**
+     * @var bool
+     */
     public static $reportWasExecuted = false;
+
+    /**
+     * @var OutputBehavior|null
+     */
     public static $customBehavior;
+
+    /**
+     * @var Options|null
+     */
     public static $customOptions;
 
     public static function fromConfiguration(array $configuration): ServiceInterface
@@ -92,6 +111,7 @@ class DummyService extends AbstractService
 
     public function unsetBehavior(): void
     {
+        /* @phpstan-ignore-next-line */
         $this->behavior = null;
     }
 

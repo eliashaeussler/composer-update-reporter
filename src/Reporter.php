@@ -66,7 +66,7 @@ class Reporter
     private $registeredServices;
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
     private $configuration;
 
@@ -96,6 +96,7 @@ class Reporter
         /** @var ServiceInterface $registeredService */
         foreach ($this->registeredServices as $registeredService) {
             if (!in_array(ServiceInterface::class, class_implements($registeredService), true)) {
+                /* @phpstan-ignore-next-line */
                 throw new \InvalidArgumentException(sprintf('Service "%s" must implement "%s".', $registeredService, ServiceInterface::class), 1600814017);
             }
             if ($registeredService::isEnabled($this->configuration)) {
@@ -119,6 +120,9 @@ class Reporter
         $this->options = $options;
     }
 
+    /**
+     * @param string[] $registeredServices
+     */
     public function setRegisteredServices(array $registeredServices): self
     {
         $this->registeredServices = $registeredServices;
@@ -126,6 +130,9 @@ class Reporter
         return $this;
     }
 
+    /**
+     * @return string[]
+     */
     private function getDefaultServices(): array
     {
         return [
@@ -146,6 +153,9 @@ class Reporter
         );
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function resolveConfiguration(): array
     {
         return $this->composer->getPackage()->getExtra()['update-check'] ?? [];

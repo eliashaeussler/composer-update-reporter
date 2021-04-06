@@ -81,6 +81,8 @@ class SlackTest extends AbstractTestCase
     /**
      * @test
      * @dataProvider fromConfigurationThrowsExceptionIfSlackUrlIsNotSetDataProvider
+     *
+     * @param array<string, mixed> $configuration
      */
     public function fromConfigurationThrowsExceptionIfSlackUrlIsNotSet(array $configuration): void
     {
@@ -249,6 +251,9 @@ class SlackTest extends AbstractTestCase
         $this->assertPayloadOfLastRequestContainsSubset($expectedPayloadSubset);
     }
 
+    /**
+     * @return array<string, array>
+     */
     public function fromConfigurationThrowsExceptionIfSlackUrlIsNotSetDataProvider(): array
     {
         return [
@@ -270,6 +275,9 @@ class SlackTest extends AbstractTestCase
         ];
     }
 
+    /**
+     * @return array<string, array>
+     */
     public function reportSendsUpdateReportSuccessfullyDataProvider(): array
     {
         return [

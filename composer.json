@@ -33,6 +33,7 @@
     "composer/composer": "^1.0 || ^2.0",
     "friendsofphp/php-cs-fixer": "^2.17",
     "php-http/mock-client": "^1.4",
+    "phpstan/phpstan": "^0.12.80",
     "phpunit/phpunit": "^7.0 || ^8.0 || ^9.0",
     "rpkamp/mailhog-client": "^0.3 || ^0.4 || ^0.5"
   },
@@ -51,6 +52,7 @@
   },
   "scripts": {
     "lint": "php-cs-fixer fix",
+    "sca": "phpstan analyse -c phpstan.neon",
     "test": [
       "@test:docker:start",
       "@test:run",

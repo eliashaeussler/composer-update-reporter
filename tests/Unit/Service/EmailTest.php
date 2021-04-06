@@ -33,6 +33,7 @@ use rpkamp\Mailhog\MailhogClient;
 use rpkamp\Mailhog\Message\Contact;
 use Symfony\Component\HttpClient\HttplugClient;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
+use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
 
 /**
  * EmailTest.
@@ -45,10 +46,29 @@ class EmailTest extends AbstractTestCase
     use OutputBehaviorTrait;
     use TestEnvironmentTrait;
 
+    /**
+     * @var string
+     */
     protected static $mailhogHost;
+
+    /**
+     * @var int
+     */
     protected static $mailhogSmtpPort;
+
+    /**
+     * @var int
+     */
     protected static $mailhogApiPort;
+
+    /**
+     * @var string
+     */
     protected static $mailhogSmtp;
+
+    /**
+     * @var string
+     */
     protected static $mailhogApi;
 
     /**
@@ -124,6 +144,8 @@ class EmailTest extends AbstractTestCase
     /**
      * @test
      * @dataProvider fromConfigurationThrowsExceptionIfEmailDsnIsNotSetDataProvider
+     *
+     * @param array<string, mixed> $configuration
      */
     public function fromConfigurationThrowsExceptionIfEmailDsnIsNotSet(array $configuration): void
     {
@@ -190,18 +212,17 @@ class EmailTest extends AbstractTestCase
         ];
         /** @var Email $subject */
         $subject = Email::fromConfiguration($configuration);
+        /** @var EsmtpTransport $transport */
         $transport = $subject->getTransport();
+        /** @var SocketStream $stream */
+        $stream = $transport->getStream();
 
         static::assertInstanceOf(Email::class, $subject);
         static::assertInstanceOf(EsmtpTransport::class, $transport);
-        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         static::assertSame('', $transport->getUsername());
-        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         static::assertSame('', $transport->getPassword());
-        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
-        static::assertSame(static::$mailhogHost, $transport->getStream()->getHost());
-        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
-        static::assertSame(static::$mailhogSmtpPort, $transport->getStream()->getPort());
+        static::assertSame(static::$mailhogHost, $stream->getHost());
+        static::assertSame(static::$mailhogSmtpPort, $stream->getPort());
         static::assertSame(['foo@foo.com', 'foo@another-foo.com'], $subject->getReceivers());
         static::assertSame('baz@baz.com', $subject->getSender());
     }
@@ -217,18 +238,17 @@ class EmailTest extends AbstractTestCase
 
         /** @var Email $subject */
         $subject = Email::fromConfiguration([]);
+        /** @var EsmtpTransport $transport */
         $transport = $subject->getTransport();
+        /** @var SocketStream $stream */
+        $stream = $transport->getStream();
 
         static::assertInstanceOf(Email::class, $subject);
         static::assertInstanceOf(EsmtpTransport::class, $transport);
-        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         static::assertSame('', $transport->getUsername());
-        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         static::assertSame('', $transport->getPassword());
-        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
-        static::assertSame(static::$mailhogHost, $transport->getStream()->getHost());
-        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
-        static::assertSame(static::$mailhogSmtpPort, $transport->getStream()->getPort());
+        static::assertSame(static::$mailhogHost, $stream->getHost());
+        static::assertSame(static::$mailhogSmtpPort, $stream->getPort());
         static::assertSame(['foo@foo.com', 'foo@another-foo.com'], $subject->getReceivers());
         static::assertSame('baz@baz.com', $subject->getSender());
     }
@@ -270,6 +290,9 @@ class EmailTest extends AbstractTestCase
         static::assertSame($expected, $message->body);
     }
 
+    /**
+     * @return array<string, array>
+     */
     public function fromConfigurationThrowsExceptionIfEmailDsnIsNotSetDataProvider(): array
     {
         return [
@@ -292,6 +315,9 @@ class EmailTest extends AbstractTestCase
         ];
     }
 
+    /**
+     * @return array<string, array>
+     */
     public function reportSendsUpdateReportSuccessfullyDataProvider(): array
     {
         return [

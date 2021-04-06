@@ -36,10 +36,13 @@ use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 interface ServiceInterface
 {
     /**
-     * @return static
+     * @param array<string, mixed> $configuration
      */
     public static function fromConfiguration(array $configuration): self;
 
+    /**
+     * @param array<string, mixed> $configuration
+     */
     public static function isEnabled(array $configuration): bool;
 
     public function report(UpdateCheckResult $result): bool;

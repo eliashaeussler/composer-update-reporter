@@ -45,7 +45,7 @@ class Email extends AbstractService
     private $transport;
 
     /**
-     * @var array
+     * @var string[]
      */
     private $receivers;
 
@@ -54,6 +54,9 @@ class Email extends AbstractService
      */
     private $sender;
 
+    /**
+     * @param string[] $receivers
+     */
     public function __construct(string $dsn, array $receivers, string $sender)
     {
         $this->transport = Transport::fromDsn($dsn);
@@ -201,6 +204,9 @@ class Email extends AbstractService
         return $this->transport;
     }
 
+    /**
+     * @return string[]
+     */
     public function getReceivers(): array
     {
         return $this->receivers;

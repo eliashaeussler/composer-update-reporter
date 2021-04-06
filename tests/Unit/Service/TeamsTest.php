@@ -82,6 +82,8 @@ class TeamsTest extends AbstractTestCase
     /**
      * @test
      * @dataProvider fromConfigurationThrowsExceptionIfTeamsUrlIsNotSetDataProvider
+     *
+     * @param array<string, mixed> $configuration
      */
     public function fromConfigurationThrowsExceptionIfTeamsUrlIsNotSet(array $configuration): void
     {
@@ -155,6 +157,9 @@ class TeamsTest extends AbstractTestCase
         static::assertSame($expected, $text);
     }
 
+    /**
+     * @return array<string, array>
+     */
     public function fromConfigurationThrowsExceptionIfTeamsUrlIsNotSetDataProvider(): array
     {
         return [
@@ -176,6 +181,9 @@ class TeamsTest extends AbstractTestCase
         ];
     }
 
+    /**
+     * @return array<string, array>
+     */
     public function reportSendsUpdateReportSuccessfullyDataProvider(): array
     {
         return [

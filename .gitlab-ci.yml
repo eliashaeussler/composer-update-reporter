@@ -17,6 +17,7 @@ workflow:
 
 stages:
   - lint
+  - sca
   - test
 
 lint:php:
@@ -25,6 +26,21 @@ lint:php:
     - composer install --no-progress
   script:
     - composer lint -- --dry-run
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "pipeline"'
+      when: never
+    - when: on_success
+
+sca:php:
+  stage: sca
+  before_script:
+    - composer install --no-progress
+    - mkdir -p .build
+  script:
+    - composer sca -- --error-format gitlab > .build/phpstan.json
+  artifacts:
+    reports:
+      codequality: .build/phpstan.json
   rules:
     - if: '$CI_PIPELINE_SOURCE == "pipeline"'
       when: never

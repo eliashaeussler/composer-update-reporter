@@ -31,6 +31,12 @@ namespace EliasHaeussler\ComposerUpdateReporter;
  */
 class Util
 {
+    /**
+     * @param array<string, mixed> $array1
+     * @param array<string, mixed> $array2
+     *
+     * @return array<string, mixed>
+     */
     public static function arrayDiffRecursive(array $array1, array $array2): array
     {
         $difference = [];

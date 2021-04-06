@@ -57,9 +57,9 @@ class AbstractServiceTest extends AbstractTestCase
      * @test
      * @dataProvider isEnabledReturnsStateOfAvailabilityDataProvider
      *
-     * @param $environmentVariable
+     * @param array<string, mixed> $configuration
      */
-    public function isEnabledReturnsStateOfAvailability(array $configuration, $environmentVariable, bool $expected): void
+    public function isEnabledReturnsStateOfAvailability(array $configuration, ?string $environmentVariable, bool $expected): void
     {
         $this->modifyEnvironmentVariable('DUMMY_ENABLE', $environmentVariable);
 
@@ -118,6 +118,9 @@ class AbstractServiceTest extends AbstractTestCase
         static::assertStringContainsString('Dummy report was successful', $this->getIO()->getOutput());
     }
 
+    /**
+     * @return array<string, array>
+     */
     public function isEnabledReturnsStateOfAvailabilityDataProvider(): array
     {
         return [

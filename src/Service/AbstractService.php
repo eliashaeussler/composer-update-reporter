@@ -50,6 +50,9 @@ abstract class AbstractService implements ServiceInterface
      */
     protected $options;
 
+    /**
+     * @param array<string, mixed> $configuration
+     */
     public static function isEnabled(array $configuration): bool
     {
         $identifier = static::getIdentifier();

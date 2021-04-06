@@ -92,6 +92,8 @@ class MattermostTest extends AbstractTestCase
     /**
      * @test
      * @dataProvider fromConfigurationThrowsExceptionIfMattermostUrlIsNotSetDataProvider
+     *
+     * @param array<string, mixed> $configuration
      */
     public function fromConfigurationThrowsExceptionIfMattermostUrlIsNotSet(array $configuration): void
     {
@@ -197,6 +199,9 @@ class MattermostTest extends AbstractTestCase
         static::assertStringContainsString($expected, $text);
     }
 
+    /**
+     * @return array<string, array>
+     */
     public function fromConfigurationThrowsExceptionIfMattermostUrlIsNotSetDataProvider(): array
     {
         return [
@@ -218,6 +223,9 @@ class MattermostTest extends AbstractTestCase
         ];
     }
 
+    /**
+     * @return array<string, array>
+     */
     public function reportSendsUpdateReportSuccessfullyDataProvider(): array
     {
         return [

@@ -51,12 +51,18 @@ trait ClientMockTrait
         return new Psr18Client(new MockHttpClient($callback));
     }
 
+    /**
+     * @param array<string, mixed> $expectedPayloadSubset
+     */
     protected function assertPayloadOfLastRequestContainsSubset(array $expectedPayloadSubset): void
     {
         $payload = $this->getPayloadOfLastRequest();
         self::assertSame([], Util::arrayDiffRecursive($expectedPayloadSubset, $payload));
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function getPayloadOfLastRequest(): array
     {
         $lastResponse = $this->mockedResponse;
