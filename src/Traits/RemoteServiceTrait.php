@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace EliasHaeussler\ComposerUpdateReporter\Traits;
+
 /*
  * This file is part of the Composer package "eliashaeussler/composer-update-reporter".
  *
@@ -20,8 +22,6 @@ declare(strict_types=1);
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-
-namespace EliasHaeussler\ComposerUpdateReporter\Traits;
 
 use Nyholm\Psr7\Stream;
 use Psr\Http\Client\ClientExceptionInterface;
