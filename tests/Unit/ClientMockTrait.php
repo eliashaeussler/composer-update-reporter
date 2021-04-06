@@ -24,13 +24,10 @@ declare(strict_types=1);
 namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit;
 
 use EliasHaeussler\ComposerUpdateReporter\Util;
-use GuzzleHttp\Client;
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware;
 use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Psr18Client;
+use Symfony\Component\HttpClient\Response\MockResponse;
 
 /**
  * ClientMockTrait
@@ -41,23 +38,16 @@ use Psr\Http\Message\ResponseInterface;
 trait ClientMockTrait
 {
     /**
-     * @var MockHandler
+     * @var MockResponse
      */
-    private $mockHandler;
-
-    /**
-     * @var array{request: RequestInterface, response: ResponseInterface|null, error: string|mixed, options: array}
-     */
-    private $requestContainer = [];
+    private $mockedResponse;
 
     private function getClient(): ClientInterface
     {
-        $this->mockHandler = $this->mockHandler ?? new MockHandler();
-        $this->mockHandler->reset();
-        $history = Middleware::history($this->requestContainer);
-        $handlerStack = HandlerStack::create($this->mockHandler);
-        $handlerStack->push($history);
-        return new Client(['handler' => $handlerStack]);
+        $callback = function () {
+            return $this->mockedResponse;
+        };
+        return new Psr18Client(new MockHttpClient($callback));
     }
 
     protected function assertPayloadOfLastRequestContainsSubset(array $expectedPayloadSubset): void
@@ -68,11 +58,10 @@ trait ClientMockTrait
 
     protected function getPayloadOfLastRequest(): array
     {
-        self::assertNotEmpty($this->requestContainer, 'Unable to find last request');
-        /** @var RequestInterface $request */
-        $request = end($this->requestContainer)['request'];
-        self::assertInstanceOf(RequestInterface::class, $request);
-        $request->getBody()->rewind();
-        return json_decode($request->getBody()->getContents(), true);
+        $lastResponse = $this->mockedResponse;
+
+        self::assertInstanceOf(MockResponse::class, $lastResponse, 'Unable to find last request');
+
+        return json_decode($lastResponse->getRequestOptions()['body'], true);
     }
 }

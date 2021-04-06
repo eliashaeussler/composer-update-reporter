@@ -28,10 +28,10 @@ use EliasHaeussler\ComposerUpdateReporter\Service\Teams;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\ClientMockTrait;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\TestEnvironmentTrait;
-use Nyholm\Psr7\Response;
 use Nyholm\Psr7\Uri;
 use Psr\Http\Client\ClientExceptionInterface;
 use Spatie\Emoji\Emoji;
+use Symfony\Component\HttpClient\Response\MockResponse;
 
 /**
  * TeamsTest
@@ -165,7 +165,7 @@ class TeamsTest extends AbstractTestCase
         $io = new BufferIO();
 
         $this->subject->setClient($this->getClient());
-        $this->mockHandler->append(new Response());
+        $this->mockedResponse = new MockResponse();
 
         static::assertTrue($this->subject->report($result, $io));
         static::assertStringContainsString('MS Teams report was successful.', $io->getOutput());

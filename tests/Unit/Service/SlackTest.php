@@ -28,9 +28,9 @@ use EliasHaeussler\ComposerUpdateReporter\Service\Slack;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\ClientMockTrait;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\TestEnvironmentTrait;
-use Nyholm\Psr7\Response;
 use Nyholm\Psr7\Uri;
 use Psr\Http\Client\ClientExceptionInterface;
+use Symfony\Component\HttpClient\Response\MockResponse;
 
 /**
  * SlackTest
@@ -194,7 +194,7 @@ class SlackTest extends AbstractTestCase
             $expectedFields = array_merge($expectedFields, $expectedSecurityPayload);
         }
         $this->subject->setClient($this->getClient());
-        $this->mockHandler->append(new Response());
+        $this->mockedResponse = new MockResponse();
 
         static::assertTrue($this->subject->report($result, $io));
         static::assertStringContainsString('Slack report was successful.', $io->getOutput());
