@@ -24,6 +24,10 @@ namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit;
 use Composer\Composer;
 use Composer\Factory;
 use Composer\IO\NullIO;
+use EliasHaeussler\ComposerUpdateCheck\IO\OutputBehavior;
+use EliasHaeussler\ComposerUpdateCheck\IO\Style;
+use EliasHaeussler\ComposerUpdateCheck\IO\Verbosity;
+use EliasHaeussler\ComposerUpdateCheck\Options;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateReporter\Reporter;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\Fixtures\Service\DummyService;
@@ -52,8 +56,10 @@ class ReporterTest extends AbstractTestCase
     {
         $this->goToTestDirectory();
 
+        DummyService::$enabled = true;
+
         $this->composer = Factory::create(new NullIO());
-        $this->subject = new Reporter($this->composer, new NullIO());
+        $this->subject = new Reporter($this->composer);
     }
 
     /**
@@ -75,6 +81,7 @@ class ReporterTest extends AbstractTestCase
     public function reportDoesNotIncludeDisabledServicesForReporting(): void
     {
         DummyService::$enabled = false;
+
         $this->subject->setRegisteredServices([DummyService::class]);
         $this->subject->report(new UpdateCheckResult([]));
 
@@ -95,13 +102,31 @@ class ReporterTest extends AbstractTestCase
     /**
      * @test
      */
-    public function setJsonForwardsJsonStateToServices(): void
+    public function setBehaviorForwardsBehaviorToServices(): void
     {
-        $this->subject->setJson(true);
+        $behavior = new OutputBehavior(new Style(), new Verbosity(), new NullIO());
+
+        $this->subject->setBehavior($behavior);
         $this->subject->setRegisteredServices([DummyService::class]);
         $this->subject->report(new UpdateCheckResult([]));
 
-        static::assertTrue(DummyService::$json);
+        static::assertSame($behavior, DummyService::$customBehavior);
+    }
+
+    /**
+     * @test
+     */
+    public function setOptionsForwardsOptionsToServices(): void
+    {
+        DummyService::$enabled = true;
+
+        $options = new Options();
+
+        $this->subject->setOptions($options);
+        $this->subject->setRegisteredServices([DummyService::class]);
+        $this->subject->report(new UpdateCheckResult([]));
+
+        static::assertSame($options, DummyService::$customOptions);
     }
 
     protected function tearDown(): void
@@ -109,9 +134,7 @@ class ReporterTest extends AbstractTestCase
         $this->goBackToInitialDirectory();
 
         // Restore initial state of dummy service
-        DummyService::$enabled = true;
-        DummyService::$reportWasExecuted = false;
-        DummyService::$json = false;
+        DummyService::reset();
 
         parent::tearDown();
     }

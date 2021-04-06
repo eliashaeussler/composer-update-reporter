@@ -24,8 +24,6 @@ namespace EliasHaeussler\ComposerUpdateReporter;
 use Composer\Composer;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
-use Composer\Plugin\CommandEvent;
-use Composer\Plugin\PluginEvents;
 use Composer\Plugin\PluginInterface;
 use EliasHaeussler\ComposerUpdateCheck\Event\PostUpdateCheckEvent;
 
@@ -45,7 +43,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
     public function activate(Composer $composer, IOInterface $io): void
     {
-        $this->reporter = new Reporter($composer, $io);
+        $this->reporter = new Reporter($composer);
     }
 
     public function deactivate(Composer $composer, IOInterface $io)
@@ -61,19 +59,16 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            PluginEvents::COMMAND => [
+            PostUpdateCheckEvent::NAME => [
                 ['onPostUpdateCheck']
             ],
         ];
     }
 
-    public function onPostUpdateCheck(CommandEvent $event): void
+    public function onPostUpdateCheck(PostUpdateCheckEvent $event): void
     {
-        if ($event instanceof PostUpdateCheckEvent) {
-            if ($event->getInput()->hasOption('json')) {
-                $this->reporter->setJson($event->getInput()->getOption('json'));
-            }
-            $this->reporter->report($event->getUpdateCheckResult());
-        }
+        $this->reporter->setBehavior($event->getBehavior());
+        $this->reporter->setOptions($event->getOptions());
+        $this->reporter->report($event->getUpdateCheckResult());
     }
 }

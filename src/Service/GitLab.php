@@ -21,7 +21,6 @@ namespace EliasHaeussler\ComposerUpdateReporter\Service;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use Composer\IO\IOInterface;
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateReporter\Traits\RemoteServiceTrait;
@@ -30,7 +29,6 @@ use Nyholm\Psr7\Uri;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\UriInterface;
 use Spatie\Emoji\Emoji;
-use Spatie\Emoji\Exceptions\UnknownCharacter;
 use Symfony\Component\HttpClient\Psr18Client;
 
 /**
@@ -39,7 +37,7 @@ use Symfony\Component\HttpClient\Psr18Client;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class GitLab implements ServiceInterface
+class GitLab extends AbstractService
 {
     use RemoteServiceTrait;
 
@@ -52,11 +50,6 @@ class GitLab implements ServiceInterface
      * @var string
      */
     private $authorizationKey;
-
-    /**
-     * @var bool
-     */
-    private $json = false;
 
     public function __construct(UriInterface $uri, string $authorizationKey)
     {
@@ -100,30 +93,23 @@ class GitLab implements ServiceInterface
         return new self($uri, $authKey);
     }
 
-    public static function isEnabled(array $configuration): bool
+    protected static function getIdentifier(): string
     {
-        if (getenv('GITLAB_ENABLE') !== false && (bool)getenv('GITLAB_ENABLE')) {
-            return true;
-        }
-        $extra = $configuration['gitlab'] ?? null;
-        return is_array($extra) && (bool)($extra['enable'] ?? false);
+        return 'gitlab';
+    }
+
+    protected static function getName(): string
+    {
+        return 'GitLab';
     }
 
     /**
      * @inheritDoc
      * @throws ClientExceptionInterface
      */
-    public function report(UpdateCheckResult $result, IOInterface $io): bool
+    protected function sendReport(UpdateCheckResult $result): bool
     {
         $outdatedPackages = $result->getOutdatedPackages();
-
-        // Do not send report if packages are up to date
-        if ($outdatedPackages === []) {
-            if (!$this->json) {
-                $io->write(Emoji::crossMark() . ' Skipped GitLab report.');
-            }
-            return true;
-        }
 
         // Build JSON payload
         $count = count($outdatedPackages);
@@ -132,26 +118,12 @@ class GitLab implements ServiceInterface
         ], $this->getPackagesPayload($outdatedPackages));
 
         // Send report
-        if (!$this->json) {
-            $io->write(Emoji::rocket() . ' Sending report to GitLab...');
+        if (!$this->behavior->style->isJson()) {
+            $this->behavior->io->write(Emoji::rocket() . ' Sending report to GitLab...');
         }
         $response = $this->sendRequest($payload, ['Authorization' => 'Bearer ' . $this->authorizationKey,]);
-        $successful = $response->getStatusCode() < 400;
 
-        // Print report state
-        if (!$successful) {
-            $io->writeError(Emoji::crossMark() . ' Error during GitLab report.');
-        } elseif (!$this->json) {
-            try {
-                $checkMark = Emoji::checkMark();
-            } /** @noinspection PhpRedundantCatchClauseInspection */ catch (UnknownCharacter $e) {
-                /** @noinspection PhpUndefinedMethodInspection */
-                $checkMark = Emoji::heavyCheckMark();
-            }
-            $io->write($checkMark . ' GitLab report was successful.');
-        }
-
-        return $successful;
+        return $response->getStatusCode() < 400;
     }
 
     /**
@@ -184,12 +156,6 @@ class GitLab implements ServiceInterface
     public function getAuthorizationKey(): string
     {
         return $this->authorizationKey;
-    }
-
-    public function setJson(bool $json): ServiceInterface
-    {
-        $this->json = $json;
-        return $this;
     }
 
     private function validateUri(): void

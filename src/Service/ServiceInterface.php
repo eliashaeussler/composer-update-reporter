@@ -21,7 +21,8 @@ namespace EliasHaeussler\ComposerUpdateReporter\Service;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use Composer\IO\IOInterface;
+use EliasHaeussler\ComposerUpdateCheck\IO\OutputBehavior;
+use EliasHaeussler\ComposerUpdateCheck\Options;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 
 /**
@@ -46,14 +47,19 @@ interface ServiceInterface
 
     /**
      * @param UpdateCheckResult $result
-     * @param IOInterface $io
      * @return bool
      */
-    public function report(UpdateCheckResult $result, IOInterface $io): bool;
+    public function report(UpdateCheckResult $result): bool;
 
     /**
-     * @param bool $json
+     * @param OutputBehavior $behavior
      * @return static
      */
-    public function setJson(bool $json): self;
+    public function setBehavior(OutputBehavior $behavior): self;
+
+    /**
+     * @param Options $options
+     * @return static
+     */
+    public function setOptions(Options $options): self;
 }

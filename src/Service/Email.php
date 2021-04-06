@@ -21,12 +21,9 @@ namespace EliasHaeussler\ComposerUpdateReporter\Service;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use Composer\IO\IOInterface;
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
-use EliasHaeussler\ComposerUpdateReporter\Traits\PackageProviderLinkTrait;
 use Spatie\Emoji\Emoji;
-use Spatie\Emoji\Exceptions\UnknownCharacter;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
@@ -38,10 +35,8 @@ use Symfony\Component\Mime\Email as SymfonyEmail;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class Email implements ServiceInterface
+class Email extends AbstractService
 {
-    use PackageProviderLinkTrait;
-
     /**
      * @var TransportInterface
      */
@@ -56,11 +51,6 @@ class Email implements ServiceInterface
      * @var string
      */
     private $sender;
-
-    /**
-     * @var bool
-     */
-    private $json = false;
 
     public function __construct(string $dsn, array $receivers, string $sender)
     {
@@ -115,30 +105,23 @@ class Email implements ServiceInterface
         return new self($dsn, array_map('trim', array_filter($receivers)), $sender);
     }
 
-    public static function isEnabled(array $configuration): bool
+    protected static function getIdentifier(): string
     {
-        if (getenv('EMAIL_ENABLE') !== false && (bool)getenv('EMAIL_ENABLE')) {
-            return true;
-        }
-        $extra = $configuration['email'] ?? null;
-        return is_array($extra) && (bool)($extra['enable'] ?? false);
+        return 'email';
+    }
+
+    protected static function getName(): string
+    {
+        return 'E-mail';
     }
 
     /**
      * @inheritDoc
      * @throws TransportExceptionInterface
      */
-    public function report(UpdateCheckResult $result, IOInterface $io): bool
+    protected function sendReport(UpdateCheckResult $result): bool
     {
         $outdatedPackages = $result->getOutdatedPackages();
-
-        // Do not send report if packages are up to date
-        if ($outdatedPackages === []) {
-            if (!$this->json) {
-                $io->write(Emoji::crossMark() . ' Skipped Email report.');
-            }
-            return true;
-        }
 
         // Set subject
         $count = count($outdatedPackages);
@@ -149,6 +132,9 @@ class Email implements ServiceInterface
         $html = $this->parseHtmlBody($outdatedPackages);
 
         // Send email
+        if (!$this->behavior->style->isJson()) {
+            $this->behavior->io->write(Emoji::rocket() . ' Sending report via Email...');
+        }
         $email = (new SymfonyEmail())
             ->from($this->sender)
             ->to(...$this->receivers)
@@ -156,22 +142,8 @@ class Email implements ServiceInterface
             ->text($body)
             ->html($html);
         $sentMessage = $this->transport->send($email);
-        $successful = $sentMessage !== null;
 
-        // Print report state
-        if (!$successful) {
-            $io->writeError(Emoji::crossMark() . ' Error during Email report.');
-        } elseif (!$this->json) {
-            try {
-                $checkMark = Emoji::checkMark();
-            } /** @noinspection PhpRedundantCatchClauseInspection */ catch (UnknownCharacter $e) {
-                /** @noinspection PhpUndefinedMethodInspection */
-                $checkMark = Emoji::heavyCheckMark();
-            }
-            $io->write($checkMark . ' Email report was successful.');
-        }
-
-        return $successful;
+        return $sentMessage !== null;
     }
 
     /**
@@ -219,7 +191,7 @@ class Email implements ServiceInterface
             /** @noinspection HtmlUnknownTarget */
             $html[] =   sprintf(
                 '<td><a href="%s">%s</a></td>',
-                $this->getProviderLink($outdatedPackage),
+                $outdatedPackage->getProviderLink(),
                 $outdatedPackage->getName()
             );
             $html[] =   '<td>' . $outdatedPackage->getOutdatedVersion() . $insecure . '</td>';
@@ -243,12 +215,6 @@ class Email implements ServiceInterface
     public function getSender(): string
     {
         return $this->sender;
-    }
-
-    public function setJson(bool $json): ServiceInterface
-    {
-        $this->json = $json;
-        return $this;
     }
 
     private function validateReceivers(): void

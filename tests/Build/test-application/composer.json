@@ -1,6 +1,6 @@
 {
   "require-dev": {
-    "eliashaeussler/composer-update-check": "~0.7",
+    "eliashaeussler/composer-update-check": "^1.0@dev",
     "phpunit/phpunit": "^5.0"
   },
   "extra": {

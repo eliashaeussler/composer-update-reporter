@@ -21,17 +21,14 @@ namespace EliasHaeussler\ComposerUpdateReporter\Service;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use Composer\IO\IOInterface;
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
-use EliasHaeussler\ComposerUpdateReporter\Traits\PackageProviderLinkTrait;
 use EliasHaeussler\ComposerUpdateReporter\Traits\RemoteServiceTrait;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Uri;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\UriInterface;
 use Spatie\Emoji\Emoji;
-use Spatie\Emoji\Exceptions\UnknownCharacter;
 use Symfony\Component\HttpClient\Psr18Client;
 
 /**
@@ -40,20 +37,14 @@ use Symfony\Component\HttpClient\Psr18Client;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-class Slack implements ServiceInterface
+class Slack extends AbstractService
 {
-    use PackageProviderLinkTrait;
     use RemoteServiceTrait;
 
     /**
      * @var UriInterface
      */
     private $uri;
-
-    /**
-     * @var bool
-     */
-    private $json = false;
 
     public function __construct(UriInterface $uri)
     {
@@ -83,30 +74,23 @@ class Slack implements ServiceInterface
         return new self($uri);
     }
 
-    public static function isEnabled(array $configuration): bool
+    protected static function getIdentifier(): string
     {
-        if (getenv('SLACK_ENABLE') !== false && (bool)getenv('SLACK_ENABLE')) {
-            return true;
-        }
-        $extra = $configuration['slack'] ?? null;
-        return is_array($extra) && (bool)($extra['enable'] ?? false);
+        return 'slack';
+    }
+
+    protected static function getName(): string
+    {
+        return 'Slack';
     }
 
     /**
      * @inheritDoc
      * @throws ClientExceptionInterface
      */
-    public function report(UpdateCheckResult $result, IOInterface $io): bool
+    protected function sendReport(UpdateCheckResult $result): bool
     {
         $outdatedPackages = $result->getOutdatedPackages();
-
-        // Do not send report if packages are up to date
-        if ($outdatedPackages === []) {
-            if (!$this->json) {
-                $io->write(Emoji::crossMark() . ' Skipped Slack report.');
-            }
-            return true;
-        }
 
         // Build JSON payload
         $payload = [
@@ -114,26 +98,12 @@ class Slack implements ServiceInterface
         ];
 
         // Send report
-        if (!$this->json) {
-            $io->write(Emoji::rocket() . ' Sending report to Slack...');
+        if (!$this->behavior->style->isJson()) {
+            $this->behavior->io->write(Emoji::rocket() . ' Sending report to Slack...');
         }
         $response = $this->sendRequest($payload);
-        $successful = $response->getStatusCode() < 400;
 
-        // Print report state
-        if (!$successful) {
-            $io->writeError(Emoji::crossMark() . ' Error during Slack report.');
-        } elseif (!$this->json) {
-            try {
-                $checkMark = Emoji::checkMark();
-            } /** @noinspection PhpRedundantCatchClauseInspection */ catch (UnknownCharacter $e) {
-                /** @noinspection PhpUndefinedMethodInspection */
-                $checkMark = Emoji::heavyCheckMark();
-            }
-            $io->write($checkMark . ' Slack report was successful.');
-        }
-
-        return $successful;
+        return $response->getStatusCode() < 400;
     }
 
     /**
@@ -142,7 +112,21 @@ class Slack implements ServiceInterface
      */
     private function renderBlocks(array $outdatedPackages): array
     {
+        $hasInsecurePackages = false;
         $count = count($outdatedPackages);
+
+        // Calculate longest version numbers of all outdated packages
+        $outdatedVersionNumberLength = 0;
+        $newVersionNumberLength = 0;
+        array_walk($outdatedPackages, function (OutdatedPackage $outdatedPackage) use (&$outdatedVersionNumberLength, &$newVersionNumberLength) {
+            if (($length = mb_strlen($outdatedPackage->getOutdatedVersion())) > $outdatedVersionNumberLength) {
+                $outdatedVersionNumberLength = $length;
+            }
+            if (($length = mb_strlen($outdatedPackage->getNewVersion())) > $newVersionNumberLength) {
+                $newVersionNumberLength = $length;
+            }
+        });
+
         $blocks = [
             [
                 'type' => 'header',
@@ -151,68 +135,78 @@ class Slack implements ServiceInterface
                     'text' => sprintf('%d outdated package%s', $count, $count !== 1 ? 's' : ''),
                 ],
             ],
+            [
+                'type' => 'section',
+                'text' => [
+                    'type' => 'plain_text',
+                    'text' => $count !== 1
+                        ? 'The following packages are outdated and need to be updated:'
+                        : 'The following package is outdated and needs to be updated:',
+                ],
+            ],
         ];
+
         foreach ($outdatedPackages as $outdatedPackage) {
-            $block = [
+            if ($outdatedPackage->isInsecure()) {
+                $hasInsecurePackages = true;
+            }
+
+            $blocks[] = [
                 'type' => 'section',
                 'fields' => [
                     [
                         'type' => 'mrkdwn',
-                        'text' => '*Package*',
-                    ],
-                    [
-                        'type' => 'mrkdwn',
                         'text' => sprintf(
                             '<%s|%s>',
-                            $this->getProviderLink($outdatedPackage),
+                            $outdatedPackage->getProviderLink(),
                             $outdatedPackage->getName()
                         ),
                     ],
                     [
                         'type' => 'mrkdwn',
-                        'text' => '*Current version*',
-                    ],
-                    [
-                        'type' => 'mrkdwn',
-                        'text' => sprintf('`%s`', $outdatedPackage->getOutdatedVersion()),
-                    ],
-                    [
-                        'type' => 'mrkdwn',
-                        'text' => '*New version*',
-                    ],
-                    [
-                        'type' => 'mrkdwn',
-                        'text' => sprintf('*`%s`*', $outdatedPackage->getNewVersion()),
+                        'text' => sprintf(
+                            '`%s` → *`%s`*%s',
+                            str_pad($outdatedPackage->getOutdatedVersion(), $outdatedVersionNumberLength, ' ', STR_PAD_RIGHT),
+                            str_pad($outdatedPackage->getNewVersion(), $newVersionNumberLength, ' ', STR_PAD_RIGHT),
+                            $outdatedPackage->isInsecure() ? ' :rotating_light:' : ''
+                        ),
                     ],
                 ],
             ];
-            if ($outdatedPackage->isInsecure()) {
-                $block['fields'][] = [
-                    'type' => 'mrkdwn',
-                    'text' => '*Security state*',
+
+            // Slack allows only a limited number of blocks, therefore
+            // we have to omit the remaining packages and show a message instead
+            $remainingPackages = $count - (count($blocks) - 2);
+            if (count($blocks) >= 48 && $remainingPackages > 0) {
+                $blocks[] = [
+                    'type' => 'section',
+                    'text' => [
+                        'type' => 'plain_text',
+                        'text' => sprintf('... and %d more', $remainingPackages),
+                    ],
                 ];
-                $block['fields'][] = [
-                    'type' => 'mrkdwn',
-                    'text' => '*Package is insecure* :warning:',
-                ];
+                break;
             }
-            $blocks[] = [
-                'type' => 'divider',
-            ];
-            $blocks[] = $block;
         }
+
+        if ($hasInsecurePackages) {
+            $blocks[] = [
+                'type' => 'context',
+                'elements' => [
+                    [
+                        'type' => 'mrkdwn',
+                        'text' => 'Package versions with :rotating_light: are marked as insecure',
+                    ],
+                ],
+            ];
+        }
+
         return $blocks;
     }
 
     public function getUri(): UriInterface
     {
         return $this->uri;
-    }
-
-    public function setJson(bool $json): ServiceInterface
-    {
-        $this->json = $json;
-        return $this;
     }
 
     private function validateUri(): void
