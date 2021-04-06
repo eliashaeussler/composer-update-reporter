@@ -48,6 +48,17 @@ lint:php:
       when: never
     - when: on_success
 
+lint:composer:
+  stage: lint
+  needs:
+    - build
+  script:
+    - composer normalize --dry-run
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "pipeline"'
+      when: never
+    - when: on_success
+
 sca:php:
   stage: sca
   needs:
