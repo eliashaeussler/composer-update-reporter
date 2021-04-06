@@ -1,29 +1,46 @@
 default:
   image: webdevops/php:8.0
 
+cache: &cache
+  key: "$CI_COMMIT_REF_SLUG"
+  paths:
+    - vendor/
+  policy: pull
+
 variables:
-  COMPOSER_CACHE_DIR: /cache/composer
   COMPOSER_ALLOW_SUPERUSER: "1"
   COMPOSER_NO_INTERACTION: "1"
   GIT_CLONE_PATH: $CI_BUILDS_DIR/$CI_JOB_ID/$CI_PROJECT_PATH
   MAILHOG_HOST: mailhog
   MAILHOG_SMTP_PORT: "1025"
   MAILHOG_API_PORT: "8025"
-  PHP_MEMORY_LIMIT: "-1"
 
 workflow:
   rules:
     - if: '$CI_COMMIT_BRANCH'
 
 stages:
+  - build
   - lint
   - sca
   - test
 
+build:
+  stage: build
+  script:
+    - composer install --no-progress
+  cache:
+    <<: *cache
+    policy: pull-push
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "pipeline"'
+      when: never
+    - when: on_success
+
 lint:php:
   stage: lint
-  before_script:
-    - composer install --no-progress
+  needs:
+    - build
   script:
     - composer lint -- --dry-run
   rules:
@@ -33,8 +50,9 @@ lint:php:
 
 sca:php:
   stage: sca
+  needs:
+    - build
   before_script:
-    - composer install --no-progress
     - mkdir -p .build
   script:
     - composer sca -- --error-format gitlab > .build/phpstan.json
@@ -52,7 +70,11 @@ test:
   services:
     - name: mailhog/mailhog
       alias: mailhog
+  variables:
+    PHP_MEMORY_LIMIT: "-1"
+    PHP_MAX_EXECUTION_TIME: "600"
   before_script:
+    - composer global require --dev --no-progress --prefer-stable brianium/paratest:"*"
     - >
       if [ "$COVERAGE" == "1" ]; then
         pecl channel-update pecl.php.net
@@ -70,9 +92,9 @@ test:
       fi
     - >
       if [ "$COVERAGE" == "1" ]; then
-        COMPOSER_PROCESS_TIMEOUT=1000 composer test:ci -- --testdox
+        COMPOSER_PROCESS_TIMEOUT=1000 /root/.composer/vendor/bin/paratest --runner=WrapperRunner -c phpunit.coverage.xml
       else
-        composer test:run -- --testdox
+        /root/.composer/vendor/bin/paratest --runner=WrapperRunner -c phpunit.xml
       fi
   parallel:
     matrix:
@@ -89,6 +111,10 @@ test:
       - runner_system_failure
       - stuck_or_timeout_failure
   coverage: '/^\s*Lines:\s*\d+.\d+\%/'
+  cache:
+    <<: *cache
+    key: "${CI_COMMIT_REF_SLUG}-${PHP_VERSION}-${COMPOSER_VERSION}"
+    policy: pull-push
   artifacts:
     reports:
       junit: .build/coverage/junit.xml
