@@ -85,6 +85,7 @@ test:
     PHP_MEMORY_LIMIT: "-1"
     PHP_MAX_EXECUTION_TIME: "600"
   before_script:
+    - mkdir -p .build/coverage
     - composer global require --dev --no-progress --prefer-stable brianium/paratest:"*"
     - >
       if [ "$COVERAGE" == "1" ]; then
