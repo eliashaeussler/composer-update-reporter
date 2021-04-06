@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit;
 
 /*
@@ -33,7 +35,7 @@ use EliasHaeussler\ComposerUpdateReporter\Reporter;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\Fixtures\Service\DummyService;
 
 /**
- * ReporterTest
+ * ReporterTest.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later

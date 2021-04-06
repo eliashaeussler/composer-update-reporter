@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit\Service;
 
 /*
@@ -32,7 +34,7 @@ use Nyholm\Psr7\Uri;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
 /**
- * GitLabTest
+ * GitLabTest.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -90,7 +92,6 @@ class GitLabTest extends AbstractTestCase
     /**
      * @test
      * @dataProvider fromConfigurationThrowsExceptionIfGitLabUrlIsNotSetDataProvider
-     * @param array $configuration
      */
     public function fromConfigurationThrowsExceptionIfGitLabUrlIsNotSet(array $configuration): void
     {
@@ -138,7 +139,7 @@ class GitLabTest extends AbstractTestCase
         $subject = GitLab::fromConfiguration($configuration);
 
         static::assertInstanceOf(GitLab::class, $subject);
-        static::assertSame('https://example.org', (string)$subject->getUri());
+        static::assertSame('https://example.org', (string) $subject->getUri());
         static::assertSame('foo', $subject->getAuthorizationKey());
     }
 
@@ -154,15 +155,13 @@ class GitLabTest extends AbstractTestCase
         $subject = GitLab::fromConfiguration([]);
 
         static::assertInstanceOf(GitLab::class, $subject);
-        static::assertSame('https://example.org', (string)$subject->getUri());
+        static::assertSame('https://example.org', (string) $subject->getUri());
         static::assertSame('foo', $subject->getAuthorizationKey());
     }
 
     /**
      * @test
      * @dataProvider reportSendsUpdateReportSuccessfullyDataProvider
-     * @param bool $insecure
-     * @param string $expectedSecurityNotice
      */
     public function reportSendsUpdateReportSuccessfully(bool $insecure, string $expectedSecurityNotice): void
     {
@@ -178,7 +177,7 @@ class GitLabTest extends AbstractTestCase
 
         $expectedPayloadSubset = [
             'title' => '1 outdated package',
-            'foo/foo' => 'Outdated version: 1.0.0' . $expectedSecurityNotice . ', new version: 1.0.5',
+            'foo/foo' => 'Outdated version: 1.0.0'.$expectedSecurityNotice.', new version: 1.0.5',
         ];
         $this->assertPayloadOfLastRequestContainsSubset($expectedPayloadSubset);
     }

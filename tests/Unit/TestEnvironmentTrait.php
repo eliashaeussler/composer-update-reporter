@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit;
 
 /*
@@ -22,7 +24,7 @@ namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit;
  */
 
 /**
- * TestEnvironmentTrait
+ * TestEnvironmentTrait.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -37,8 +39,8 @@ trait TestEnvironmentTrait
     protected function modifyEnvironmentVariable(string $environmentVariable, $value = null): void
     {
         $this->backedUpEnvironmentVariables[$environmentVariable] = getenv($environmentVariable);
-        if ($value !== null) {
-            putenv($environmentVariable . '=' . $value);
+        if (null !== $value) {
+            putenv($environmentVariable.'='.$value);
         } else {
             putenv($environmentVariable);
         }
@@ -47,10 +49,10 @@ trait TestEnvironmentTrait
     protected function restoreEnvironmentVariables(): void
     {
         foreach ($this->backedUpEnvironmentVariables as $name => $value) {
-            if ($value === false) {
+            if (false === $value) {
                 putenv($name);
             } else {
-                putenv($name . '=' . $value);
+                putenv($name.'='.$value);
             }
         }
     }

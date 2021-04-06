@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit;
 
 /*
@@ -24,7 +26,7 @@ namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit;
 use PHPUnit\Framework\TestCase;
 
 /**
- * AbstractTestCase
+ * AbstractTestCase.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -38,7 +40,7 @@ abstract class AbstractTestCase extends TestCase
             if (
                 !$property->isStatic() &&
                 !$property->isPrivate() &&
-                strpos($property->getDeclaringClass()->getName(), 'PHPUnit') !== 0
+                0 !== strpos($property->getDeclaringClass()->getName(), 'PHPUnit')
             ) {
                 unset($this->{$property->getName()});
             }

@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateReporter;
 
 /*
@@ -22,7 +24,7 @@ namespace EliasHaeussler\ComposerUpdateReporter;
  */
 
 /**
- * Util
+ * Util.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -42,6 +44,7 @@ class Util
                 }
             }
         }
+
         return $difference;
     }
 }

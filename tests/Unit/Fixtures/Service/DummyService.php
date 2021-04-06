@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit\Fixtures\Service;
 
 /*
@@ -28,7 +30,7 @@ use EliasHaeussler\ComposerUpdateReporter\Service\AbstractService;
 use EliasHaeussler\ComposerUpdateReporter\Service\ServiceInterface;
 
 /**
- * DummyService
+ * DummyService.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -67,6 +69,7 @@ class DummyService extends AbstractService
     public function report(UpdateCheckResult $result): bool
     {
         static::$reportWasExecuted = true;
+
         return parent::report($result);
     }
 
@@ -78,6 +81,7 @@ class DummyService extends AbstractService
     public function setBehavior(OutputBehavior $behavior): ServiceInterface
     {
         static::$customBehavior = $behavior;
+
         return parent::setBehavior($behavior);
     }
 
@@ -94,6 +98,7 @@ class DummyService extends AbstractService
     public function setOptions(Options $options): ServiceInterface
     {
         static::$customOptions = $options;
+
         return parent::setOptions($options);
     }
 

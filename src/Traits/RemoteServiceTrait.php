@@ -30,7 +30,7 @@ use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * RemoteServiceTrait
+ * RemoteServiceTrait.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -48,9 +48,6 @@ trait RemoteServiceTrait
     private $client;
 
     /**
-     * @param array $payload
-     * @param array $headers
-     * @return ResponseInterface
      * @throws ClientExceptionInterface
      */
     protected function sendRequest(array $payload, array $headers = []): ResponseInterface
@@ -61,12 +58,14 @@ trait RemoteServiceTrait
         foreach ($headers as $name => $value) {
             $request = $request->withHeader($name, $value);
         }
+
         return $this->client->sendRequest($request);
     }
 
     public function setClient(ClientInterface $client): self
     {
         $this->client = $client;
+
         return $this;
     }
 }

@@ -33,7 +33,7 @@ use Spatie\Emoji\Emoji;
 use Spatie\Emoji\Exceptions\UnknownCharacter;
 
 /**
- * AbstractService
+ * AbstractService.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -53,14 +53,14 @@ abstract class AbstractService implements ServiceInterface
     public static function isEnabled(array $configuration): bool
     {
         $identifier = static::getIdentifier();
-        $envVariable = strtoupper($identifier . '_enable');
+        $envVariable = strtoupper($identifier.'_enable');
         $extra = $configuration[strtolower($identifier)] ?? null;
 
-        if (getenv($envVariable) !== false) {
-            return (bool)getenv($envVariable);
+        if (false !== getenv($envVariable)) {
+            return (bool) getenv($envVariable);
         }
 
-        return is_array($extra) && (bool)($extra['enable'] ?? false);
+        return is_array($extra) && (bool) ($extra['enable'] ?? false);
     }
 
     abstract protected static function getIdentifier(): string;
@@ -70,19 +70,20 @@ abstract class AbstractService implements ServiceInterface
     public function report(UpdateCheckResult $result): bool
     {
         // Fall back to default output behavior if no custom behavior is defined
-        if ($this->behavior === null) {
+        if (null === $this->behavior) {
             $this->behavior = $this->getDefaultBehavior();
         }
 
         $outdatedPackages = $result->getOutdatedPackages();
 
         // Do not send report if packages are up to date
-        if ($outdatedPackages === []) {
+        if ([] === $outdatedPackages) {
             if (!$this->behavior->style->isJson()) {
                 $this->behavior->io->write(
                     sprintf('%s Skipped %s report', Emoji::prohibited(), static::getName())
                 );
             }
+
             return true;
         }
 
@@ -93,6 +94,7 @@ abstract class AbstractService implements ServiceInterface
             $this->behavior->io->writeError(
                 sprintf('%s <error>Error during %s report</error>', Emoji::crossMark(), static::getName())
             );
+
             return false;
         }
 
@@ -111,21 +113,19 @@ abstract class AbstractService implements ServiceInterface
         return true;
     }
 
-    /**
-     * @param UpdateCheckResult $result
-     * @return bool
-     */
     abstract protected function sendReport(UpdateCheckResult $result): bool;
 
     public function setBehavior(OutputBehavior $behavior): ServiceInterface
     {
         $this->behavior = $behavior;
+
         return $this;
     }
 
     public function setOptions(Options $options): ServiceInterface
     {
         $this->options = $options;
+
         return $this;
     }
 

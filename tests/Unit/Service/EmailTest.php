@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit\Service;
 
 /*
@@ -33,7 +35,7 @@ use Symfony\Component\HttpClient\HttplugClient;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 
 /**
- * EmailTest
+ * EmailTest.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -62,8 +64,8 @@ class EmailTest extends AbstractTestCase
     public static function setUpBeforeClass(): void
     {
         static::$mailhogHost = getenv('MAILHOG_HOST') ?: 'localhost';
-        static::$mailhogSmtpPort = (int)(getenv('MAILHOG_SMTP_PORT') ?: 2025);
-        static::$mailhogApiPort = (int)(getenv('MAILHOG_API_PORT') ?: 9025);
+        static::$mailhogSmtpPort = (int) (getenv('MAILHOG_SMTP_PORT') ?: 2025);
+        static::$mailhogApiPort = (int) (getenv('MAILHOG_API_PORT') ?: 9025);
         static::$mailhogSmtp = sprintf('smtp://%s:%d', static::$mailhogHost, static::$mailhogSmtpPort);
         static::$mailhogApi = sprintf('http://%s:%d', static::$mailhogHost, static::$mailhogApiPort);
     }
@@ -122,7 +124,6 @@ class EmailTest extends AbstractTestCase
     /**
      * @test
      * @dataProvider fromConfigurationThrowsExceptionIfEmailDsnIsNotSetDataProvider
-     * @param array $configuration
      */
     public function fromConfigurationThrowsExceptionIfEmailDsnIsNotSet(array $configuration): void
     {
@@ -235,8 +236,6 @@ class EmailTest extends AbstractTestCase
     /**
      * @test
      * @dataProvider reportSendsUpdateReportSuccessfullyDataProvider
-     * @param bool $insecure
-     * @param string $expectedSecurityNotice
      */
     public function reportSendsUpdateReportSuccessfully(bool $insecure, string $expectedSecurityNotice): void
     {
@@ -263,7 +262,7 @@ class EmailTest extends AbstractTestCase
             '</tr>',
             '<tr>',
             '<td><a href="https://packagist.org/packages/foo/foo#1.0.5">foo/foo</a></td>',
-            '<td>1.0.0' . $expectedSecurityNotice . '</td>',
+            '<td>1.0.0'.$expectedSecurityNotice.'</td>',
             '<td><strong>1.0.5</strong></td>',
             '</tr>',
             '</table>',

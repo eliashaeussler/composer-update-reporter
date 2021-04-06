@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateReporter\Service;
 
 /*
@@ -30,7 +32,7 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Email as SymfonyEmail;
 
 /**
- * Email
+ * Email.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -68,38 +70,29 @@ class Email extends AbstractService
 
         // Parse Email DSN
         if (is_array($extra) && array_key_exists('dsn', $extra)) {
-            $dsn = (string)$extra['dsn'];
-        } elseif (getenv('EMAIL_DSN') !== false) {
+            $dsn = (string) $extra['dsn'];
+        } elseif (false !== getenv('EMAIL_DSN')) {
             $dsn = getenv('EMAIL_DSN');
         } else {
-            throw new \RuntimeException(
-                'Email DSN is not defined. Define it either in composer.json or as $EMAIL_DSN.',
-                1601391909
-            );
+            throw new \RuntimeException('Email DSN is not defined. Define it either in composer.json or as $EMAIL_DSN.', 1601391909);
         }
 
         // Parse Email receivers
         if (is_array($extra) && array_key_exists('receivers', $extra)) {
-            $receivers = explode(',', (string)$extra['receivers']);
-        } elseif (getenv('EMAIL_RECEIVERS') !== false) {
+            $receivers = explode(',', (string) $extra['receivers']);
+        } elseif (false !== getenv('EMAIL_RECEIVERS')) {
             $receivers = explode(',', getenv('EMAIL_RECEIVERS'));
         } else {
-            throw new \RuntimeException(
-                'Email receivers are not defined. Define it either in composer.json or as $EMAIL_RECEIVERS.',
-                1601391943
-            );
+            throw new \RuntimeException('Email receivers are not defined. Define it either in composer.json or as $EMAIL_RECEIVERS.', 1601391943);
         }
 
         // Parse Email sender
         if (is_array($extra) && array_key_exists('sender', $extra)) {
-            $sender = (string)$extra['sender'];
-        } elseif (getenv('EMAIL_SENDER') !== false) {
+            $sender = (string) $extra['sender'];
+        } elseif (false !== getenv('EMAIL_SENDER')) {
             $sender = getenv('EMAIL_SENDER');
         } else {
-            throw new \RuntimeException(
-                'Email sender is not defined. Define it either in composer.json or as $EMAIL_SENDER.',
-                1601391961
-            );
+            throw new \RuntimeException('Email sender is not defined. Define it either in composer.json or as $EMAIL_SENDER.', 1601391961);
         }
 
         return new self($dsn, array_map('trim', array_filter($receivers)), $sender);
@@ -116,7 +109,8 @@ class Email extends AbstractService
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
      * @throws TransportExceptionInterface
      */
     protected function sendReport(UpdateCheckResult $result): bool
@@ -125,7 +119,7 @@ class Email extends AbstractService
 
         // Set subject
         $count = count($outdatedPackages);
-        $subject = sprintf('%d outdated package%s', $count, $count !== 1 ? 's' : '');
+        $subject = sprintf('%d outdated package%s', $count, 1 !== $count ? 's' : '');
 
         // Set plain text body and html content
         $body = $this->parsePlainBody($outdatedPackages);
@@ -133,7 +127,7 @@ class Email extends AbstractService
 
         // Send email
         if (!$this->behavior->style->isJson()) {
-            $this->behavior->io->write(Emoji::rocket() . ' Sending report via Email...');
+            $this->behavior->io->write(Emoji::rocket().' Sending report via Email...');
         }
         $email = (new SymfonyEmail())
             ->from($this->sender)
@@ -143,12 +137,11 @@ class Email extends AbstractService
             ->html($html);
         $sentMessage = $this->transport->send($email);
 
-        return $sentMessage !== null;
+        return null !== $sentMessage;
     }
 
     /**
      * @param OutdatedPackage[] $outdatedPackages
-     * @return string
      */
     private function parsePlainBody(array $outdatedPackages): string
     {
@@ -166,39 +159,40 @@ class Email extends AbstractService
                 $outdatedPackage->getNewVersion()
             );
         }
+
         return implode(PHP_EOL, $textParts);
     }
 
     /**
      * @param OutdatedPackage[] $outdatedPackages
-     * @return string
      */
     private function parseHtmlBody(array $outdatedPackages): string
     {
         $html = [];
         $html[] = '<table>';
-        $html[] =   '<tr>';
-        $html[] =     '<th>Package name</th>';
-        $html[] =     '<th>Outdated version</th>';
-        $html[] =     '<th>New version</th>';
-        $html[] =   '</tr>';
+        $html[] = '<tr>';
+        $html[] = '<th>Package name</th>';
+        $html[] = '<th>Outdated version</th>';
+        $html[] = '<th>New version</th>';
+        $html[] = '</tr>';
         foreach ($outdatedPackages as $outdatedPackage) {
             $insecure = '';
             if ($outdatedPackage->isInsecure()) {
                 $insecure = ' <strong style="color: red;">(insecure)</strong>';
             }
             $html[] = '<tr>';
-            /** @noinspection HtmlUnknownTarget */
-            $html[] =   sprintf(
+            /* @noinspection HtmlUnknownTarget */
+            $html[] = sprintf(
                 '<td><a href="%s">%s</a></td>',
                 $outdatedPackage->getProviderLink(),
                 $outdatedPackage->getName()
             );
-            $html[] =   '<td>' . $outdatedPackage->getOutdatedVersion() . $insecure . '</td>';
-            $html[] =   '<td><strong>' . $outdatedPackage->getNewVersion() . '</strong></td>';
+            $html[] = '<td>'.$outdatedPackage->getOutdatedVersion().$insecure.'</td>';
+            $html[] = '<td><strong>'.$outdatedPackage->getNewVersion().'</strong></td>';
             $html[] = '</tr>';
         }
         $html[] = '</table>';
+
         return implode(PHP_EOL, $html);
     }
 
@@ -219,25 +213,22 @@ class Email extends AbstractService
 
     private function validateReceivers(): void
     {
-        if ($this->receivers === []) {
+        if ([] === $this->receivers) {
             throw new \InvalidArgumentException('Email receivers must not be empty.', 1601395103);
         }
         foreach ($this->receivers as $receiver) {
-            if (filter_var($receiver, FILTER_VALIDATE_EMAIL) === false) {
-                throw new \InvalidArgumentException(
-                    sprintf('Email receiver "%s" is no valid email address.', $receiver),
-                    1601395301
-                );
+            if (false === filter_var($receiver, FILTER_VALIDATE_EMAIL)) {
+                throw new \InvalidArgumentException(sprintf('Email receiver "%s" is no valid email address.', $receiver), 1601395301);
             }
         }
     }
 
     private function validateSender(): void
     {
-        if (trim($this->sender) === '') {
+        if ('' === trim($this->sender)) {
             throw new \InvalidArgumentException('Email sender must not be empty.', 1601395109);
         }
-        if (filter_var($this->sender, FILTER_VALIDATE_EMAIL) === false) {
+        if (false === filter_var($this->sender, FILTER_VALIDATE_EMAIL)) {
             throw new \InvalidArgumentException('Email sender is no valid email address.', 1601395313);
         }
     }

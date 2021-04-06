@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateReporter\Service;
 
 /*
@@ -32,7 +34,7 @@ use Spatie\Emoji\Emoji;
 use Symfony\Component\HttpClient\Psr18Client;
 
 /**
- * Mattermost
+ * Mattermost.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -74,33 +76,27 @@ class Mattermost extends AbstractService
 
         // Parse Mattermost URL
         if (is_array($extra) && array_key_exists('url', $extra)) {
-            $uri = new Uri((string)$extra['url']);
-        } elseif (getenv('MATTERMOST_URL') !== false) {
+            $uri = new Uri((string) $extra['url']);
+        } elseif (false !== getenv('MATTERMOST_URL')) {
             $uri = new Uri(getenv('MATTERMOST_URL'));
         } else {
-            throw new \RuntimeException(
-                'Mattermost URL is not defined. Define it either in composer.json or as $MATTERMOST_URL.',
-                1600283681
-            );
+            throw new \RuntimeException('Mattermost URL is not defined. Define it either in composer.json or as $MATTERMOST_URL.', 1600283681);
         }
 
         // Parse Mattermost channel name
         if (is_array($extra) && array_key_exists('channel', $extra)) {
-            $channelName = (string)$extra['channel'];
-        } elseif (getenv('MATTERMOST_CHANNEL') !== false) {
+            $channelName = (string) $extra['channel'];
+        } elseif (false !== getenv('MATTERMOST_CHANNEL')) {
             $channelName = getenv('MATTERMOST_CHANNEL');
         } else {
-            throw new \RuntimeException(
-                'Mattermost channel name is not defined. Define it either in composer.json or as $MATTERMOST_CHANNEL.',
-                1600284246
-            );
+            throw new \RuntimeException('Mattermost channel name is not defined. Define it either in composer.json or as $MATTERMOST_CHANNEL.', 1600284246);
         }
 
         // Parse Mattermost username
         $username = null;
         if (is_array($extra) && array_key_exists('username', $extra)) {
-            $username = (string)$extra['username'];
-        } elseif (getenv('MATTERMOST_USERNAME') !== false) {
+            $username = (string) $extra['username'];
+        } elseif (false !== getenv('MATTERMOST_USERNAME')) {
             $username = getenv('MATTERMOST_USERNAME');
         }
 
@@ -118,7 +114,8 @@ class Mattermost extends AbstractService
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
      * @throws ClientExceptionInterface
      */
     protected function sendReport(UpdateCheckResult $result): bool
@@ -135,13 +132,13 @@ class Mattermost extends AbstractService
                 ],
             ],
         ];
-        if ($this->username !== null) {
+        if (null !== $this->username) {
             $payload['username'] = $this->username;
         }
 
         // Send report
         if (!$this->behavior->style->isJson()) {
-            $this->behavior->io->write(Emoji::rocket() . ' Sending report to Mattermost...');
+            $this->behavior->io->write(Emoji::rocket().' Sending report to Mattermost...');
         }
         $response = $this->sendRequest($payload);
 
@@ -150,13 +147,12 @@ class Mattermost extends AbstractService
 
     /**
      * @param OutdatedPackage[] $outdatedPackages
-     * @return string
      */
     private function renderText(array $outdatedPackages): string
     {
         $count = count($outdatedPackages);
         $textParts = [
-            sprintf('#### :rotating_light: %d outdated package%s', $count, $count !== 1 ? 's' : ''),
+            sprintf('#### :rotating_light: %d outdated package%s', $count, 1 !== $count ? 's' : ''),
             '| Package | Current version | New version |',
             '|:------- |:--------------- |:----------- |',
         ];
@@ -174,6 +170,7 @@ class Mattermost extends AbstractService
                 $outdatedPackage->getNewVersion()
             );
         }
+
         return implode(PHP_EOL, $textParts);
     }
 
@@ -195,17 +192,17 @@ class Mattermost extends AbstractService
     private function validateUri(): void
     {
         $uri = (string) $this->uri;
-        if (trim($uri) === '') {
+        if ('' === trim($uri)) {
             throw new \InvalidArgumentException('Mattermost URL must not be empty.', 1600793015);
         }
-        if (filter_var($uri, FILTER_VALIDATE_URL) === false) {
+        if (false === filter_var($uri, FILTER_VALIDATE_URL)) {
             throw new \InvalidArgumentException('Mattermost URL is no valid URL.', 1600792942);
         }
     }
 
     private function validateChannelName(): void
     {
-        if (trim($this->channelName) === '') {
+        if ('' === trim($this->channelName)) {
             throw new \InvalidArgumentException('Mattermost channel name must not be empty.', 1600793071);
         }
     }

@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateReporter\Service;
 
 /*
@@ -32,7 +34,7 @@ use Spatie\Emoji\Emoji;
 use Symfony\Component\HttpClient\Psr18Client;
 
 /**
- * Slack
+ * Slack.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -61,14 +63,11 @@ class Slack extends AbstractService
 
         // Parse Slack URL
         if (is_array($extra) && array_key_exists('url', $extra)) {
-            $uri = new Uri((string)$extra['url']);
-        } elseif (getenv('SLACK_URL') !== false) {
+            $uri = new Uri((string) $extra['url']);
+        } elseif (false !== getenv('SLACK_URL')) {
             $uri = new Uri(getenv('SLACK_URL'));
         } else {
-            throw new \RuntimeException(
-                'Slack URL is not defined. Define it either in composer.json or as $SLACK_URL.',
-                1602496964
-            );
+            throw new \RuntimeException('Slack URL is not defined. Define it either in composer.json or as $SLACK_URL.', 1602496964);
         }
 
         return new self($uri);
@@ -85,7 +84,8 @@ class Slack extends AbstractService
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
      * @throws ClientExceptionInterface
      */
     protected function sendReport(UpdateCheckResult $result): bool
@@ -99,7 +99,7 @@ class Slack extends AbstractService
 
         // Send report
         if (!$this->behavior->style->isJson()) {
-            $this->behavior->io->write(Emoji::rocket() . ' Sending report to Slack...');
+            $this->behavior->io->write(Emoji::rocket().' Sending report to Slack...');
         }
         $response = $this->sendRequest($payload);
 
@@ -108,7 +108,6 @@ class Slack extends AbstractService
 
     /**
      * @param OutdatedPackage[] $outdatedPackages
-     * @return array
      */
     private function renderBlocks(array $outdatedPackages): array
     {
@@ -132,14 +131,14 @@ class Slack extends AbstractService
                 'type' => 'header',
                 'text' => [
                     'type' => 'plain_text',
-                    'text' => sprintf('%d outdated package%s', $count, $count !== 1 ? 's' : ''),
+                    'text' => sprintf('%d outdated package%s', $count, 1 !== $count ? 's' : ''),
                 ],
             ],
             [
                 'type' => 'section',
                 'text' => [
                     'type' => 'plain_text',
-                    'text' => $count !== 1
+                    'text' => 1 !== $count
                         ? 'The following packages are outdated and need to be updated:'
                         : 'The following package is outdated and needs to be updated:',
                 ],
@@ -212,10 +211,10 @@ class Slack extends AbstractService
     private function validateUri(): void
     {
         $uri = (string) $this->uri;
-        if (trim($uri) === '') {
+        if ('' === trim($uri)) {
             throw new \InvalidArgumentException('Slack URL must not be empty.', 1602496937);
         }
-        if (filter_var($uri, FILTER_VALIDATE_URL) === false) {
+        if (false === filter_var($uri, FILTER_VALIDATE_URL)) {
             throw new \InvalidArgumentException('Slack URL is no valid URL.', 1602496941);
         }
     }

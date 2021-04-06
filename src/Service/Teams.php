@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateReporter\Service;
 
 /*
@@ -32,7 +34,7 @@ use Spatie\Emoji\Emoji;
 use Symfony\Component\HttpClient\Psr18Client;
 
 /**
- * Teams
+ * Teams.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -61,14 +63,11 @@ class Teams extends AbstractService
 
         // Parse MS Teams URL
         if (is_array($extra) && array_key_exists('url', $extra)) {
-            $uri = new Uri((string)$extra['url']);
-        } elseif (getenv('TEAMS_URL') !== false) {
+            $uri = new Uri((string) $extra['url']);
+        } elseif (false !== getenv('TEAMS_URL')) {
             $uri = new Uri(getenv('TEAMS_URL'));
         } else {
-            throw new \RuntimeException(
-                'MS Teams URL is not defined. Define it either in composer.json or as $TEAMS_URL.',
-                1612865679
-            );
+            throw new \RuntimeException('MS Teams URL is not defined. Define it either in composer.json or as $TEAMS_URL.', 1612865679);
         }
 
         return new self($uri);
@@ -85,7 +84,8 @@ class Teams extends AbstractService
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
      * @throws ClientExceptionInterface
      */
     protected function sendReport(UpdateCheckResult $result): bool
@@ -94,7 +94,7 @@ class Teams extends AbstractService
 
         // Build JSON payload
         $count = count($outdatedPackages);
-        $multiple = $count !== 1;
+        $multiple = 1 !== $count;
         $payload = [
             'title' => sprintf('%s %d outdated package%s', Emoji::policeCarLight(), $count, $multiple ? 's' : ''),
             'summary' => sprintf('%d package%s %s outdated', $count, $multiple ? 's' : '', $multiple ? 'are' : 'is'),
@@ -103,7 +103,7 @@ class Teams extends AbstractService
 
         // Send report
         if (!$this->behavior->style->isJson()) {
-            $this->behavior->io->write(Emoji::rocket() . ' Sending report to MS Teams...');
+            $this->behavior->io->write(Emoji::rocket().' Sending report to MS Teams...');
         }
         $response = $this->sendRequest($payload);
 
@@ -112,7 +112,6 @@ class Teams extends AbstractService
 
     /**
      * @param OutdatedPackage[] $outdatedPackages
-     * @return array
      */
     private function renderSections(array $outdatedPackages): array
     {
@@ -126,8 +125,9 @@ class Teams extends AbstractService
             $textParts[] = sprintf('# [%s](%s)', $outdatedPackage->getName(), $outdatedPackage->getProviderLink());
             $textParts[] = sprintf('Current version: **%s**%s', $outdatedPackage->getOutdatedVersion(), $insecure);
             $textParts[] = sprintf('New version: **%s**', $outdatedPackage->getNewVersion());
-            $sections[] = ['text' => implode(PHP_EOL . PHP_EOL, $textParts)];
+            $sections[] = ['text' => implode(PHP_EOL.PHP_EOL, $textParts)];
         }
+
         return $sections;
     }
 
@@ -138,11 +138,11 @@ class Teams extends AbstractService
 
     private function validateUri(): void
     {
-        $uri = (string)$this->uri;
-        if (trim($uri) === '') {
+        $uri = (string) $this->uri;
+        if ('' === trim($uri)) {
             throw new \InvalidArgumentException('MS Teams URL must not be empty.', 1612865642);
         }
-        if (filter_var($uri, FILTER_VALIDATE_URL) === false) {
+        if (false === filter_var($uri, FILTER_VALIDATE_URL)) {
             throw new \InvalidArgumentException('MS Teams URL is no valid URL.', 1612865646);
         }
     }

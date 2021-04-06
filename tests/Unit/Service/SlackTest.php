@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit\Service;
 
 /*
@@ -32,7 +34,7 @@ use Nyholm\Psr7\Uri;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
 /**
- * SlackTest
+ * SlackTest.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -79,7 +81,6 @@ class SlackTest extends AbstractTestCase
     /**
      * @test
      * @dataProvider fromConfigurationThrowsExceptionIfSlackUrlIsNotSetDataProvider
-     * @param array $configuration
      */
     public function fromConfigurationThrowsExceptionIfSlackUrlIsNotSet(array $configuration): void
     {
@@ -107,7 +108,7 @@ class SlackTest extends AbstractTestCase
         $subject = Slack::fromConfiguration($configuration);
 
         static::assertInstanceOf(Slack::class, $subject);
-        static::assertSame('https://example.org', (string)$subject->getUri());
+        static::assertSame('https://example.org', (string) $subject->getUri());
     }
 
     /**
@@ -121,13 +122,12 @@ class SlackTest extends AbstractTestCase
         $subject = Slack::fromConfiguration([]);
 
         static::assertInstanceOf(Slack::class, $subject);
-        static::assertSame('https://example.org', (string)$subject->getUri());
+        static::assertSame('https://example.org', (string) $subject->getUri());
     }
 
     /**
      * @dataProvider reportSendsUpdateReportSuccessfullyDataProvider
      * @test
-     * @param bool $insecure
      */
     public function reportSendsUpdateReportSuccessfully(bool $insecure): void
     {

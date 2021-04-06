@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit;
 
 /*
@@ -24,7 +26,7 @@ namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit;
 use EliasHaeussler\ComposerUpdateReporter\Util;
 
 /**
- * UtilTest
+ * UtilTest.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -34,9 +36,6 @@ class UtilTest extends AbstractTestCase
     /**
      * @test
      * @dataProvider arrayDiffRecursiveReturnsDiffBetweenArraysDataProvider
-     * @param array $array1
-     * @param array $array2
-     * @param array $expected
      */
     public function arrayDiffRecursiveReturnsDiffBetweenArrays(array $array1, array $array2, array $expected): void
     {

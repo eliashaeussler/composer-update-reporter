@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateReporter;
 
 /*
@@ -28,7 +30,7 @@ use Composer\Plugin\PluginInterface;
 use EliasHaeussler\ComposerUpdateCheck\Event\PostUpdateCheckEvent;
 
 /**
- * Plugin
+ * Plugin.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -60,7 +62,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     {
         return [
             PostUpdateCheckEvent::NAME => [
-                ['onPostUpdateCheck']
+                ['onPostUpdateCheck'],
             ],
         ];
     }

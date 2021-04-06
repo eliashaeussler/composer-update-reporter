@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateReporter\Service;
 
 /*
@@ -26,7 +28,7 @@ use EliasHaeussler\ComposerUpdateCheck\Options;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 
 /**
- * ServiceInterface
+ * ServiceInterface.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -34,31 +36,20 @@ use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 interface ServiceInterface
 {
     /**
-     * @param array $configuration
      * @return static
      */
     public static function fromConfiguration(array $configuration): self;
 
-    /**
-     * @param array $configuration
-     * @return bool
-     */
     public static function isEnabled(array $configuration): bool;
 
-    /**
-     * @param UpdateCheckResult $result
-     * @return bool
-     */
     public function report(UpdateCheckResult $result): bool;
 
     /**
-     * @param OutputBehavior $behavior
      * @return static
      */
     public function setBehavior(OutputBehavior $behavior): self;
 
     /**
-     * @param Options $options
      * @return static
      */
     public function setOptions(Options $options): self;

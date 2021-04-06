@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit\Service;
 
 /*
@@ -32,7 +34,7 @@ use Nyholm\Psr7\Uri;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
 /**
- * MattermostTest
+ * MattermostTest.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -90,7 +92,6 @@ class MattermostTest extends AbstractTestCase
     /**
      * @test
      * @dataProvider fromConfigurationThrowsExceptionIfMattermostUrlIsNotSetDataProvider
-     * @param array $configuration
      */
     public function fromConfigurationThrowsExceptionIfMattermostUrlIsNotSet(array $configuration): void
     {
@@ -140,7 +141,7 @@ class MattermostTest extends AbstractTestCase
         $subject = Mattermost::fromConfiguration($configuration);
 
         static::assertInstanceOf(Mattermost::class, $subject);
-        static::assertSame('https://example.org', (string)$subject->getUri());
+        static::assertSame('https://example.org', (string) $subject->getUri());
         static::assertSame('foo', $subject->getChannelName());
         static::assertSame('baz', $subject->getUsername());
     }
@@ -158,7 +159,7 @@ class MattermostTest extends AbstractTestCase
         $subject = Mattermost::fromConfiguration([]);
 
         static::assertInstanceOf(Mattermost::class, $subject);
-        static::assertSame('https://example.org', (string)$subject->getUri());
+        static::assertSame('https://example.org', (string) $subject->getUri());
         static::assertSame('foo', $subject->getChannelName());
         static::assertSame('baz', $subject->getUsername());
     }
@@ -166,8 +167,6 @@ class MattermostTest extends AbstractTestCase
     /**
      * @test
      * @dataProvider reportSendsUpdateReportSuccessfullyDataProvider
-     * @param bool $insecure
-     * @param string $expectedSecurityNotice
      */
     public function reportSendsUpdateReportSuccessfully(bool $insecure, string $expectedSecurityNotice): void
     {
@@ -194,7 +193,7 @@ class MattermostTest extends AbstractTestCase
 
         $payload = $this->getPayloadOfLastRequest();
         $text = $payload['attachments'][0]['text'] ?? null;
-        $expected = '[foo/foo](https://packagist.org/packages/foo/foo#1.0.5) | 1.0.0' . $expectedSecurityNotice . ' | **1.0.5**';
+        $expected = '[foo/foo](https://packagist.org/packages/foo/foo#1.0.5) | 1.0.0'.$expectedSecurityNotice.' | **1.0.5**';
         static::assertStringContainsString($expected, $text);
     }
 
@@ -228,7 +227,7 @@ class MattermostTest extends AbstractTestCase
             ],
             'insecure package' => [
                 true,
-                ' :warning: **`insecure`**'
+                ' :warning: **`insecure`**',
             ],
         ];
     }

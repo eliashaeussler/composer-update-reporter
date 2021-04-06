@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateReporter\Service;
 
 /*
@@ -32,7 +34,7 @@ use Spatie\Emoji\Emoji;
 use Symfony\Component\HttpClient\Psr18Client;
 
 /**
- * GitLab
+ * GitLab.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -68,26 +70,20 @@ class GitLab extends AbstractService
 
         // Parse GitLab URL
         if (is_array($extra) && array_key_exists('url', $extra)) {
-            $uri = new Uri((string)$extra['url']);
-        } elseif (getenv('GITLAB_URL') !== false) {
+            $uri = new Uri((string) $extra['url']);
+        } elseif (false !== getenv('GITLAB_URL')) {
             $uri = new Uri(getenv('GITLAB_URL'));
         } else {
-            throw new \RuntimeException(
-                'GitLab URL is not defined. Define it either in composer.json or as $GITLAB_URL.',
-                1600852917
-            );
+            throw new \RuntimeException('GitLab URL is not defined. Define it either in composer.json or as $GITLAB_URL.', 1600852917);
         }
 
         // Parse GitLab authorization key
         if (is_array($extra) && array_key_exists('authKey', $extra)) {
-            $authKey = (string)$extra['authKey'];
-        } elseif (getenv('GITLAB_AUTH_KEY') !== false) {
+            $authKey = (string) $extra['authKey'];
+        } elseif (false !== getenv('GITLAB_AUTH_KEY')) {
             $authKey = getenv('GITLAB_AUTH_KEY');
         } else {
-            throw new \RuntimeException(
-                'GitLab authorization key is not defined. Define it either in composer.json or as $GITLAB_AUTH_KEY.',
-                1600852990
-            );
+            throw new \RuntimeException('GitLab authorization key is not defined. Define it either in composer.json or as $GITLAB_AUTH_KEY.', 1600852990);
         }
 
         return new self($uri, $authKey);
@@ -104,7 +100,8 @@ class GitLab extends AbstractService
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
      * @throws ClientExceptionInterface
      */
     protected function sendReport(UpdateCheckResult $result): bool
@@ -114,21 +111,20 @@ class GitLab extends AbstractService
         // Build JSON payload
         $count = count($outdatedPackages);
         $payload = array_merge([
-            'title' => sprintf('%d outdated package%s', $count, $count !== 1 ? 's' : ''),
+            'title' => sprintf('%d outdated package%s', $count, 1 !== $count ? 's' : ''),
         ], $this->getPackagesPayload($outdatedPackages));
 
         // Send report
         if (!$this->behavior->style->isJson()) {
-            $this->behavior->io->write(Emoji::rocket() . ' Sending report to GitLab...');
+            $this->behavior->io->write(Emoji::rocket().' Sending report to GitLab...');
         }
-        $response = $this->sendRequest($payload, ['Authorization' => 'Bearer ' . $this->authorizationKey,]);
+        $response = $this->sendRequest($payload, ['Authorization' => 'Bearer '.$this->authorizationKey]);
 
         return $response->getStatusCode() < 400;
     }
 
     /**
      * @param OutdatedPackage[] $outdatedPackages
-     * @return array
      */
     private function getPackagesPayload(array $outdatedPackages): array
     {
@@ -145,6 +141,7 @@ class GitLab extends AbstractService
                 $outdatedPackage->getNewVersion()
             );
         }
+
         return $payload;
     }
 
@@ -161,17 +158,17 @@ class GitLab extends AbstractService
     private function validateUri(): void
     {
         $uri = (string) $this->uri;
-        if (trim($uri) === '') {
+        if ('' === trim($uri)) {
             throw new \InvalidArgumentException('GitLab URL must not be empty.', 1600852837);
         }
-        if (filter_var($uri, FILTER_VALIDATE_URL) === false) {
+        if (false === filter_var($uri, FILTER_VALIDATE_URL)) {
             throw new \InvalidArgumentException('GitLab URL is no valid URL.', 1600852841);
         }
     }
 
     private function validateAuthorizationKey(): void
     {
-        if (trim($this->authorizationKey) === '') {
+        if ('' === trim($this->authorizationKey)) {
             throw new \InvalidArgumentException('GitLab authorization key must not be empty.', 1600852864);
         }
     }

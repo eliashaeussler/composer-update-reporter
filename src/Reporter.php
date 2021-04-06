@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateReporter;
 
 /*
@@ -36,7 +38,7 @@ use EliasHaeussler\ComposerUpdateReporter\Service\Slack;
 use EliasHaeussler\ComposerUpdateReporter\Service\Teams;
 
 /**
- * Reporter
+ * Reporter.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -94,10 +96,7 @@ class Reporter
         /** @var ServiceInterface $registeredService */
         foreach ($this->registeredServices as $registeredService) {
             if (!in_array(ServiceInterface::class, class_implements($registeredService), true)) {
-                throw new \InvalidArgumentException(
-                    sprintf('Service "%s" must implement "%s".', $registeredService, ServiceInterface::class),
-                    1600814017
-                );
+                throw new \InvalidArgumentException(sprintf('Service "%s" must implement "%s".', $registeredService, ServiceInterface::class), 1600814017);
             }
             if ($registeredService::isEnabled($this->configuration)) {
                 $service = $registeredService::fromConfiguration($this->configuration);
@@ -106,6 +105,7 @@ class Reporter
                 $services[] = $service;
             }
         }
+
         return $services;
     }
 
@@ -122,6 +122,7 @@ class Reporter
     public function setRegisteredServices(array $registeredServices): self
     {
         $this->registeredServices = $registeredServices;
+
         return $this;
     }
 

@@ -32,7 +32,7 @@ use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\OutputBehaviorTrait;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\TestEnvironmentTrait;
 
 /**
- * AbstractServiceTest
+ * AbstractServiceTest.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -56,9 +56,8 @@ class AbstractServiceTest extends AbstractTestCase
     /**
      * @test
      * @dataProvider isEnabledReturnsStateOfAvailabilityDataProvider
-     * @param array $configuration
+     *
      * @param $environmentVariable
-     * @param bool $expected
      */
     public function isEnabledReturnsStateOfAvailability(array $configuration, $environmentVariable, bool $expected): void
     {

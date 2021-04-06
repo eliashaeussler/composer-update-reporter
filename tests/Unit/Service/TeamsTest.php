@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit\Service;
 
 /*
@@ -33,7 +35,7 @@ use Spatie\Emoji\Emoji;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
 /**
- * TeamsTest
+ * TeamsTest.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -80,7 +82,6 @@ class TeamsTest extends AbstractTestCase
     /**
      * @test
      * @dataProvider fromConfigurationThrowsExceptionIfTeamsUrlIsNotSetDataProvider
-     * @param array $configuration
      */
     public function fromConfigurationThrowsExceptionIfTeamsUrlIsNotSet(array $configuration): void
     {
@@ -108,7 +109,7 @@ class TeamsTest extends AbstractTestCase
         $subject = Teams::fromConfiguration($configuration);
 
         static::assertInstanceOf(Teams::class, $subject);
-        static::assertSame('https://example.org', (string)$subject->getUri());
+        static::assertSame('https://example.org', (string) $subject->getUri());
     }
 
     /**
@@ -122,14 +123,12 @@ class TeamsTest extends AbstractTestCase
         $subject = Teams::fromConfiguration([]);
 
         static::assertInstanceOf(Teams::class, $subject);
-        static::assertSame('https://example.org', (string)$subject->getUri());
+        static::assertSame('https://example.org', (string) $subject->getUri());
     }
 
     /**
      * @test
      * @dataProvider reportSendsUpdateReportSuccessfullyDataProvider
-     * @param bool $insecure
-     * @param string $expectedSecurityNotice
      */
     public function reportSendsUpdateReportSuccessfully(bool $insecure, string $expectedSecurityNotice): void
     {
@@ -148,9 +147,9 @@ class TeamsTest extends AbstractTestCase
         static::assertSame('1 package is outdated', $payload['summary']);
 
         $text = $payload['sections'][0]['text'];
-        $expected = implode(PHP_EOL . PHP_EOL, [
+        $expected = implode(PHP_EOL.PHP_EOL, [
             '# [foo/foo](https://packagist.org/packages/foo/foo#1.0.5)',
-            'Current version: **1.0.0**' . $expectedSecurityNotice,
+            'Current version: **1.0.0**'.$expectedSecurityNotice,
             'New version: **1.0.5**',
         ]);
         static::assertSame($expected, $text);

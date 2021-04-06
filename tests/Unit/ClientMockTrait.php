@@ -30,7 +30,7 @@ use Symfony\Component\HttpClient\Psr18Client;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
 /**
- * ClientMockTrait
+ * ClientMockTrait.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
@@ -47,6 +47,7 @@ trait ClientMockTrait
         $callback = function () {
             return $this->mockedResponse;
         };
+
         return new Psr18Client(new MockHttpClient($callback));
     }
 

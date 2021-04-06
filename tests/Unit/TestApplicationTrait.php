@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit;
 
 /*
@@ -22,7 +24,7 @@ namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit;
  */
 
 /**
- * TestApplicationTrait
+ * TestApplicationTrait.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
