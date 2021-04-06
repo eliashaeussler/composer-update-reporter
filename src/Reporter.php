@@ -22,7 +22,11 @@ namespace EliasHaeussler\ComposerUpdateReporter;
  */
 
 use Composer\Composer;
-use Composer\IO\IOInterface;
+use Composer\IO\NullIO;
+use EliasHaeussler\ComposerUpdateCheck\IO\OutputBehavior;
+use EliasHaeussler\ComposerUpdateCheck\IO\Style;
+use EliasHaeussler\ComposerUpdateCheck\IO\Verbosity;
+use EliasHaeussler\ComposerUpdateCheck\Options;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateReporter\Service\Email;
 use EliasHaeussler\ComposerUpdateReporter\Service\GitLab;
@@ -45,14 +49,14 @@ class Reporter
     private $composer;
 
     /**
-     * @var IOInterface
+     * @var OutputBehavior
      */
-    private $io;
+    private $behavior;
 
     /**
-     * @var bool
+     * @var Options
      */
-    private $json;
+    private $options;
 
     /**
      * @var string[]
@@ -64,11 +68,11 @@ class Reporter
      */
     private $configuration;
 
-    public function __construct(Composer $composer, IOInterface $io, bool $json = false)
+    public function __construct(Composer $composer)
     {
         $this->composer = $composer;
-        $this->io = $io;
-        $this->json = $json;
+        $this->behavior = $this->getDefaultBehavior();
+        $this->options = new Options();
         $this->registeredServices = $this->getDefaultServices();
         $this->configuration = $this->resolveConfiguration();
     }
@@ -77,8 +81,7 @@ class Reporter
     {
         $services = $this->buildServicesFromConfiguration();
         foreach ($services as $service) {
-            $service->setJson($this->json);
-            $service->report($result, $this->io);
+            $service->report($result);
         }
     }
 
@@ -98,17 +101,22 @@ class Reporter
             }
             if ($registeredService::isEnabled($this->configuration)) {
                 $service = $registeredService::fromConfiguration($this->configuration);
-                $service->setJson($this->json);
+                $service->setBehavior($this->behavior);
+                $service->setOptions($this->options);
                 $services[] = $service;
             }
         }
         return $services;
     }
 
-    public function setJson(bool $json): self
+    public function setBehavior(OutputBehavior $behavior): void
     {
-        $this->json = $json;
-        return $this;
+        $this->behavior = $behavior;
+    }
+
+    public function setOptions(Options $options): void
+    {
+        $this->options = $options;
     }
 
     public function setRegisteredServices(array $registeredServices): self
@@ -126,6 +134,15 @@ class Reporter
             Slack::class,
             Teams::class,
         ];
+    }
+
+    private function getDefaultBehavior(): OutputBehavior
+    {
+        return new OutputBehavior(
+            new Style(Style::NORMAL),
+            new Verbosity(Verbosity::NORMAL),
+            new NullIO()
+        );
     }
 
     private function resolveConfiguration(): array

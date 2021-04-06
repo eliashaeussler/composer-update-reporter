@@ -1,11 +1,13 @@
 <?php
+
 declare(strict_types=1);
-namespace EliasHaeussler\ComposerUpdateReporter\Traits;
+
+namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit;
 
 /*
  * This file is part of the Composer package "eliashaeussler/composer-update-reporter".
  *
- * Copyright (C) 2020 Elias Häußler <elias@haeussler.dev>
+ * Copyright (C) 2021 Elias Häußler <elias@haeussler.dev>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,22 +23,33 @@ namespace EliasHaeussler\ComposerUpdateReporter\Traits;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
+use Composer\IO\BufferIO;
+use EliasHaeussler\ComposerUpdateCheck\IO\OutputBehavior;
+use EliasHaeussler\ComposerUpdateCheck\IO\Style;
+use EliasHaeussler\ComposerUpdateCheck\IO\Verbosity;
 
 /**
- * PackageProviderLinkTrait
+ * OutputBehaviorTrait
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-trait PackageProviderLinkTrait
+trait OutputBehaviorTrait
 {
-    private function getProviderLink(OutdatedPackage $outdatedPackage): string
+    /**
+     * @var OutputBehavior
+     */
+    protected $behavior;
+
+    protected function getDefaultBehavior(): OutputBehavior
     {
-        if (method_exists($outdatedPackage, 'getProviderLink')) {
-            return (string)$outdatedPackage->getProviderLink();
-        }
-        // Fallback for BC: Manually build provider link
-        return sprintf('https://packagist.org/packages/%s', $outdatedPackage->getName());
+        return $this->behavior = new OutputBehavior(new Style(), new Verbosity(), new BufferIO());
+    }
+
+    protected function getIO(): BufferIO
+    {
+        /** @var BufferIO $io */
+        $io = $this->behavior->io;
+        return $io;
     }
 }

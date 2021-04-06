@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit;
 
 /*
- * This file is part of the TYPO3 CMS extension "eliashaeussler/composer-update-reporter".
+ * This file is part of the Composer package "eliashaeussler/composer-update-reporter".
  *
  * Copyright (C) 2020 Elias Häußler <elias@haeussler.dev>
  *

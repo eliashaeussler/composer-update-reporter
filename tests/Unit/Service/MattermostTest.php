@@ -21,19 +21,15 @@ namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit\Service;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use Composer\IO\BufferIO;
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateReporter\Service\Mattermost;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\AbstractTestCase;
+use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\ClientMockTrait;
+use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\OutputBehaviorTrait;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\TestEnvironmentTrait;
-use EliasHaeussler\ComposerUpdateReporter\Util;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Psr7\Uri;
-use GuzzleHttp\RequestOptions;
-use Prophecy\Argument;
+use Nyholm\Psr7\Uri;
+use Symfony\Component\HttpClient\Response\MockResponse;
 
 /**
  * MattermostTest
@@ -43,6 +39,8 @@ use Prophecy\Argument;
  */
 class MattermostTest extends AbstractTestCase
 {
+    use ClientMockTrait;
+    use OutputBehaviorTrait;
     use TestEnvironmentTrait;
 
     /**
@@ -53,6 +51,7 @@ class MattermostTest extends AbstractTestCase
     protected function setUp(): void
     {
         $this->subject = new Mattermost(new Uri('https://example.org'), 'foo', 'baz');
+        $this->subject->setBehavior($this->getDefaultBehavior());
     }
 
     /**
@@ -166,107 +165,37 @@ class MattermostTest extends AbstractTestCase
 
     /**
      * @test
-     * @dataProvider isEnabledReturnsStateOfAvailabilityDataProvider
-     * @param array $configuration
-     * @param $environmentVariable
-     * @param bool $expected
-     */
-    public function isEnabledReturnsStateOfAvailability(array $configuration, $environmentVariable, bool $expected): void
-    {
-        $this->modifyEnvironmentVariable('MATTERMOST_ENABLE', $environmentVariable);
-
-        static::assertSame($expected, Mattermost::isEnabled($configuration));
-    }
-
-    /**
-     * @test
-     * @throws GuzzleException
-     */
-    public function reportSkipsReportIfNoPackagesAreOutdated(): void
-    {
-        $result = new UpdateCheckResult([]);
-        $io = new BufferIO();
-
-        static::assertTrue($this->subject->report($result, $io));
-        static::assertStringContainsString('Skipped Mattermost report.', $io->getOutput());
-    }
-
-    /**
-     * @test
      * @dataProvider reportSendsUpdateReportSuccessfullyDataProvider
      * @param bool $insecure
      * @param string $expectedSecurityNotice
-     * @throws GuzzleException
-     * @throws \ReflectionException
      */
     public function reportSendsUpdateReportSuccessfully(bool $insecure, string $expectedSecurityNotice): void
     {
         $result = new UpdateCheckResult([
             new OutdatedPackage('foo/foo', '1.0.0', '1.0.5', $insecure),
         ]);
-        $io = new BufferIO();
 
-        // Prophesize Client
-        $clientProphecy = $this->prophesize(Client::class);
-        /** @noinspection PhpParamsInspection */
-        $clientProphecy->post('', Argument::allOf(
-            Argument::that(function (array $argument) {
-                return Util::arrayDiffRecursive([
-                    RequestOptions::JSON => [
-                        'channel' => 'foo',
-                        'attachments' => [
-                            [
-                                'color' => '#EE0000',
-                            ],
-                        ],
-                        'username' => 'baz',
-                    ],
-                ], $argument) === [];
-            }),
-            Argument::that(function (array $argument) use ($expectedSecurityNotice) {
-                $text = $argument[RequestOptions::JSON]['attachments'][0]['text'] ?? null;
-                $expected = '[foo/foo](https://packagist.org/packages/foo/foo#1.0.5) | 1.0.0' . $expectedSecurityNotice . ' | **1.0.5**';
-                static::assertStringContainsString($expected, $text);
-                return true;
-            })
-        ))->willReturn(new Response())->shouldBeCalledOnce();
+        $this->subject->setClient($this->getClient());
+        $this->mockedResponse = new MockResponse();
 
-        // Inject client prophecy into subject
-        $reflectionClass = new \ReflectionClass($this->subject);
-        $clientProperty = $reflectionClass->getProperty('client');
-        $clientProperty->setAccessible(true);
-        $clientProperty->setValue($this->subject, $clientProphecy->reveal());
+        static::assertTrue($this->subject->report($result));
+        static::assertStringContainsString('Mattermost report was successful', $this->getIO()->getOutput());
 
-        static::assertTrue($this->subject->report($result, $io));
-        static::assertStringContainsString('Mattermost report was successful.', $io->getOutput());
-    }
+        $expectedPayloadSubset = [
+            'channel' => 'foo',
+            'attachments' => [
+                [
+                    'color' => '#EE0000',
+                ],
+            ],
+            'username' => 'baz',
+        ];
+        $this->assertPayloadOfLastRequestContainsSubset($expectedPayloadSubset);
 
-    /**
-     * @test
-     * @throws GuzzleException
-     * @throws \ReflectionException
-     */
-    public function reportsPrintsErrorOnErroneousReport(): void
-    {
-        $result = new UpdateCheckResult([
-            new OutdatedPackage('foo/foo', '1.0.0', '1.0.5'),
-        ]);
-        $io = new BufferIO();
-
-        // Prophesize Client
-        $clientProphecy = $this->prophesize(Client::class);
-        $clientProphecy->post('', Argument::type('array'))
-            ->willReturn(new Response(404))
-            ->shouldBeCalledOnce();
-
-        // Inject client prophecy into subject
-        $reflectionClass = new \ReflectionClass($this->subject);
-        $clientProperty = $reflectionClass->getProperty('client');
-        $clientProperty->setAccessible(true);
-        $clientProperty->setValue($this->subject, $clientProphecy->reveal());
-
-        static::assertFalse($this->subject->report($result, $io));
-        static::assertStringContainsString('Error during Mattermost report.', $io->getOutput());
+        $payload = $this->getPayloadOfLastRequest();
+        $text = $payload['attachments'][0]['text'] ?? null;
+        $expected = '[foo/foo](https://packagist.org/packages/foo/foo#1.0.5) | 1.0.0' . $expectedSecurityNotice . ' | **1.0.5**';
+        static::assertStringContainsString($expected, $text);
     }
 
     public function fromConfigurationThrowsExceptionIfMattermostUrlIsNotSetDataProvider(): array
@@ -286,63 +215,6 @@ class MattermostTest extends AbstractTestCase
                         'channel' => 'foo',
                     ],
                 ],
-            ],
-        ];
-    }
-
-    public function isEnabledReturnsStateOfAvailabilityDataProvider(): array
-    {
-        return [
-            'no configuration and no environment variable' => [
-                [],
-                null,
-                false,
-            ],
-            'empty configuration and no environment variable' => [
-                [
-                    'mattermost' => [],
-                ],
-                null,
-                false,
-            ],
-            'truthy configuration and no environment variable' => [
-                [
-                    'mattermost' => [
-                        'enable' => true,
-                    ],
-                ],
-                null,
-                true,
-            ],
-            'truthy configuration and falsy environment variable' => [
-                [
-                    'mattermost' => [
-                        'enable' => true,
-                    ],
-                ],
-                '0',
-                true,
-            ],
-            'falsy configuration and truthy environment variable' => [
-                [
-                    'mattermost' => [
-                        'enable' => false,
-                    ],
-                ],
-                '1',
-                true,
-            ],
-            'empty configuration and truthy environment variable' => [
-                [
-                    'mattermost' => [],
-                ],
-                '1',
-                true,
-            ],
-            'no configuration and truthy environment variable' => [
-                [],
-                '1',
-                true,
             ],
         ];
     }

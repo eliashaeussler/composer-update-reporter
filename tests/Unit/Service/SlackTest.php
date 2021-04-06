@@ -21,19 +21,15 @@ namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit\Service;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use Composer\IO\BufferIO;
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateReporter\Service\Slack;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\AbstractTestCase;
+use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\ClientMockTrait;
+use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\OutputBehaviorTrait;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\TestEnvironmentTrait;
-use EliasHaeussler\ComposerUpdateReporter\Util;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Psr7\Uri;
-use GuzzleHttp\RequestOptions;
-use Prophecy\Argument;
+use Nyholm\Psr7\Uri;
+use Symfony\Component\HttpClient\Response\MockResponse;
 
 /**
  * SlackTest
@@ -43,6 +39,8 @@ use Prophecy\Argument;
  */
 class SlackTest extends AbstractTestCase
 {
+    use ClientMockTrait;
+    use OutputBehaviorTrait;
     use TestEnvironmentTrait;
 
     /**
@@ -53,6 +51,7 @@ class SlackTest extends AbstractTestCase
     protected function setUp(): void
     {
         $this->subject = new Slack(new Uri('https://example.org'));
+        $this->subject->setBehavior($this->getDefaultBehavior());
     }
 
     /**
@@ -126,138 +125,128 @@ class SlackTest extends AbstractTestCase
     }
 
     /**
-     * @test
-     * @dataProvider isEnabledReturnsStateOfAvailabilityDataProvider
-     * @param array $configuration
-     * @param $environmentVariable
-     * @param bool $expected
-     */
-    public function isEnabledReturnsStateOfAvailability(array $configuration, $environmentVariable, bool $expected): void
-    {
-        $this->modifyEnvironmentVariable('SLACK_ENABLE', $environmentVariable);
-
-        static::assertSame($expected, Slack::isEnabled($configuration));
-    }
-
-    /**
-     * @test
-     * @throws GuzzleException
-     */
-    public function reportSkipsReportIfNoPackagesAreOutdated(): void
-    {
-        $result = new UpdateCheckResult([]);
-        $io = new BufferIO();
-
-        static::assertTrue($this->subject->report($result, $io));
-        static::assertStringContainsString('Skipped Slack report.', $io->getOutput());
-    }
-
-    /**
      * @dataProvider reportSendsUpdateReportSuccessfullyDataProvider
      * @test
      * @param bool $insecure
-     * @param array|null $expectedSecurityPayload
-     * @throws GuzzleException
-     * @throws \ReflectionException
      */
-    public function reportSendsUpdateReportSuccessfully(bool $insecure, ?array $expectedSecurityPayload): void
+    public function reportSendsUpdateReportSuccessfully(bool $insecure): void
     {
         $result = new UpdateCheckResult([
             new OutdatedPackage('foo/foo', '1.0.0', '1.0.5', $insecure),
         ]);
-        $io = new BufferIO();
 
-        // Prophesize Client
-        $clientProphecy = $this->prophesize(Client::class);
-        /** @noinspection PhpParamsInspection */
-        $clientProphecy->post('', Argument::that(function (array $argument) use ($expectedSecurityPayload) {
-            $expectedFields = [
+        $expectedPayloadSubset = [
+            'blocks' => [
                 [
-                    'type' => 'mrkdwn',
-                    'text' => '*Package*',
+                    'type' => 'header',
+                    'text' => [
+                        'type' => 'plain_text',
+                        'text' => '1 outdated package',
+                    ],
                 ],
                 [
-                    'type' => 'mrkdwn',
-                    'text' => '<https://packagist.org/packages/foo/foo#1.0.5|foo/foo>',
+                    'type' => 'section',
+                    'text' => [
+                        'type' => 'plain_text',
+                        'text' => 'The following package is outdated and needs to be updated:',
+                    ],
                 ],
                 [
-                    'type' => 'mrkdwn',
-                    'text' => '*Current version*',
-                ],
-                [
-                    'type' => 'mrkdwn',
-                    'text' => '`1.0.0`',
-                ],
-                [
-                    'type' => 'mrkdwn',
-                    'text' => '*New version*',
-                ],
-                [
-                    'type' => 'mrkdwn',
-                    'text' => '*`1.0.5`*',
-                ],
-            ];
-            if ($expectedSecurityPayload !== null) {
-                $expectedFields = array_merge($expectedFields, $expectedSecurityPayload);
-            }
-            return Util::arrayDiffRecursive([
-                RequestOptions::JSON => [
-                    'blocks' => [
+                    'type' => 'section',
+                    'fields' => [
                         [
-                            'type' => 'header',
-                            'text' => [
-                                'type' => 'plain_text',
-                                'text' => '1 outdated package',
-                            ],
+                            'type' => 'mrkdwn',
+                            'text' => '<https://packagist.org/packages/foo/foo#1.0.5|foo/foo>',
                         ],
                         [
-                            'type' => 'divider',
-                        ],
-                        [
-                            'type' => 'section',
-                            'fields' => $expectedFields,
+                            'type' => 'mrkdwn',
+                            'text' => '`1.0.0` → *`1.0.5`*',
                         ],
                     ],
                 ],
-            ], $argument) === [];
-        }))->willReturn(new Response())->shouldBeCalledOnce();
+            ],
+        ];
 
-        // Inject client prophecy into subject
-        $reflectionClass = new \ReflectionClass($this->subject);
-        $clientProperty = $reflectionClass->getProperty('client');
-        $clientProperty->setAccessible(true);
-        $clientProperty->setValue($this->subject, $clientProphecy->reveal());
+        if ($insecure) {
+            $expectedPayloadSubset['blocks'][2]['fields'][1]['text'] .= ' :rotating_light:';
+            $expectedPayloadSubset['blocks'][] = [
+                'type' => 'context',
+                'elements' => [
+                    [
+                        'type' => 'mrkdwn',
+                        'text' => 'Package versions with :rotating_light: are marked as insecure',
+                    ],
+                ],
+            ];
+        }
 
-        static::assertTrue($this->subject->report($result, $io));
-        static::assertStringContainsString('Slack report was successful.', $io->getOutput());
+        $this->subject->setClient($this->getClient());
+        $this->mockedResponse = new MockResponse();
+
+        static::assertTrue($this->subject->report($result));
+        static::assertStringContainsString('Slack report was successful', $this->getIO()->getOutput());
+
+        $this->assertPayloadOfLastRequestContainsSubset($expectedPayloadSubset);
     }
 
     /**
      * @test
-     * @throws GuzzleException
-     * @throws \ReflectionException
      */
-    public function reportsPrintsErrorOnErroneousReport(): void
+    public function reportSendsLimitedUpdateReportIfManyPackagesAreOutdated(): void
     {
-        $result = new UpdateCheckResult([
-            new OutdatedPackage('foo/foo', '1.0.0', '1.0.5'),
-        ]);
-        $io = new BufferIO();
+        $outdatedPackage = new OutdatedPackage('foo/foo', '1.0.0', '1.0.5');
+        $result = new UpdateCheckResult(array_fill(0, 50, $outdatedPackage));
 
-        // Prophesize Client
-        $clientProphecy = $this->prophesize(Client::class);
-        $clientProphecy->post('', Argument::type('array'))
-            ->willReturn(new Response(404))
-            ->shouldBeCalledOnce();
+        $expectedPayloadSubset = [
+            'blocks' => array_merge(
+                [
+                    [
+                        'type' => 'header',
+                        'text' => [
+                            'type' => 'plain_text',
+                            'text' => '1 outdated package',
+                        ],
+                    ],
+                    [
+                        'type' => 'section',
+                        'text' => [
+                            'type' => 'plain_text',
+                            'text' => 'The following package is outdated and needs to be updated:',
+                        ],
+                    ],
+                ],
+                array_fill(0, 46, [
+                    'type' => 'section',
+                    'fields' => [
+                        [
+                            'type' => 'mrkdwn',
+                            'text' => '<https://packagist.org/packages/foo/foo#1.0.5|foo/foo>',
+                        ],
+                        [
+                            'type' => 'mrkdwn',
+                            'text' => '`1.0.0` → *`1.0.5`*',
+                        ],
+                    ],
+                ]),
+                [
+                    [
+                        'type' => 'section',
+                        'text' => [
+                            'type' => 'plain_text',
+                            'text' => '... and 4 more',
+                        ],
+                    ],
+                ]
+            ),
+        ];
 
-        // Inject client prophecy into subject
-        $reflectionClass = new \ReflectionClass($this->subject);
-        $clientProperty = $reflectionClass->getProperty('client');
-        $clientProperty->setAccessible(true);
-        $clientProperty->setValue($this->subject, $clientProphecy->reveal());
+        $this->subject->setClient($this->getClient());
+        $this->mockedResponse = new MockResponse();
 
-        static::assertFalse($this->subject->report($result, $io));
-        static::assertStringContainsString('Error during Slack report.', $io->getOutput());
+        static::assertTrue($this->subject->report($result));
+        static::assertStringContainsString('Slack report was successful', $this->getIO()->getOutput());
+
+        $this->assertPayloadOfLastRequestContainsSubset($expectedPayloadSubset);
     }
 
     public function fromConfigurationThrowsExceptionIfSlackUrlIsNotSetDataProvider(): array
@@ -281,82 +270,14 @@ class SlackTest extends AbstractTestCase
         ];
     }
 
-    public function isEnabledReturnsStateOfAvailabilityDataProvider(): array
-    {
-        return [
-            'no configuration and no environment variable' => [
-                [],
-                null,
-                false,
-            ],
-            'empty configuration and no environment variable' => [
-                [
-                    'slack' => [],
-                ],
-                null,
-                false,
-            ],
-            'truthy configuration and no environment variable' => [
-                [
-                    'slack' => [
-                        'enable' => true,
-                    ],
-                ],
-                null,
-                true,
-            ],
-            'truthy configuration and falsy environment variable' => [
-                [
-                    'slack' => [
-                        'enable' => true,
-                    ],
-                ],
-                '0',
-                true,
-            ],
-            'falsy configuration and truthy environment variable' => [
-                [
-                    'slack' => [
-                        'enable' => false,
-                    ],
-                ],
-                '1',
-                true,
-            ],
-            'empty configuration and truthy environment variable' => [
-                [
-                    'slack' => [],
-                ],
-                '1',
-                true,
-            ],
-            'no configuration and truthy environment variable' => [
-                [],
-                '1',
-                true,
-            ],
-        ];
-    }
-
     public function reportSendsUpdateReportSuccessfullyDataProvider(): array
     {
         return [
             'secure package' => [
                 false,
-                null,
             ],
             'insecure package' => [
                 true,
-                [
-                    [
-                        'type' => 'mrkdwn',
-                        'text' => '*Security state*',
-                    ],
-                    [
-                        'type' => 'mrkdwn',
-                        'text' => '*Package is insecure* :warning:',
-                    ],
-                ],
             ],
         ];
     }

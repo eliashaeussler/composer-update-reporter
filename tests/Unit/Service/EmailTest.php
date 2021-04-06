@@ -21,20 +21,16 @@ namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit\Service;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use Composer\IO\BufferIO;
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateReporter\Service\Email;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\AbstractTestCase;
+use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\OutputBehaviorTrait;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\TestEnvironmentTrait;
-use Prophecy\Argument;
 use rpkamp\Mailhog\MailhogClient;
 use rpkamp\Mailhog\Message\Contact;
 use Symfony\Component\HttpClient\HttplugClient;
-use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
-use Symfony\Component\Mailer\Transport\TransportInterface;
-use Symfony\Component\Mime\Email as SymfonyEmail;
 
 /**
  * EmailTest
@@ -44,6 +40,7 @@ use Symfony\Component\Mime\Email as SymfonyEmail;
  */
 class EmailTest extends AbstractTestCase
 {
+    use OutputBehaviorTrait;
     use TestEnvironmentTrait;
 
     protected static $mailhogHost;
@@ -74,6 +71,7 @@ class EmailTest extends AbstractTestCase
     protected function setUp(): void
     {
         $this->subject = new Email(static::$mailhogSmtp, ['foo@example.org'], 'baz@example.org');
+        $this->subject->setBehavior($this->getDefaultBehavior());
         $this->mailhog = new MailhogClient(new HttplugClient(), new HttplugClient(), static::$mailhogApi);
     }
 
@@ -236,47 +234,18 @@ class EmailTest extends AbstractTestCase
 
     /**
      * @test
-     * @dataProvider isEnabledReturnsStateOfAvailabilityDataProvider
-     * @param array $configuration
-     * @param $environmentVariable
-     * @param bool $expected
-     */
-    public function isEnabledReturnsStateOfAvailability(array $configuration, $environmentVariable, bool $expected): void
-    {
-        $this->modifyEnvironmentVariable('EMAIL_ENABLE', $environmentVariable);
-
-        static::assertSame($expected, Email::isEnabled($configuration));
-    }
-
-    /**
-     * @test
-     * @throws TransportExceptionInterface
-     */
-    public function reportSkipsReportIfNoPackagesAreOutdated(): void
-    {
-        $result = new UpdateCheckResult([]);
-        $io = new BufferIO();
-
-        static::assertTrue($this->subject->report($result, $io));
-        static::assertStringContainsString('Skipped Email report.', $io->getOutput());
-    }
-
-    /**
-     * @test
      * @dataProvider reportSendsUpdateReportSuccessfullyDataProvider
      * @param bool $insecure
      * @param string $expectedSecurityNotice
-     * @throws TransportExceptionInterface
      */
     public function reportSendsUpdateReportSuccessfully(bool $insecure, string $expectedSecurityNotice): void
     {
         $result = new UpdateCheckResult([
             new OutdatedPackage('foo/foo', '1.0.0', '1.0.5', $insecure),
         ]);
-        $io = new BufferIO();
 
-        static::assertTrue($this->subject->report($result, $io));
-        static::assertStringContainsString('Email report was successful.', $io->getOutput());
+        static::assertTrue($this->subject->report($result));
+        static::assertStringContainsString('E-mail report was successful', $this->getIO()->getOutput());
         static::assertSame(1, $this->mailhog->getNumberOfMessages());
 
         $message = $this->mailhog->getLastMessage();
@@ -302,34 +271,6 @@ class EmailTest extends AbstractTestCase
         static::assertSame($expected, $message->body);
     }
 
-    /**
-     * @test
-     * @throws TransportExceptionInterface
-     * @throws \ReflectionException
-     */
-    public function reportsPrintsErrorOnErroneousReport(): void
-    {
-        $result = new UpdateCheckResult([
-            new OutdatedPackage('foo/foo', '1.0.0', '1.0.5'),
-        ]);
-        $io = new BufferIO();
-
-        // Prophesize Transport
-        $transportProphecy = $this->prophesize(TransportInterface::class);
-        $transportProphecy->send(Argument::type(SymfonyEmail::class))
-            ->willReturn(null)
-            ->shouldBeCalledOnce();
-
-        // Inject transport prophecy into subject
-        $reflectionClass = new \ReflectionClass($this->subject);
-        $clientProperty = $reflectionClass->getProperty('transport');
-        $clientProperty->setAccessible(true);
-        $clientProperty->setValue($this->subject, $transportProphecy->reveal());
-
-        static::assertFalse($this->subject->report($result, $io));
-        static::assertStringContainsString('Error during Email report.', $io->getOutput());
-    }
-
     public function fromConfigurationThrowsExceptionIfEmailDsnIsNotSetDataProvider(): array
     {
         return [
@@ -348,63 +289,6 @@ class EmailTest extends AbstractTestCase
                         'receivers' => 'baz',
                     ],
                 ],
-            ],
-        ];
-    }
-
-    public function isEnabledReturnsStateOfAvailabilityDataProvider(): array
-    {
-        return [
-            'no configuration and no environment variable' => [
-                [],
-                null,
-                false,
-            ],
-            'empty configuration and no environment variable' => [
-                [
-                    'email' => [],
-                ],
-                null,
-                false,
-            ],
-            'truthy configuration and no environment variable' => [
-                [
-                    'email' => [
-                        'enable' => true,
-                    ],
-                ],
-                null,
-                true,
-            ],
-            'truthy configuration and falsy environment variable' => [
-                [
-                    'email' => [
-                        'enable' => true,
-                    ],
-                ],
-                '0',
-                true,
-            ],
-            'falsy configuration and truthy environment variable' => [
-                [
-                    'email' => [
-                        'enable' => false,
-                    ],
-                ],
-                '1',
-                true,
-            ],
-            'empty configuration and truthy environment variable' => [
-                [
-                    'email' => [],
-                ],
-                '1',
-                true,
-            ],
-            'no configuration and truthy environment variable' => [
-                [],
-                '1',
-                true,
             ],
         ];
     }

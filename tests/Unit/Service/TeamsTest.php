@@ -21,19 +21,16 @@ namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit\Service;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use Composer\IO\BufferIO;
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateReporter\Service\Teams;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\AbstractTestCase;
+use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\ClientMockTrait;
+use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\OutputBehaviorTrait;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\TestEnvironmentTrait;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Psr7\Uri;
-use GuzzleHttp\RequestOptions;
-use Prophecy\Argument;
+use Nyholm\Psr7\Uri;
 use Spatie\Emoji\Emoji;
+use Symfony\Component\HttpClient\Response\MockResponse;
 
 /**
  * TeamsTest
@@ -43,6 +40,8 @@ use Spatie\Emoji\Emoji;
  */
 class TeamsTest extends AbstractTestCase
 {
+    use ClientMockTrait;
+    use OutputBehaviorTrait;
     use TestEnvironmentTrait;
 
     /**
@@ -53,6 +52,7 @@ class TeamsTest extends AbstractTestCase
     protected function setUp(): void
     {
         $this->subject = new Teams(new Uri('https://example.org'));
+        $this->subject->setBehavior($this->getDefaultBehavior());
     }
 
     /**
@@ -127,101 +127,33 @@ class TeamsTest extends AbstractTestCase
 
     /**
      * @test
-     * @dataProvider isEnabledReturnsStateOfAvailabilityDataProvider
-     * @param array $configuration
-     * @param $environmentVariable
-     * @param bool $expected
-     */
-    public function isEnabledReturnsStateOfAvailability(array $configuration, $environmentVariable, bool $expected): void
-    {
-        $this->modifyEnvironmentVariable('TEAMS_ENABLE', $environmentVariable);
-
-        static::assertSame($expected, Teams::isEnabled($configuration));
-    }
-
-    /**
-     * @test
-     */
-    public function reportSkipsReportIfNoPackagesAreOutdated(): void
-    {
-        $result = new UpdateCheckResult([]);
-        $io = new BufferIO();
-
-        static::assertTrue($this->subject->report($result, $io));
-        static::assertStringContainsString('Skipped MS Teams report.', $io->getOutput());
-    }
-
-    /**
-     * @test
      * @dataProvider reportSendsUpdateReportSuccessfullyDataProvider
      * @param bool $insecure
      * @param string $expectedSecurityNotice
-     * @throws GuzzleException
      */
     public function reportSendsUpdateReportSuccessfully(bool $insecure, string $expectedSecurityNotice): void
     {
         $result = new UpdateCheckResult([
             new OutdatedPackage('foo/foo', '1.0.0', '1.0.5', $insecure),
         ]);
-        $io = new BufferIO();
 
-        // Prophesize Client
-        $clientProphecy = $this->prophesize(Client::class);
-        /** @noinspection PhpParamsInspection */
-        $clientProphecy->post('', Argument::that(
-            function (array $argument) use ($expectedSecurityNotice) {
-                $json = $argument[RequestOptions::JSON];
+        $this->subject->setClient($this->getClient());
+        $this->mockedResponse = new MockResponse();
 
-                static::assertSame(sprintf('%s 1 outdated package', Emoji::policeCarLight()), $json['title']);
-                static::assertSame('1 package is outdated', $json['summary']);
+        static::assertTrue($this->subject->report($result));
+        static::assertStringContainsString('MS Teams report was successful', $this->getIO()->getOutput());
 
-                $text = $json['sections'][0]['text'];
-                $expected = implode(PHP_EOL . PHP_EOL, [
-                    '# [foo/foo](https://packagist.org/packages/foo/foo#1.0.5)',
-                    'Current version: **1.0.0**' . $expectedSecurityNotice,
-                    'New version: **1.0.5**',
-                ]);
-                static::assertSame($expected, $text);
-                return true;
-            }
-        ))->willReturn(new Response())->shouldBeCalledOnce();
+        $payload = $this->getPayloadOfLastRequest();
+        static::assertSame(sprintf('%s 1 outdated package', Emoji::policeCarLight()), $payload['title']);
+        static::assertSame('1 package is outdated', $payload['summary']);
 
-        // Inject client prophecy into subject
-        $reflectionClass = new \ReflectionClass($this->subject);
-        $clientProperty = $reflectionClass->getProperty('client');
-        $clientProperty->setAccessible(true);
-        $clientProperty->setValue($this->subject, $clientProphecy->reveal());
-
-        static::assertTrue($this->subject->report($result, $io));
-        static::assertStringContainsString('MS Teams report was successful.', $io->getOutput());
-    }
-
-    /**
-     * @test
-     * @throws GuzzleException
-     * @throws \ReflectionException
-     */
-    public function reportsPrintsErrorOnErroneousReport(): void
-    {
-        $result = new UpdateCheckResult([
-            new OutdatedPackage('foo/foo', '1.0.0', '1.0.5'),
+        $text = $payload['sections'][0]['text'];
+        $expected = implode(PHP_EOL . PHP_EOL, [
+            '# [foo/foo](https://packagist.org/packages/foo/foo#1.0.5)',
+            'Current version: **1.0.0**' . $expectedSecurityNotice,
+            'New version: **1.0.5**',
         ]);
-        $io = new BufferIO();
-
-        // Prophesize Client
-        $clientProphecy = $this->prophesize(Client::class);
-        $clientProphecy->post('', Argument::type('array'))
-            ->willReturn(new Response(404))
-            ->shouldBeCalledOnce();
-
-        // Inject client prophecy into subject
-        $reflectionClass = new \ReflectionClass($this->subject);
-        $clientProperty = $reflectionClass->getProperty('client');
-        $clientProperty->setAccessible(true);
-        $clientProperty->setValue($this->subject, $clientProphecy->reveal());
-
-        static::assertFalse($this->subject->report($result, $io));
-        static::assertStringContainsString('Error during MS Teams report.', $io->getOutput());
+        static::assertSame($expected, $text);
     }
 
     public function fromConfigurationThrowsExceptionIfTeamsUrlIsNotSetDataProvider(): array
@@ -241,63 +173,6 @@ class TeamsTest extends AbstractTestCase
                         'foo' => 'baz',
                     ],
                 ],
-            ],
-        ];
-    }
-
-    public function isEnabledReturnsStateOfAvailabilityDataProvider(): array
-    {
-        return [
-            'no configuration and no environment variable' => [
-                [],
-                null,
-                false,
-            ],
-            'empty configuration and no environment variable' => [
-                [
-                    'teams' => [],
-                ],
-                null,
-                false,
-            ],
-            'truthy configuration and no environment variable' => [
-                [
-                    'teams' => [
-                        'enable' => true,
-                    ],
-                ],
-                null,
-                true,
-            ],
-            'truthy configuration and falsy environment variable' => [
-                [
-                    'teams' => [
-                        'enable' => true,
-                    ],
-                ],
-                '0',
-                true,
-            ],
-            'falsy configuration and truthy environment variable' => [
-                [
-                    'teams' => [
-                        'enable' => false,
-                    ],
-                ],
-                '1',
-                true,
-            ],
-            'empty configuration and truthy environment variable' => [
-                [
-                    'teams' => [],
-                ],
-                '1',
-                true,
-            ],
-            'no configuration and truthy environment variable' => [
-                [],
-                '1',
-                true,
             ],
         ];
     }

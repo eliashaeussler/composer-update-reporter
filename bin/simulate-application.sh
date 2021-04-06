@@ -14,7 +14,7 @@ TEMP_PATH="${TEMP_DIR}/update-reporter-test"
 
 # Define cleanup function for several signals
 function cleanup() {
-  exitCode=$?
+  local exitCode=$?
   rm -rf "${TEMP_PATH}"
   exit $exitCode
 }
