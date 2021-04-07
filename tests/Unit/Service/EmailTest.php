@@ -296,6 +296,40 @@ class EmailTest extends AbstractTestCase
     }
 
     /**
+     * @test
+     */
+    public function reportIncludesProjectNameInSubjectAndBody(): void
+    {
+        $this->subject->setProjectName('foo/baz');
+        $result = new UpdateCheckResult([
+            new OutdatedPackage('foo/foo', '1.0.0', '1.0.5'),
+        ]);
+
+        $this->subject->report($result);
+
+        $message = $this->mailhog->getLastMessage();
+        static::assertSame('1 outdated package @ foo/baz', $message->subject);
+
+        $expected = implode("\r\n", [
+            '<p>Project: <strong>foo/baz</strong></p>',
+            '<hr>',
+            '<table>',
+            '<tr>',
+            '<th>Package name</th>',
+            '<th>Outdated version</th>',
+            '<th>New version</th>',
+            '</tr>',
+            '<tr>',
+            '<td><a href="https://packagist.org/packages/foo/foo#1.0.5">foo/foo</a></td>',
+            '<td>1.0.0</td>',
+            '<td><strong>1.0.5</strong></td>',
+            '</tr>',
+            '</table>',
+        ]);
+        static::assertSame($expected, $message->body);
+    }
+
+    /**
      * @return array<string, array>
      */
     public function fromConfigurationThrowsExceptionIfEmailDsnIsNotSetDataProvider(): array

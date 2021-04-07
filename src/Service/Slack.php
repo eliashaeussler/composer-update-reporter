@@ -104,6 +104,8 @@ class Slack extends AbstractService
     {
         $hasInsecurePackages = false;
         $count = count($outdatedPackages);
+        $remainingPackages = $count;
+        $maxBlocks = 50;
 
         // Calculate longest version numbers of all outdated packages
         $outdatedVersionNumberLength = 0;
@@ -125,16 +127,17 @@ class Slack extends AbstractService
                     'text' => sprintf('%d outdated package%s', $count, 1 !== $count ? 's' : ''),
                 ],
             ],
-            [
+        ];
+
+        if (null !== $this->projectName) {
+            $blocks[] = [
                 'type' => 'section',
                 'text' => [
-                    'type' => 'plain_text',
-                    'text' => 1 !== $count
-                        ? 'The following packages are outdated and need to be updated:'
-                        : 'The following package is outdated and needs to be updated:',
+                    'type' => 'mrkdwn',
+                    'text' => sprintf('Project: *%s*', $this->projectName),
                 ],
-            ],
-        ];
+            ];
+        }
 
         foreach ($outdatedPackages as $outdatedPackage) {
             if ($outdatedPackage->isInsecure()) {
@@ -166,8 +169,7 @@ class Slack extends AbstractService
 
             // Slack allows only a limited number of blocks, therefore
             // we have to omit the remaining packages and show a message instead
-            $remainingPackages = $count - (count($blocks) - 2);
-            if (count($blocks) >= 48 && $remainingPackages > 0) {
+            if (count($blocks) >= ($maxBlocks - 2) && --$remainingPackages > 0) {
                 $blocks[] = [
                     'type' => 'section',
                     'text' => [

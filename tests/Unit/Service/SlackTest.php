@@ -153,13 +153,6 @@ class SlackTest extends AbstractTestCase
                 ],
                 [
                     'type' => 'section',
-                    'text' => [
-                        'type' => 'plain_text',
-                        'text' => 'The following package is outdated and needs to be updated:',
-                    ],
-                ],
-                [
-                    'type' => 'section',
                     'fields' => [
                         [
                             'type' => 'mrkdwn',
@@ -175,7 +168,7 @@ class SlackTest extends AbstractTestCase
         ];
 
         if ($insecure) {
-            $expectedPayloadSubset['blocks'][2]['fields'][1]['text'] .= ' :rotating_light:';
+            $expectedPayloadSubset['blocks'][1]['fields'][1]['text'] .= ' :rotating_light:';
             $expectedPayloadSubset['blocks'][] = [
                 'type' => 'context',
                 'elements' => [
@@ -214,15 +207,8 @@ class SlackTest extends AbstractTestCase
                             'text' => '1 outdated package',
                         ],
                     ],
-                    [
-                        'type' => 'section',
-                        'text' => [
-                            'type' => 'plain_text',
-                            'text' => 'The following package is outdated and needs to be updated:',
-                        ],
-                    ],
                 ],
-                array_fill(0, 46, [
+                array_fill(0, 47, [
                     'type' => 'section',
                     'fields' => [
                         [
@@ -240,7 +226,7 @@ class SlackTest extends AbstractTestCase
                         'type' => 'section',
                         'text' => [
                             'type' => 'plain_text',
-                            'text' => '... and 4 more',
+                            'text' => '... and 3 more',
                         ],
                     ],
                 ]
@@ -253,6 +239,35 @@ class SlackTest extends AbstractTestCase
         static::assertTrue($this->subject->report($result));
         static::assertStringContainsString('Slack report was successful', $this->getIO()->getOutput());
 
+        $this->assertPayloadOfLastRequestContainsSubset($expectedPayloadSubset);
+    }
+
+    /**
+     * @test
+     */
+    public function reportIncludesProjectNameInMessage(): void
+    {
+        $result = new UpdateCheckResult([
+            new OutdatedPackage('foo/foo', '1.0.0', '1.0.5'),
+        ]);
+
+        $this->subject->setProjectName('foo/baz');
+        $this->subject->setClient($this->getClient());
+        $this->mockedResponse = new MockResponse();
+
+        static::assertTrue($this->subject->report($result));
+
+        $expectedPayloadSubset = [
+            'blocks' => [
+                [
+                    'type' => 'section',
+                    'text' => [
+                        'type' => 'mrkdwn',
+                        'text' => 'Project: *foo/baz*',
+                    ],
+                ],
+            ],
+        ];
         $this->assertPayloadOfLastRequestContainsSubset($expectedPayloadSubset);
     }
 

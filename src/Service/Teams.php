@@ -90,6 +90,10 @@ class Teams extends AbstractService
             'sections' => $this->renderSections($outdatedPackages),
         ];
 
+        if (null !== $this->projectName) {
+            $payload['title'] .= sprintf(' @ %s', $this->projectName);
+        }
+
         // Send report
         if (!$this->behavior->style->isJson()) {
             $this->behavior->io->write(Emoji::rocket().' Sending report to MS Teams...');

@@ -96,6 +96,9 @@ class Email extends AbstractService
         // Set subject
         $count = count($outdatedPackages);
         $subject = sprintf('%d outdated package%s', $count, 1 !== $count ? 's' : '');
+        if (null !== $this->projectName) {
+            $subject .= sprintf(' @ %s', $this->projectName);
+        }
 
         // Set plain text body and html content
         $body = $this->parsePlainBody($outdatedPackages);
@@ -122,6 +125,12 @@ class Email extends AbstractService
     private function parsePlainBody(array $outdatedPackages): string
     {
         $textParts = [];
+
+        if (null !== $this->projectName) {
+            $textParts[] = sprintf('Project: "%s"', $this->projectName);
+            $textParts[] = '';
+        }
+
         foreach ($outdatedPackages as $outdatedPackage) {
             $insecure = '';
             if ($outdatedPackage->isInsecure()) {
@@ -145,12 +154,19 @@ class Email extends AbstractService
     private function parseHtmlBody(array $outdatedPackages): string
     {
         $html = [];
+
+        if (null !== $this->projectName) {
+            $html[] = sprintf('<p>Project: <strong>%s</strong></p>', $this->projectName);
+            $html[] = '<hr>';
+        }
+
         $html[] = '<table>';
         $html[] = '<tr>';
         $html[] = '<th>Package name</th>';
         $html[] = '<th>Outdated version</th>';
         $html[] = '<th>New version</th>';
         $html[] = '</tr>';
+
         foreach ($outdatedPackages as $outdatedPackage) {
             $insecure = '';
             if ($outdatedPackage->isInsecure()) {

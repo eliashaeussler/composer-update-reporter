@@ -163,6 +163,25 @@ class TeamsTest extends AbstractTestCase
     }
 
     /**
+     * @test
+     */
+    public function reportIncludesProjectNameInTitle(): void
+    {
+        $result = new UpdateCheckResult([
+            new OutdatedPackage('foo/foo', '1.0.0', '1.0.5'),
+        ]);
+
+        $this->subject->setProjectName('foo/baz');
+        $this->subject->setClient($this->getClient());
+        $this->mockedResponse = new MockResponse();
+
+        static::assertTrue($this->subject->report($result));
+
+        $payload = $this->getPayloadOfLastRequest();
+        static::assertSame(sprintf('%s 1 outdated package @ foo/baz', Emoji::policeCarLight()), $payload['title']);
+    }
+
+    /**
      * @return array<string, array>
      */
     public function fromConfigurationThrowsExceptionIfTeamsUrlIsNotSetDataProvider(): array

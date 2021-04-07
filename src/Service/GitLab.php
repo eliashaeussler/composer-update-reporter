@@ -89,10 +89,17 @@ class GitLab extends AbstractService
     {
         $outdatedPackages = $result->getOutdatedPackages();
 
-        // Build JSON payload
+        // Build title
         $count = count($outdatedPackages);
+        $title = sprintf('%d outdated package%s', $count, 1 !== $count ? 's' : '');
+
+        if (null !== $this->projectName) {
+            $title .= sprintf(' @ %s', $this->projectName);
+        }
+
+        // Build JSON payload
         $payload = array_merge([
-            'title' => sprintf('%d outdated package%s', $count, 1 !== $count ? 's' : ''),
+            'title' => $title,
         ], $this->getPackagesPayload($outdatedPackages));
 
         // Send report

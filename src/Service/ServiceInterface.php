@@ -52,13 +52,9 @@ interface ServiceInterface
 
     public function report(UpdateCheckResult $result): bool;
 
-    /**
-     * @return static
-     */
     public function setBehavior(OutputBehavior $behavior): self;
 
-    /**
-     * @return static
-     */
     public function setOptions(Options $options): self;
+
+    public function setProjectName(string $projectName): self;
 }

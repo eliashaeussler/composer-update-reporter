@@ -105,7 +105,7 @@ class ReporterTest extends AbstractTestCase
     /**
      * @test
      */
-    public function setBehaviorForwardsBehaviorToServices(): void
+    public function reportForwardsBehaviorToServices(): void
     {
         $behavior = new OutputBehavior(new Style(), new Verbosity(), new NullIO());
 
@@ -118,7 +118,7 @@ class ReporterTest extends AbstractTestCase
     /**
      * @test
      */
-    public function setOptionsForwardsOptionsToServices(): void
+    public function reportForwardsOptionsToServices(): void
     {
         DummyService::$enabled = true;
 
@@ -128,6 +128,16 @@ class ReporterTest extends AbstractTestCase
         $this->subject->report(new UpdateCheckResult([]));
 
         static::assertSame($options, DummyService::$customOptions);
+    }
+
+    /**
+     * @test
+     */
+    public function reportForwardsProjectNameToServices(): void
+    {
+        $this->subject->report(new UpdateCheckResult([]));
+
+        static::assertSame('foo/baz', DummyService::$customProjectName);
     }
 
     /**

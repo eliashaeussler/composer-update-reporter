@@ -97,8 +97,10 @@ class Mattermost extends AbstractService
         $outdatedPackages = $result->getOutdatedPackages();
 
         // Build JSON payload
+        $count = count($outdatedPackages);
         $payload = [
             'channel' => $this->channelName,
+            'text' => sprintf('#### :rotating_light: %d outdated package%s', $count, 1 !== $count ? 's' : ''),
             'attachments' => [
                 [
                     'color' => '#EE0000',
@@ -124,23 +126,22 @@ class Mattermost extends AbstractService
      */
     private function renderText(array $outdatedPackages): string
     {
-        $count = count($outdatedPackages);
-        $textParts = [
-            sprintf('#### :rotating_light: %d outdated package%s', $count, 1 !== $count ? 's' : ''),
-            '| Package | Current version | New version |',
-            '|:------- |:--------------- |:----------- |',
-        ];
+        $textParts = [];
+
+        if (null !== $this->projectName) {
+            $textParts[] = sprintf('##### %s', $this->projectName);
+        }
+
+        $textParts[] = '| Package | Current version | New version |';
+        $textParts[] = '|:------- |:--------------- |:----------- |';
+
         foreach ($outdatedPackages as $outdatedPackage) {
-            $insecure = '';
-            if ($outdatedPackage->isInsecure()) {
-                $insecure = ' :warning: **`insecure`**';
-            }
             $textParts[] = sprintf(
                 '| [%s](%s) | %s%s | **%s** |',
                 $outdatedPackage->getName(),
                 $outdatedPackage->getProviderLink(),
                 $outdatedPackage->getOutdatedVersion(),
-                $insecure,
+                $outdatedPackage->isInsecure() ? ' :warning: **`insecure`**' : '',
                 $outdatedPackage->getNewVersion()
             );
         }

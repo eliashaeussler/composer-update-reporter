@@ -62,6 +62,11 @@ class DummyService extends AbstractService
      */
     public static $customOptions;
 
+    /**
+     * @var string|null
+     */
+    public static $customProjectName;
+
     public static function getIdentifier(): string
     {
         return 'dummy';
@@ -84,6 +89,7 @@ class DummyService extends AbstractService
         static::$reportWasExecuted = false;
         static::$customBehavior = null;
         static::$customOptions = null;
+        static::$customProjectName = null;
     }
 
     public static function isEnabled(array $configuration): bool
@@ -135,5 +141,17 @@ class DummyService extends AbstractService
     public function getOptions(): Options
     {
         return $this->options;
+    }
+
+    public function setProjectName(string $projectName): ServiceInterface
+    {
+        static::$customProjectName = $projectName;
+
+        return parent::setProjectName($projectName);
+    }
+
+    public function getProjectName(): ?string
+    {
+        return $this->projectName;
     }
 }

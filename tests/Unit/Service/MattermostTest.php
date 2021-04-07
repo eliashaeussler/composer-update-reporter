@@ -189,6 +189,7 @@ class MattermostTest extends AbstractTestCase
 
         $expectedPayloadSubset = [
             'channel' => 'foo',
+            'text' => '#### :rotating_light: 1 outdated package',
             'attachments' => [
                 [
                     'color' => '#EE0000',
@@ -199,9 +200,29 @@ class MattermostTest extends AbstractTestCase
         $this->assertPayloadOfLastRequestContainsSubset($expectedPayloadSubset);
 
         $payload = $this->getPayloadOfLastRequest();
-        $text = $payload['attachments'][0]['text'] ?? null;
+        $text = $payload['attachments'][0]['text'] ?? '';
         $expected = '[foo/foo](https://packagist.org/packages/foo/foo#1.0.5) | 1.0.0'.$expectedSecurityNotice.' | **1.0.5**';
         static::assertStringContainsString($expected, $text);
+    }
+
+    /**
+     * @test
+     */
+    public function reportIncludesProjectNameInMessageAttachment(): void
+    {
+        $result = new UpdateCheckResult([
+            new OutdatedPackage('foo/foo', '1.0.0', '1.0.5'),
+        ]);
+
+        $this->subject->setProjectName('foo/baz');
+        $this->subject->setClient($this->getClient());
+        $this->mockedResponse = new MockResponse();
+
+        static::assertTrue($this->subject->report($result));
+
+        $payload = $this->getPayloadOfLastRequest();
+        $text = $payload['attachments'][0]['text'] ?? '';
+        static::assertStringContainsString('##### foo/baz', $text);
     }
 
     /**

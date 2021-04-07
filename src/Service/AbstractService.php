@@ -54,6 +54,11 @@ abstract class AbstractService implements ServiceInterface
     protected $options;
 
     /**
+     * @var string|null
+     */
+    protected $projectName;
+
+    /**
      * @param array<string, mixed> $configuration
      */
     public static function isEnabled(array $configuration): bool
@@ -129,6 +134,13 @@ abstract class AbstractService implements ServiceInterface
     public function setOptions(Options $options): ServiceInterface
     {
         $this->options = $options;
+
+        return $this;
+    }
+
+    public function setProjectName(string $projectName): ServiceInterface
+    {
+        $this->projectName = $projectName;
 
         return $this;
     }

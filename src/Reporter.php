@@ -94,14 +94,28 @@ class Reporter
     private function buildServicesFromConfiguration(): array
     {
         $services = [];
+
+        // Resolve project name from root composer.json
+        $projectName = $this->composer->getPackage()->getName();
+        if ('__root__' === $projectName) {
+            $projectName = null;
+        }
+
         /** @var ServiceInterface $registeredService */
         foreach ($this->registeredServices as $registeredService) {
-            if ($registeredService::isEnabled($this->configuration)) {
-                $service = $registeredService::fromConfiguration($this->configuration);
-                $service->setBehavior($this->behavior);
-                $service->setOptions($this->options);
-                $services[] = $service;
+            if (!$registeredService::isEnabled($this->configuration)) {
+                continue;
             }
+
+            $service = $registeredService::fromConfiguration($this->configuration);
+            $service->setBehavior($this->behavior);
+            $service->setOptions($this->options);
+
+            if (!empty($projectName)) {
+                $service->setProjectName($projectName);
+            }
+
+            $services[] = $service;
         }
 
         return $services;
