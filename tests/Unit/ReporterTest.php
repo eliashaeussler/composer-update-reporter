@@ -30,8 +30,15 @@ use EliasHaeussler\ComposerUpdateCheck\IO\OutputBehavior;
 use EliasHaeussler\ComposerUpdateCheck\IO\Style;
 use EliasHaeussler\ComposerUpdateCheck\IO\Verbosity;
 use EliasHaeussler\ComposerUpdateCheck\Options;
+use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
+use EliasHaeussler\ComposerUpdateReporter\Exception\InvalidServiceException;
 use EliasHaeussler\ComposerUpdateReporter\Reporter;
+use EliasHaeussler\ComposerUpdateReporter\Service\Email;
+use EliasHaeussler\ComposerUpdateReporter\Service\GitLab;
+use EliasHaeussler\ComposerUpdateReporter\Service\Mattermost;
+use EliasHaeussler\ComposerUpdateReporter\Service\Slack;
+use EliasHaeussler\ComposerUpdateReporter\Service\Teams;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\Fixtures\Service\DummyService;
 
 /**
@@ -54,6 +61,9 @@ class ReporterTest extends AbstractTestCase
      */
     protected $composer;
 
+    /**
+     * @throws InvalidServiceException
+     */
     protected function setUp(): void
     {
         $this->goToTestDirectory();
@@ -61,20 +71,13 @@ class ReporterTest extends AbstractTestCase
         DummyService::$enabled = true;
 
         $this->composer = Factory::create(new NullIO());
-        $this->subject = new Reporter($this->composer);
-    }
-
-    /**
-     * @test
-     */
-    public function reportThrowsExceptionIfInvalidServiceIsRegistered(): void
-    {
-        $this->subject->setRegisteredServices([\Exception::class]);
-
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionCode(1600814017);
-
-        $this->subject->report(new UpdateCheckResult([]));
+        $this->subject = (new Reporter($this->composer))
+            ->unregisterService(Email::class)
+            ->unregisterService(GitLab::class)
+            ->unregisterService(Mattermost::class)
+            ->unregisterService(Slack::class)
+            ->unregisterService(Teams::class)
+            ->registerService(DummyService::class);
     }
 
     /**
@@ -84,7 +87,6 @@ class ReporterTest extends AbstractTestCase
     {
         DummyService::$enabled = false;
 
-        $this->subject->setRegisteredServices([DummyService::class]);
         $this->subject->report(new UpdateCheckResult([]));
 
         static::assertFalse(DummyService::$reportWasExecuted);
@@ -95,7 +97,6 @@ class ReporterTest extends AbstractTestCase
      */
     public function reportIncludesEnabledServicesForReporting(): void
     {
-        $this->subject->setRegisteredServices([DummyService::class]);
         $this->subject->report(new UpdateCheckResult([]));
 
         static::assertTrue(DummyService::$reportWasExecuted);
@@ -109,7 +110,6 @@ class ReporterTest extends AbstractTestCase
         $behavior = new OutputBehavior(new Style(), new Verbosity(), new NullIO());
 
         $this->subject->setBehavior($behavior);
-        $this->subject->setRegisteredServices([DummyService::class]);
         $this->subject->report(new UpdateCheckResult([]));
 
         static::assertSame($behavior, DummyService::$customBehavior);
@@ -125,10 +125,34 @@ class ReporterTest extends AbstractTestCase
         $options = new Options();
 
         $this->subject->setOptions($options);
-        $this->subject->setRegisteredServices([DummyService::class]);
         $this->subject->report(new UpdateCheckResult([]));
 
         static::assertSame($options, DummyService::$customOptions);
+    }
+
+    /**
+     * @test
+     */
+    public function registerServiceThrowsExceptionIfInvalidServiceIsGiven(): void
+    {
+        $this->expectException(InvalidServiceException::class);
+        $this->expectExceptionCode(1600814017);
+
+        $this->subject->registerService(\Exception::class);
+    }
+
+    /**
+     * @test
+     */
+    public function unregisterServiceRemovesServiceFromListOfRegisteredServices(): void
+    {
+        $this->subject->unregisterService(DummyService::class);
+
+        $this->subject->report(new UpdateCheckResult([
+            new OutdatedPackage('foo/baz', '1.0.0', '1.0.5'),
+        ]));
+
+        static::assertFalse(DummyService::$reportWasExecuted);
     }
 
     protected function tearDown(): void

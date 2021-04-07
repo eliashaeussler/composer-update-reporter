@@ -30,6 +30,7 @@ use EliasHaeussler\ComposerUpdateCheck\IO\Style;
 use EliasHaeussler\ComposerUpdateCheck\IO\Verbosity;
 use EliasHaeussler\ComposerUpdateCheck\Options;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
+use EliasHaeussler\ComposerUpdateReporter\Exception\InvalidServiceException;
 use EliasHaeussler\ComposerUpdateReporter\Service\Email;
 use EliasHaeussler\ComposerUpdateReporter\Service\GitLab;
 use EliasHaeussler\ComposerUpdateReporter\Service\Mattermost;
@@ -95,10 +96,6 @@ class Reporter
         $services = [];
         /** @var ServiceInterface $registeredService */
         foreach ($this->registeredServices as $registeredService) {
-            if (!in_array(ServiceInterface::class, class_implements($registeredService), true)) {
-                /* @phpstan-ignore-next-line */
-                throw new \InvalidArgumentException(sprintf('Service "%s" must implement "%s".', $registeredService, ServiceInterface::class), 1600814017);
-            }
             if ($registeredService::isEnabled($this->configuration)) {
                 $service = $registeredService::fromConfiguration($this->configuration);
                 $service->setBehavior($this->behavior);
@@ -121,11 +118,26 @@ class Reporter
     }
 
     /**
-     * @param string[] $registeredServices
+     * @throws InvalidServiceException
      */
-    public function setRegisteredServices(array $registeredServices): self
+    public function registerService(string $service): self
     {
-        $this->registeredServices = $registeredServices;
+        if (!in_array(ServiceInterface::class, class_implements($service), true)) {
+            throw InvalidServiceException::create($service);
+        }
+
+        if (!in_array($service, $this->registeredServices, true)) {
+            $this->registeredServices[] = $service;
+        }
+
+        return $this;
+    }
+
+    public function unregisterService(string $service): self
+    {
+        if (($key = array_search($service, $this->registeredServices, true)) !== false) {
+            unset($this->registeredServices[$key]);
+        }
 
         return $this;
     }
