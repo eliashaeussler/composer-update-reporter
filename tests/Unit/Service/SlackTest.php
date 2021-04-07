@@ -25,6 +25,7 @@ namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit\Service;
 
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
+use EliasHaeussler\ComposerUpdateReporter\Exception\MissingConfigurationException;
 use EliasHaeussler\ComposerUpdateReporter\Service\Slack;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\ClientMockTrait;
@@ -88,14 +89,16 @@ class SlackTest extends AbstractTestCase
     {
         $this->modifyEnvironmentVariable('SLACK_URL');
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionCode(1602496964);
+        $this->expectException(MissingConfigurationException::class);
+        $this->expectExceptionCode(1617805421);
 
         Slack::fromConfiguration($configuration);
     }
 
     /**
      * @test
+     *
+     * @throws MissingConfigurationException
      */
     public function fromConfigurationReadsConfigurationFromComposerJson(): void
     {
@@ -115,6 +118,8 @@ class SlackTest extends AbstractTestCase
 
     /**
      * @test
+     *
+     * @throws MissingConfigurationException
      */
     public function fromConfigurationReadsConfigurationFromEnvironmentVariables(): void
     {

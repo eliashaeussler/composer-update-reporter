@@ -69,23 +69,12 @@ class Slack extends AbstractService
 
     public static function fromConfiguration(array $configuration): ServiceInterface
     {
-        $extra = $configuration['slack'] ?? null;
-
-        // Parse Slack URL
-        if (is_array($extra) && array_key_exists('url', $extra)) {
-            $uri = new Uri((string) $extra['url']);
-        } elseif (false !== getenv('SLACK_URL')) {
-            $uri = new Uri(getenv('SLACK_URL'));
-        } else {
-            throw new \RuntimeException('Slack URL is not defined. Define it either in composer.json or as $SLACK_URL.', 1602496964);
-        }
+        $uri = new Uri((string) static::resolveConfigurationKey($configuration, 'url'));
 
         return new self($uri);
     }
 
     /**
-     * {@inheritDoc}
-     *
      * @throws ClientExceptionInterface
      */
     protected function sendReport(UpdateCheckResult $result): bool

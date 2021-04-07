@@ -25,6 +25,7 @@ namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit\Service;
 
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
+use EliasHaeussler\ComposerUpdateReporter\Exception\MissingConfigurationException;
 use EliasHaeussler\ComposerUpdateReporter\Service\GitLab;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\ClientMockTrait;
@@ -99,8 +100,8 @@ class GitLabTest extends AbstractTestCase
     {
         $this->modifyEnvironmentVariable('GITLAB_URL');
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionCode(1600852917);
+        $this->expectException(MissingConfigurationException::class);
+        $this->expectExceptionCode(1617805421);
 
         GitLab::fromConfiguration($configuration);
     }
@@ -112,8 +113,8 @@ class GitLabTest extends AbstractTestCase
     {
         $this->modifyEnvironmentVariable('GITLAB_AUTH_KEY');
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionCode(1600852990);
+        $this->expectException(MissingConfigurationException::class);
+        $this->expectExceptionCode(1617805421);
 
         $configuration = [
             'gitlab' => [
@@ -125,6 +126,8 @@ class GitLabTest extends AbstractTestCase
 
     /**
      * @test
+     *
+     * @throws MissingConfigurationException
      */
     public function fromConfigurationReadsConfigurationFromComposerJson(): void
     {
@@ -147,6 +150,8 @@ class GitLabTest extends AbstractTestCase
 
     /**
      * @test
+     *
+     * @throws MissingConfigurationException
      */
     public function fromConfigurationReadsConfigurationFromEnvironmentVariables(): void
     {

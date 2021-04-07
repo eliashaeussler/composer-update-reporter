@@ -35,6 +35,15 @@ class UtilTest extends AbstractTestCase
 {
     /**
      * @test
+     * @dataProvider uppercaseToUnderscoredReturnsUnderscoredStringDataProvider
+     */
+    public function uppercaseToUnderscoredReturnsUnderscoredString(string $string, string $expected): void
+    {
+        static::assertSame($expected, Util::camelCaseToUnderscored($string));
+    }
+
+    /**
+     * @test
      * @dataProvider arrayDiffRecursiveReturnsDiffBetweenArraysDataProvider
      *
      * @param array<string, mixed> $array1
@@ -44,6 +53,27 @@ class UtilTest extends AbstractTestCase
     public function arrayDiffRecursiveReturnsDiffBetweenArrays(array $array1, array $array2, array $expected): void
     {
         static::assertSame($expected, Util::arrayDiffRecursive($array1, $array2));
+    }
+
+    /**
+     * @return array<string, array>
+     */
+    public function uppercaseToUnderscoredReturnsUnderscoredStringDataProvider(): array
+    {
+        return [
+            'only lowercase' => [
+                'foo',
+                'foo',
+            ],
+            'only uppercase' => [
+                'FOO',
+                'F_O_O',
+            ],
+            'camel case' => [
+                'FooBaz',
+                'Foo_Baz',
+            ],
+        ];
     }
 
     /**

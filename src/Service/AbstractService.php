@@ -29,6 +29,7 @@ use EliasHaeussler\ComposerUpdateCheck\IO\Style;
 use EliasHaeussler\ComposerUpdateCheck\IO\Verbosity;
 use EliasHaeussler\ComposerUpdateCheck\Options;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
+use EliasHaeussler\ComposerUpdateReporter\Traits\ServiceConfigurationTrait;
 use Spatie\Emoji\Emoji;
 use Spatie\Emoji\Exceptions\UnknownCharacter;
 
@@ -40,6 +41,8 @@ use Spatie\Emoji\Exceptions\UnknownCharacter;
  */
 abstract class AbstractService implements ServiceInterface
 {
+    use ServiceConfigurationTrait;
+
     /**
      * @var OutputBehavior
      */

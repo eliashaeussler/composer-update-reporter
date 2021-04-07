@@ -25,6 +25,7 @@ namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit\Service;
 
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
+use EliasHaeussler\ComposerUpdateReporter\Exception\MissingConfigurationException;
 use EliasHaeussler\ComposerUpdateReporter\Service\Email;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\OutputBehaviorTrait;
@@ -151,8 +152,8 @@ class EmailTest extends AbstractTestCase
     {
         $this->modifyEnvironmentVariable('EMAIL_DSN');
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionCode(1601391909);
+        $this->expectException(MissingConfigurationException::class);
+        $this->expectExceptionCode(1617805421);
 
         Email::fromConfiguration($configuration);
     }
@@ -164,8 +165,8 @@ class EmailTest extends AbstractTestCase
     {
         $this->modifyEnvironmentVariable('EMAIL_RECEIVERS');
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionCode(1601391943);
+        $this->expectException(MissingConfigurationException::class);
+        $this->expectExceptionCode(1617805421);
 
         $configuration = [
             'email' => [
@@ -182,8 +183,8 @@ class EmailTest extends AbstractTestCase
     {
         $this->modifyEnvironmentVariable('EMAIL_SENDER');
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionCode(1601391961);
+        $this->expectException(MissingConfigurationException::class);
+        $this->expectExceptionCode(1617805421);
 
         $configuration = [
             'email' => [
@@ -196,6 +197,8 @@ class EmailTest extends AbstractTestCase
 
     /**
      * @test
+     *
+     * @throws MissingConfigurationException
      */
     public function fromConfigurationReadsConfigurationFromComposerJson(): void
     {
@@ -229,6 +232,8 @@ class EmailTest extends AbstractTestCase
 
     /**
      * @test
+     *
+     * @throws MissingConfigurationException
      */
     public function fromConfigurationReadsConfigurationFromEnvironmentVariables(): void
     {

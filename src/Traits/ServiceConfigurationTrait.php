@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace EliasHaeussler\ComposerUpdateReporter\Service;
+namespace EliasHaeussler\ComposerUpdateReporter\Traits;
 
 /*
  * This file is part of the Composer package "eliashaeussler/composer-update-reporter".
  *
- * Copyright (C) 2020 Elias Häußler <elias@haeussler.dev>
+ * Copyright (C) 2021 Elias Häußler <elias@haeussler.dev>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,42 +23,40 @@ namespace EliasHaeussler\ComposerUpdateReporter\Service;
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use EliasHaeussler\ComposerUpdateCheck\IO\OutputBehavior;
-use EliasHaeussler\ComposerUpdateCheck\Options;
-use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateReporter\Exception\MissingConfigurationException;
+use EliasHaeussler\ComposerUpdateReporter\Util;
 
 /**
- * ServiceInterface.
+ * ServiceConfigurationTrait.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-interface ServiceInterface
+trait ServiceConfigurationTrait
 {
-    public static function getIdentifier(): string;
-
     /**
      * @param array<string, mixed> $configuration
      *
+     * @return mixed
+     *
      * @throws MissingConfigurationException
      */
-    public static function fromConfiguration(array $configuration): self;
+    protected static function resolveConfigurationKey(array $configuration, string $key)
+    {
+        $serviceIdentifier = static::getIdentifier();
+        $serviceConfiguration = $configuration[$serviceIdentifier] ?? null;
 
-    /**
-     * @param array<string, mixed> $configuration
-     */
-    public static function isEnabled(array $configuration): bool;
+        if (is_array($serviceConfiguration) && isset($serviceConfiguration[$key])) {
+            return $serviceConfiguration[$key];
+        }
 
-    public function report(UpdateCheckResult $result): bool;
+        $underscoredKey = Util::camelCaseToUnderscored($key);
+        $envName = strtoupper($serviceIdentifier.'_'.$underscoredKey);
 
-    /**
-     * @return static
-     */
-    public function setBehavior(OutputBehavior $behavior): self;
+        if (false !== getenv($envName)) {
+            return getenv($envName);
+        }
 
-    /**
-     * @return static
-     */
-    public function setOptions(Options $options): self;
+        throw MissingConfigurationException::create($serviceIdentifier, $key);
+    }
 }

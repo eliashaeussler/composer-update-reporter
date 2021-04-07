@@ -25,6 +25,7 @@ namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit\Service;
 
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
+use EliasHaeussler\ComposerUpdateReporter\Exception\MissingConfigurationException;
 use EliasHaeussler\ComposerUpdateReporter\Service\Mattermost;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\ClientMockTrait;
@@ -99,8 +100,8 @@ class MattermostTest extends AbstractTestCase
     {
         $this->modifyEnvironmentVariable('MATTERMOST_URL');
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionCode(1600283681);
+        $this->expectException(MissingConfigurationException::class);
+        $this->expectExceptionCode(1617805421);
 
         Mattermost::fromConfiguration($configuration);
     }
@@ -112,8 +113,8 @@ class MattermostTest extends AbstractTestCase
     {
         $this->modifyEnvironmentVariable('MATTERMOST_CHANNEL');
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionCode(1600284246);
+        $this->expectException(MissingConfigurationException::class);
+        $this->expectExceptionCode(1617805421);
 
         $configuration = [
             'mattermost' => [
@@ -125,6 +126,8 @@ class MattermostTest extends AbstractTestCase
 
     /**
      * @test
+     *
+     * @throws MissingConfigurationException
      */
     public function fromConfigurationReadsConfigurationFromComposerJson(): void
     {
@@ -150,6 +153,8 @@ class MattermostTest extends AbstractTestCase
 
     /**
      * @test
+     *
+     * @throws MissingConfigurationException
      */
     public function fromConfigurationReadsConfigurationFromEnvironmentVariables(): void
     {

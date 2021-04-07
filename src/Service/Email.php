@@ -79,41 +79,14 @@ class Email extends AbstractService
 
     public static function fromConfiguration(array $configuration): ServiceInterface
     {
-        $extra = $configuration['email'] ?? null;
-
-        // Parse Email DSN
-        if (is_array($extra) && array_key_exists('dsn', $extra)) {
-            $dsn = (string) $extra['dsn'];
-        } elseif (false !== getenv('EMAIL_DSN')) {
-            $dsn = getenv('EMAIL_DSN');
-        } else {
-            throw new \RuntimeException('Email DSN is not defined. Define it either in composer.json or as $EMAIL_DSN.', 1601391909);
-        }
-
-        // Parse Email receivers
-        if (is_array($extra) && array_key_exists('receivers', $extra)) {
-            $receivers = explode(',', (string) $extra['receivers']);
-        } elseif (false !== getenv('EMAIL_RECEIVERS')) {
-            $receivers = explode(',', getenv('EMAIL_RECEIVERS'));
-        } else {
-            throw new \RuntimeException('Email receivers are not defined. Define it either in composer.json or as $EMAIL_RECEIVERS.', 1601391943);
-        }
-
-        // Parse Email sender
-        if (is_array($extra) && array_key_exists('sender', $extra)) {
-            $sender = (string) $extra['sender'];
-        } elseif (false !== getenv('EMAIL_SENDER')) {
-            $sender = getenv('EMAIL_SENDER');
-        } else {
-            throw new \RuntimeException('Email sender is not defined. Define it either in composer.json or as $EMAIL_SENDER.', 1601391961);
-        }
+        $dsn = (string) static::resolveConfigurationKey($configuration, 'dsn');
+        $receivers = explode(',', (string) static::resolveConfigurationKey($configuration, 'receivers'));
+        $sender = (string) static::resolveConfigurationKey($configuration, 'sender');
 
         return new self($dsn, array_map('trim', array_filter($receivers)), $sender);
     }
 
     /**
-     * {@inheritDoc}
-     *
      * @throws TransportExceptionInterface
      */
     protected function sendReport(UpdateCheckResult $result): bool

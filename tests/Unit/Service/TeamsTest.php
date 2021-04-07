@@ -25,6 +25,7 @@ namespace EliasHaeussler\ComposerUpdateReporter\Tests\Unit\Service;
 
 use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
+use EliasHaeussler\ComposerUpdateReporter\Exception\MissingConfigurationException;
 use EliasHaeussler\ComposerUpdateReporter\Service\Teams;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\AbstractTestCase;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\ClientMockTrait;
@@ -89,14 +90,16 @@ class TeamsTest extends AbstractTestCase
     {
         $this->modifyEnvironmentVariable('TEAMS_URL');
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionCode(1612865679);
+        $this->expectException(MissingConfigurationException::class);
+        $this->expectExceptionCode(1617805421);
 
         Teams::fromConfiguration($configuration);
     }
 
     /**
      * @test
+     *
+     * @throws MissingConfigurationException
      */
     public function fromConfigurationReadsConfigurationFromComposerJson(): void
     {
@@ -116,6 +119,8 @@ class TeamsTest extends AbstractTestCase
 
     /**
      * @test
+     *
+     * @throws MissingConfigurationException
      */
     public function fromConfigurationReadsConfigurationFromEnvironmentVariables(): void
     {

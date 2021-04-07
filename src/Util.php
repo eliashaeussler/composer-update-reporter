@@ -31,6 +31,11 @@ namespace EliasHaeussler\ComposerUpdateReporter;
  */
 class Util
 {
+    public static function camelCaseToUnderscored(string $string): string
+    {
+        return preg_replace('/(?<!^)([A-Z])/', '_$1', $string);
+    }
+
     /**
      * @param array<string, mixed> $array1
      * @param array<string, mixed> $array2

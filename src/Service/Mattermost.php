@@ -82,40 +82,14 @@ class Mattermost extends AbstractService
 
     public static function fromConfiguration(array $configuration): ServiceInterface
     {
-        $extra = $configuration['mattermost'] ?? null;
-
-        // Parse Mattermost URL
-        if (is_array($extra) && array_key_exists('url', $extra)) {
-            $uri = new Uri((string) $extra['url']);
-        } elseif (false !== getenv('MATTERMOST_URL')) {
-            $uri = new Uri(getenv('MATTERMOST_URL'));
-        } else {
-            throw new \RuntimeException('Mattermost URL is not defined. Define it either in composer.json or as $MATTERMOST_URL.', 1600283681);
-        }
-
-        // Parse Mattermost channel name
-        if (is_array($extra) && array_key_exists('channel', $extra)) {
-            $channelName = (string) $extra['channel'];
-        } elseif (false !== getenv('MATTERMOST_CHANNEL')) {
-            $channelName = getenv('MATTERMOST_CHANNEL');
-        } else {
-            throw new \RuntimeException('Mattermost channel name is not defined. Define it either in composer.json or as $MATTERMOST_CHANNEL.', 1600284246);
-        }
-
-        // Parse Mattermost username
-        $username = null;
-        if (is_array($extra) && array_key_exists('username', $extra)) {
-            $username = (string) $extra['username'];
-        } elseif (false !== getenv('MATTERMOST_USERNAME')) {
-            $username = getenv('MATTERMOST_USERNAME');
-        }
+        $uri = new Uri((string) static::resolveConfigurationKey($configuration, 'url'));
+        $channelName = (string) static::resolveConfigurationKey($configuration, 'channel');
+        $username = (string) static::resolveConfigurationKey($configuration, 'username');
 
         return new self($uri, $channelName, $username);
     }
 
     /**
-     * {@inheritDoc}
-     *
      * @throws ClientExceptionInterface
      */
     protected function sendReport(UpdateCheckResult $result): bool

@@ -69,23 +69,12 @@ class Teams extends AbstractService
 
     public static function fromConfiguration(array $configuration): ServiceInterface
     {
-        $extra = $configuration['teams'] ?? null;
-
-        // Parse MS Teams URL
-        if (is_array($extra) && array_key_exists('url', $extra)) {
-            $uri = new Uri((string) $extra['url']);
-        } elseif (false !== getenv('TEAMS_URL')) {
-            $uri = new Uri(getenv('TEAMS_URL'));
-        } else {
-            throw new \RuntimeException('MS Teams URL is not defined. Define it either in composer.json or as $TEAMS_URL.', 1612865679);
-        }
+        $uri = new Uri((string) static::resolveConfigurationKey($configuration, 'url'));
 
         return new self($uri);
     }
 
     /**
-     * {@inheritDoc}
-     *
      * @throws ClientExceptionInterface
      */
     protected function sendReport(UpdateCheckResult $result): bool

@@ -76,32 +76,13 @@ class GitLab extends AbstractService
 
     public static function fromConfiguration(array $configuration): ServiceInterface
     {
-        $extra = $configuration['gitlab'] ?? null;
-
-        // Parse GitLab URL
-        if (is_array($extra) && array_key_exists('url', $extra)) {
-            $uri = new Uri((string) $extra['url']);
-        } elseif (false !== getenv('GITLAB_URL')) {
-            $uri = new Uri(getenv('GITLAB_URL'));
-        } else {
-            throw new \RuntimeException('GitLab URL is not defined. Define it either in composer.json or as $GITLAB_URL.', 1600852917);
-        }
-
-        // Parse GitLab authorization key
-        if (is_array($extra) && array_key_exists('authKey', $extra)) {
-            $authKey = (string) $extra['authKey'];
-        } elseif (false !== getenv('GITLAB_AUTH_KEY')) {
-            $authKey = getenv('GITLAB_AUTH_KEY');
-        } else {
-            throw new \RuntimeException('GitLab authorization key is not defined. Define it either in composer.json or as $GITLAB_AUTH_KEY.', 1600852990);
-        }
+        $uri = new Uri((string) static::resolveConfigurationKey($configuration, 'url'));
+        $authKey = (string) static::resolveConfigurationKey($configuration, 'authKey');
 
         return new self($uri, $authKey);
     }
 
     /**
-     * {@inheritDoc}
-     *
      * @throws ClientExceptionInterface
      */
     protected function sendReport(UpdateCheckResult $result): bool
