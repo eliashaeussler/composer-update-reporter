@@ -211,43 +211,39 @@ class GitLabTest extends AbstractTestCase
     }
 
     /**
-     * @return array<string, array>
+     * @return \Generator<string, array>
      */
-    public function fromConfigurationThrowsExceptionIfGitLabUrlIsNotSetDataProvider(): array
+    public function fromConfigurationThrowsExceptionIfGitLabUrlIsNotSetDataProvider(): \Generator
     {
-        return [
-            'no service configuration' => [
-                [],
+        yield 'no service configuration' => [
+            [],
+        ];
+        yield 'available service configuration' => [
+            [
+                'gitlab' => [],
             ],
-            'available service configuration' => [
-                [
-                    'gitlab' => [],
-                ],
-            ],
-            'missing URL configuration' => [
-                [
-                    'gitlab' => [
-                        'authKey' => 'foo',
-                    ],
+        ];
+        yield 'missing URL configuration' => [
+            [
+                'gitlab' => [
+                    'authKey' => 'foo',
                 ],
             ],
         ];
     }
 
     /**
-     * @return array<string, array>
+     * @return \Generator<string, array>
      */
-    public function reportSendsUpdateReportSuccessfullyDataProvider(): array
+    public function reportSendsUpdateReportSuccessfullyDataProvider(): \Generator
     {
-        return [
-            'secure package' => [
-                false,
-                '',
-            ],
-            'insecure package' => [
-                true,
-                ' (insecure)',
-            ],
+        yield 'secure package' => [
+            false,
+            '',
+        ];
+        yield 'insecure package' => [
+            true,
+            ' (insecure)',
         ];
     }
 

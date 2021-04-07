@@ -226,43 +226,39 @@ class MattermostTest extends AbstractTestCase
     }
 
     /**
-     * @return array<string, array>
+     * @return \Generator<string, array>
      */
-    public function fromConfigurationThrowsExceptionIfMattermostUrlIsNotSetDataProvider(): array
+    public function fromConfigurationThrowsExceptionIfMattermostUrlIsNotSetDataProvider(): \Generator
     {
-        return [
-            'no service configuration' => [
-                [],
+        yield 'no service configuration' => [
+            [],
+        ];
+        yield 'available service configuration' => [
+            [
+                'mattermost' => [],
             ],
-            'available service configuration' => [
-                [
-                    'mattermost' => [],
-                ],
-            ],
-            'missing URL configuration' => [
-                [
-                    'mattermost' => [
-                        'channel' => 'foo',
-                    ],
+        ];
+        yield 'missing URL configuration' => [
+            [
+                'mattermost' => [
+                    'channel' => 'foo',
                 ],
             ],
         ];
     }
 
     /**
-     * @return array<string, array>
+     * @return \Generator<string, array>
      */
-    public function reportSendsUpdateReportSuccessfullyDataProvider(): array
+    public function reportSendsUpdateReportSuccessfullyDataProvider(): \Generator
     {
-        return [
-            'secure package' => [
-                false,
-                '',
-            ],
-            'insecure package' => [
-                true,
-                ' :warning: **`insecure`**',
-            ],
+        yield 'secure package' => [
+            false,
+            '',
+        ];
+        yield 'insecure package' => [
+            true,
+            ' :warning: **`insecure`**',
         ];
     }
 

@@ -182,43 +182,39 @@ class TeamsTest extends AbstractTestCase
     }
 
     /**
-     * @return array<string, array>
+     * @return \Generator<string, array>
      */
-    public function fromConfigurationThrowsExceptionIfTeamsUrlIsNotSetDataProvider(): array
+    public function fromConfigurationThrowsExceptionIfTeamsUrlIsNotSetDataProvider(): \Generator
     {
-        return [
-            'no service configuration' => [
-                [],
+        yield 'no service configuration' => [
+            [],
+        ];
+        yield 'available service configuration' => [
+            [
+                'teams' => [],
             ],
-            'available service configuration' => [
-                [
-                    'teams' => [],
-                ],
-            ],
-            'missing URL configuration' => [
-                [
-                    'teams' => [
-                        'foo' => 'baz',
-                    ],
+        ];
+        yield 'missing URL configuration' => [
+            [
+                'teams' => [
+                    'foo' => 'baz',
                 ],
             ],
         ];
     }
 
     /**
-     * @return array<string, array>
+     * @return \Generator<string, array>
      */
-    public function reportSendsUpdateReportSuccessfullyDataProvider(): array
+    public function reportSendsUpdateReportSuccessfullyDataProvider(): \Generator
     {
-        return [
-            'secure package' => [
-                false,
-                '',
-            ],
-            'insecure package' => [
-                true,
-                sprintf(' (%s insecure)', Emoji::warning()),
-            ],
+        yield 'secure package' => [
+            false,
+            '',
+        ];
+        yield 'insecure package' => [
+            true,
+            sprintf(' (%s insecure)', Emoji::warning()),
         ];
     }
 

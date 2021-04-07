@@ -330,44 +330,40 @@ class EmailTest extends AbstractTestCase
     }
 
     /**
-     * @return array<string, array>
+     * @return \Generator<string, array>
      */
-    public function fromConfigurationThrowsExceptionIfEmailDsnIsNotSetDataProvider(): array
+    public function fromConfigurationThrowsExceptionIfEmailDsnIsNotSetDataProvider(): \Generator
     {
-        return [
-            'no service configuration' => [
-                [],
+        yield 'no service configuration' => [
+            [],
+        ];
+        yield 'available service configuration' => [
+            [
+                'email' => [],
             ],
-            'available service configuration' => [
-                [
-                    'email' => [],
-                ],
-            ],
-            'missing URL configuration' => [
-                [
-                    'email' => [
-                        'sender' => 'foo',
-                        'receivers' => 'baz',
-                    ],
+        ];
+        yield 'missing URL configuration' => [
+            [
+                'email' => [
+                    'sender' => 'foo',
+                    'receivers' => 'baz',
                 ],
             ],
         ];
     }
 
     /**
-     * @return array<string, array>
+     * @return \Generator<string, array>
      */
-    public function reportSendsUpdateReportSuccessfullyDataProvider(): array
+    public function reportSendsUpdateReportSuccessfullyDataProvider(): \Generator
     {
-        return [
-            'secure package' => [
-                false,
-                '',
-            ],
-            'insecure package' => [
-                true,
-                ' <strong style="color: red;">(insecure)</strong>',
-            ],
+        yield 'secure package' => [
+            false,
+            '',
+        ];
+        yield 'insecure package' => [
+            true,
+            ' <strong style="color: red;">(insecure)</strong>',
         ];
     }
 

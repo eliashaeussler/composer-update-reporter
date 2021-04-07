@@ -272,42 +272,34 @@ class SlackTest extends AbstractTestCase
     }
 
     /**
-     * @return array<string, array>
+     * @return \Generator<string, array>
      */
-    public function fromConfigurationThrowsExceptionIfSlackUrlIsNotSetDataProvider(): array
+    public function fromConfigurationThrowsExceptionIfSlackUrlIsNotSetDataProvider(): \Generator
     {
-        return [
-            'no service configuration' => [
-                [],
+        yield 'no service configuration' => [
+            [],
+        ];
+        yield 'available service configuration' => [
+            [
+                'slack' => [],
             ],
-            'available service configuration' => [
-                [
-                    'slack' => [],
-                ],
-            ],
-            'missing URL configuration' => [
-                [
-                    'slack' => [
-                        'enable' => true,
-                    ],
+        ];
+        yield 'missing URL configuration' => [
+            [
+                'slack' => [
+                    'enable' => true,
                 ],
             ],
         ];
     }
 
     /**
-     * @return array<string, array>
+     * @return \Generator<string, array>
      */
-    public function reportSendsUpdateReportSuccessfullyDataProvider(): array
+    public function reportSendsUpdateReportSuccessfullyDataProvider(): \Generator
     {
-        return [
-            'secure package' => [
-                false,
-            ],
-            'insecure package' => [
-                true,
-            ],
-        ];
+        yield 'secure package' => [false];
+        yield 'insecure package' => [true];
     }
 
     protected function tearDown(): void

@@ -56,62 +56,58 @@ class UtilTest extends AbstractTestCase
     }
 
     /**
-     * @return array<string, array>
+     * @return \Generator<string, array>
      */
-    public function uppercaseToUnderscoredReturnsUnderscoredStringDataProvider(): array
+    public function uppercaseToUnderscoredReturnsUnderscoredStringDataProvider(): \Generator
     {
-        return [
-            'only lowercase' => [
-                'foo',
-                'foo',
-            ],
-            'only uppercase' => [
-                'FOO',
-                'F_O_O',
-            ],
-            'camel case' => [
-                'FooBaz',
-                'Foo_Baz',
-            ],
+        yield 'only lowercase' => [
+            'foo',
+            'foo',
+        ];
+        yield 'only uppercase' => [
+            'FOO',
+            'F_O_O',
+        ];
+        yield 'camel case' => [
+            'FooBaz',
+            'Foo_Baz',
         ];
     }
 
     /**
-     * @return array<string, array>
+     * @return \Generator<string, array>
      */
-    public function arrayDiffRecursiveReturnsDiffBetweenArraysDataProvider(): array
+    public function arrayDiffRecursiveReturnsDiffBetweenArraysDataProvider(): \Generator
     {
-        return [
-            'empty arrays' => [
-                [],
-                [],
-                [],
-            ],
-            'empty first array' => [
-                [],
-                ['foo' => 'baz'],
-                [],
-            ],
-            'empty second array' => [
-                ['foo' => 'baz'],
-                [],
-                ['foo' => 'baz'],
-            ],
-            'diff on first level' => [
-                ['foo' => 'baz'],
-                ['baz' => 'foo'],
-                ['foo' => 'baz'],
-            ],
-            'diff on deeper level' => [
-                ['foo' => ['baz' => 'bummer']],
-                ['foo' => ['foo' => 'bummer']],
-                ['foo' => ['baz' => 'bummer']],
-            ],
-            'equal multi-dimensional arrays' => [
-                ['foo' => ['baz' => 'bummer']],
-                ['foo' => ['baz' => 'bummer']],
-                [],
-            ],
+        yield 'empty arrays' => [
+            [],
+            [],
+            [],
+        ];
+        yield 'empty first array' => [
+            [],
+            ['foo' => 'baz'],
+            [],
+        ];
+        yield 'empty second array' => [
+            ['foo' => 'baz'],
+            [],
+            ['foo' => 'baz'],
+        ];
+        yield 'diff on first level' => [
+            ['foo' => 'baz'],
+            ['baz' => 'foo'],
+            ['foo' => 'baz'],
+        ];
+        yield 'diff on deeper level' => [
+            ['foo' => ['baz' => 'bummer']],
+            ['foo' => ['foo' => 'bummer']],
+            ['foo' => ['baz' => 'bummer']],
+        ];
+        yield 'equal multi-dimensional arrays' => [
+            ['foo' => ['baz' => 'bummer']],
+            ['foo' => ['baz' => 'bummer']],
+            [],
         ];
     }
 }

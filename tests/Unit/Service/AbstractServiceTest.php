@@ -119,62 +119,60 @@ class AbstractServiceTest extends AbstractTestCase
     }
 
     /**
-     * @return array<string, array>
+     * @return \Generator<string, array>
      */
-    public function isEnabledReturnsStateOfAvailabilityDataProvider(): array
+    public function isEnabledReturnsStateOfAvailabilityDataProvider(): \Generator
     {
-        return [
-            'no configuration and no environment variable' => [
-                [],
-                null,
-                false,
+        yield 'no configuration and no environment variable' => [
+            [],
+            null,
+            false,
+        ];
+        yield 'empty configuration and no environment variable' => [
+            [
+                'dummy' => [],
             ],
-            'empty configuration and no environment variable' => [
-                [
-                    'dummy' => [],
+            null,
+            false,
+        ];
+        yield 'truthy configuration and no environment variable' => [
+            [
+                'dummy' => [
+                    'enable' => true,
                 ],
-                null,
-                false,
             ],
-            'truthy configuration and no environment variable' => [
-                [
-                    'dummy' => [
-                        'enable' => true,
-                    ],
+            null,
+            true,
+        ];
+        yield 'truthy configuration and falsy environment variable' => [
+            [
+                'dummy' => [
+                    'enable' => true,
                 ],
-                null,
-                true,
             ],
-            'truthy configuration and falsy environment variable' => [
-                [
-                    'dummy' => [
-                        'enable' => true,
-                    ],
+            '0',
+            false,
+        ];
+        yield 'falsy configuration and truthy environment variable' => [
+            [
+                'dummy' => [
+                    'enable' => false,
                 ],
-                '0',
-                false,
             ],
-            'falsy configuration and truthy environment variable' => [
-                [
-                    'dummy' => [
-                        'enable' => false,
-                    ],
-                ],
-                '1',
-                true,
+            '1',
+            true,
+        ];
+        yield 'empty configuration and truthy environment variable' => [
+            [
+                'dummy' => [],
             ],
-            'empty configuration and truthy environment variable' => [
-                [
-                    'dummy' => [],
-                ],
-                '1',
-                true,
-            ],
-            'no configuration and truthy environment variable' => [
-                [],
-                '1',
-                true,
-            ],
+            '1',
+            true,
+        ];
+        yield 'no configuration and truthy environment variable' => [
+            [],
+            '1',
+            true,
         ];
     }
 
