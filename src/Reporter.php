@@ -30,13 +30,7 @@ use EliasHaeussler\ComposerUpdateCheck\IO\Style;
 use EliasHaeussler\ComposerUpdateCheck\IO\Verbosity;
 use EliasHaeussler\ComposerUpdateCheck\Options;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
-use EliasHaeussler\ComposerUpdateReporter\Exception\InvalidServiceException;
-use EliasHaeussler\ComposerUpdateReporter\Service\Email;
-use EliasHaeussler\ComposerUpdateReporter\Service\GitLab;
-use EliasHaeussler\ComposerUpdateReporter\Service\Mattermost;
 use EliasHaeussler\ComposerUpdateReporter\Service\ServiceInterface;
-use EliasHaeussler\ComposerUpdateReporter\Service\Slack;
-use EliasHaeussler\ComposerUpdateReporter\Service\Teams;
 
 /**
  * Reporter.
@@ -62,11 +56,6 @@ class Reporter
     private $options;
 
     /**
-     * @var string[]
-     */
-    private $registeredServices;
-
-    /**
      * @var array<string, mixed>
      */
     private $configuration;
@@ -76,7 +65,6 @@ class Reporter
         $this->composer = $composer;
         $this->behavior = $this->getDefaultBehavior();
         $this->options = new Options();
-        $this->registeredServices = $this->getDefaultServices();
         $this->configuration = $this->resolveConfiguration();
     }
 
@@ -102,7 +90,7 @@ class Reporter
         }
 
         /** @var ServiceInterface $registeredService */
-        foreach ($this->registeredServices as $registeredService) {
+        foreach (Registry::getServices() as $registeredService) {
             if (!$registeredService::isEnabled($this->configuration)) {
                 continue;
             }
@@ -129,45 +117,6 @@ class Reporter
     public function setOptions(Options $options): void
     {
         $this->options = $options;
-    }
-
-    /**
-     * @throws InvalidServiceException
-     */
-    public function registerService(string $service): self
-    {
-        if (!in_array(ServiceInterface::class, class_implements($service), true)) {
-            throw InvalidServiceException::create($service);
-        }
-
-        if (!in_array($service, $this->registeredServices, true)) {
-            $this->registeredServices[] = $service;
-        }
-
-        return $this;
-    }
-
-    public function unregisterService(string $service): self
-    {
-        if (($key = array_search($service, $this->registeredServices, true)) !== false) {
-            unset($this->registeredServices[$key]);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return string[]
-     */
-    private function getDefaultServices(): array
-    {
-        return [
-            Email::class,
-            GitLab::class,
-            Mattermost::class,
-            Slack::class,
-            Teams::class,
-        ];
     }
 
     private function getDefaultBehavior(): OutputBehavior

@@ -30,15 +30,10 @@ use EliasHaeussler\ComposerUpdateCheck\IO\OutputBehavior;
 use EliasHaeussler\ComposerUpdateCheck\IO\Style;
 use EliasHaeussler\ComposerUpdateCheck\IO\Verbosity;
 use EliasHaeussler\ComposerUpdateCheck\Options;
-use EliasHaeussler\ComposerUpdateCheck\Package\OutdatedPackage;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
 use EliasHaeussler\ComposerUpdateReporter\Exception\InvalidServiceException;
+use EliasHaeussler\ComposerUpdateReporter\Registry;
 use EliasHaeussler\ComposerUpdateReporter\Reporter;
-use EliasHaeussler\ComposerUpdateReporter\Service\Email;
-use EliasHaeussler\ComposerUpdateReporter\Service\GitLab;
-use EliasHaeussler\ComposerUpdateReporter\Service\Mattermost;
-use EliasHaeussler\ComposerUpdateReporter\Service\Slack;
-use EliasHaeussler\ComposerUpdateReporter\Service\Teams;
 use EliasHaeussler\ComposerUpdateReporter\Tests\Unit\Fixtures\Service\DummyService;
 
 /**
@@ -69,15 +64,10 @@ class ReporterTest extends AbstractTestCase
         $this->goToTestDirectory();
 
         DummyService::$enabled = true;
+        Registry::registerService(DummyService::class);
 
         $this->composer = Factory::create(new NullIO());
-        $this->subject = (new Reporter($this->composer))
-            ->unregisterService(Email::class)
-            ->unregisterService(GitLab::class)
-            ->unregisterService(Mattermost::class)
-            ->unregisterService(Slack::class)
-            ->unregisterService(Teams::class)
-            ->registerService(DummyService::class);
+        $this->subject = new Reporter($this->composer);
     }
 
     /**
@@ -138,31 +128,6 @@ class ReporterTest extends AbstractTestCase
         $this->subject->report(new UpdateCheckResult([]));
 
         static::assertSame('foo/baz', DummyService::$customProjectName);
-    }
-
-    /**
-     * @test
-     */
-    public function registerServiceThrowsExceptionIfInvalidServiceIsGiven(): void
-    {
-        $this->expectException(InvalidServiceException::class);
-        $this->expectExceptionCode(1600814017);
-
-        $this->subject->registerService(\Exception::class);
-    }
-
-    /**
-     * @test
-     */
-    public function unregisterServiceRemovesServiceFromListOfRegisteredServices(): void
-    {
-        $this->subject->unregisterService(DummyService::class);
-
-        $this->subject->report(new UpdateCheckResult([
-            new OutdatedPackage('foo/baz', '1.0.0', '1.0.5'),
-        ]));
-
-        static::assertFalse(DummyService::$reportWasExecuted);
     }
 
     protected function tearDown(): void

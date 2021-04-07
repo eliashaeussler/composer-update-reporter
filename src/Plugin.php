@@ -28,6 +28,12 @@ use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
 use EliasHaeussler\ComposerUpdateCheck\Event\PostUpdateCheckEvent;
+use EliasHaeussler\ComposerUpdateReporter\Exception\InvalidServiceException;
+use EliasHaeussler\ComposerUpdateReporter\Service\Email;
+use EliasHaeussler\ComposerUpdateReporter\Service\GitLab;
+use EliasHaeussler\ComposerUpdateReporter\Service\Mattermost;
+use EliasHaeussler\ComposerUpdateReporter\Service\Slack;
+use EliasHaeussler\ComposerUpdateReporter\Service\Teams;
 
 /**
  * Plugin.
@@ -43,8 +49,14 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     private $reporter;
 
+    /**
+     * {@inheritDoc}
+     *
+     * @throws InvalidServiceException
+     */
     public function activate(Composer $composer, IOInterface $io): void
     {
+        $this->registerDefaultServices();
         $this->reporter = new Reporter($composer);
     }
 
@@ -75,5 +87,23 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         $this->reporter->setBehavior($event->getBehavior());
         $this->reporter->setOptions($event->getOptions());
         $this->reporter->report($event->getUpdateCheckResult());
+    }
+
+    /**
+     * @throws InvalidServiceException
+     */
+    private function registerDefaultServices(): void
+    {
+        $defaultServices = [
+            Email::class,
+            GitLab::class,
+            Mattermost::class,
+            Slack::class,
+            Teams::class,
+        ];
+
+        foreach ($defaultServices as $className) {
+            Registry::registerService($className);
+        }
     }
 }
