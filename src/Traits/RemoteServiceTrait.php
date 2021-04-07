@@ -57,7 +57,7 @@ trait RemoteServiceTrait
     {
         $request = $this->requestFactory->createRequest('POST', $this->uri)
             ->withBody(Stream::create(json_encode($payload)));
-        $headers = array_merge($headers, ['Accept' => 'application/json']);
+        $headers = array_merge($headers, ['Content-Type' => 'application/json']);
         foreach ($headers as $name => $value) {
             $request = $request->withHeader($name, $value);
         }
