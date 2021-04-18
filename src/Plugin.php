@@ -77,7 +77,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     {
         return [
             PostUpdateCheckEvent::NAME => [
-                ['onPostUpdateCheck'],
+                ['onPostUpdateCheck', -255],
             ],
         ];
     }

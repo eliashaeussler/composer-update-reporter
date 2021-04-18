@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replace Guzzle by more lightweight libraries
 - Require versions ^1.0.0 of `eliashaeussler/composer-update-check`
 - Use Symfony rules in PHP-CS-Fixer
+- Decrease priority of post update check event listener
 
 ### Fixed
 
