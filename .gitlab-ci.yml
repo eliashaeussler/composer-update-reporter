@@ -196,7 +196,7 @@ release:
     - echo "Creating release for ${CI_COMMIT_TAG}"
   release:
     name: '${CI_COMMIT_TAG}'
-    description: 'Release notes are available in the [Changelog](CHANGELOG.md) file.'
+    description: 'Release notes are available in the [Changelog](https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter/-/blob/${CI_COMMIT_TAG}/CHANGELOG.md) file.'
     tag_name: '${CI_COMMIT_TAG}'
     ref: '${CI_COMMIT_TAG}'
   rules:
