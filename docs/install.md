@@ -16,6 +16,6 @@ composer require --dev eliashaeussler/composer-update-reporter
 ### From source
 
 ```bash
-composer config repositories.update-check vcs "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter.git"
+composer config repositories.update-reporter vcs "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter.git"
 composer require --dev eliashaeussler/composer-update-reporter
 ```
