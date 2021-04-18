@@ -29,6 +29,7 @@ use EliasHaeussler\ComposerUpdateCheck\IO\Style;
 use EliasHaeussler\ComposerUpdateCheck\IO\Verbosity;
 use EliasHaeussler\ComposerUpdateCheck\Options;
 use EliasHaeussler\ComposerUpdateCheck\Package\UpdateCheckResult;
+use EliasHaeussler\ComposerUpdateReporter\Exception\MissingConfigurationException;
 use EliasHaeussler\ComposerUpdateReporter\Traits\ServiceConfigurationTrait;
 use Spatie\Emoji\Emoji;
 use Spatie\Emoji\Exceptions\UnknownCharacter;
@@ -63,15 +64,11 @@ abstract class AbstractService implements ServiceInterface
      */
     public static function isEnabled(array $configuration): bool
     {
-        $identifier = static::getIdentifier();
-        $envVariable = strtoupper($identifier.'_enable');
-        $extra = $configuration[strtolower($identifier)] ?? null;
-
-        if (false !== getenv($envVariable)) {
-            return (bool) getenv($envVariable);
+        try {
+            return (bool) static::resolveConfigurationKey($configuration, 'enable');
+        } catch (MissingConfigurationException $e) {
+            return false;
         }
-
-        return is_array($extra) && (bool) ($extra['enable'] ?? false);
     }
 
     abstract protected static function getName(): string;

@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Ensure enable state of services is correctly read
 - Set correct `Content-Type` header for requests sent to remote services
 
 ## [0.8.0] - 2021-02-12

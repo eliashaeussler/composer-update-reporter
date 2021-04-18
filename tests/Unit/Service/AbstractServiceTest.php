@@ -151,7 +151,7 @@ class AbstractServiceTest extends AbstractTestCase
                 ],
             ],
             '0',
-            false,
+            true,
         ];
         yield 'falsy configuration and truthy environment variable' => [
             [
@@ -160,7 +160,7 @@ class AbstractServiceTest extends AbstractTestCase
                 ],
             ],
             '1',
-            true,
+            false,
         ];
         yield 'empty configuration and truthy environment variable' => [
             [
