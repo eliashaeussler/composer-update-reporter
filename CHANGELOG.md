@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Introduce `AbstractService`
 - Add method `getIdentifier()` to `ServiceInterface`
 - Include root package name in service reports
+- Project documentation
 
 ### Changed
 

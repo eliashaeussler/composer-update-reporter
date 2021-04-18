@@ -49,6 +49,17 @@
     }
   },
   "scripts": {
+    "docs": [
+      "@docs:stop",
+      "@docs:start",
+      "sleep 5",
+      "@docs:open"
+    ],
+    "docs:build": "@docs:exec run --rm docs build",
+    "docs:exec": "docker-compose -f docs/build/docker-compose.yaml",
+    "docs:open": "open http://$(docker-compose -f docs/build/docker-compose.yaml port docs 8000)",
+    "docs:start": "@docs:exec up -d",
+    "docs:stop": "@docs:exec down",
     "lint": "php-cs-fixer fix",
     "sca": "phpstan analyse -c phpstan.neon",
     "simulate": "bin/simulate-application.sh",

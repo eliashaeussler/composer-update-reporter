@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  docs:
+    build: .
+    container_name: composer-update-reporter-docs
+    ports:
+      - "8000"
+    volumes:
+      - ../../:/docs

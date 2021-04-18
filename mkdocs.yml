@@ -1,0 +1,93 @@
+# Site configuration
+site_name: Composer update reporter plugin
+site_url: https://docs.elias-haeussler.de/composer-update-reporter/
+site_description: Documentation of Composer Plugin "eliashaeussler/composer-update-reporter"
+site_author: Elias Häußler
+
+# Repository configuration
+repo_url: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter
+edit_uri: ""
+
+# Copyright
+copyright: Copyright &copy; 2020 - %current_year% <a href="https://haeussler.dev" target="_blank">Elias Häußler</a>
+
+# Navigation
+nav:
+  - Home: index.md
+  - Getting started:
+    - Installation: install.md
+    - Configuration: configuration.md
+    - API: api.md
+  - Customization:
+    - 'Create own service': custom-service.md
+  - About:
+    - Contribution: contribute.md
+    - Changelog: changelog.md
+    - License: license.md
+
+# Theme configuration
+theme:
+  name: material
+  custom_dir: docs/theme
+  favicon: assets/img/favicon.ico
+  icon:
+    logo: material/alarm
+  palette:
+    primary: red
+    accent: red
+  features:
+    - navigation.instant
+    - navigation.sections
+    - navigation.top
+use_directory_urls: false
+extra_css:
+  - assets/css/theme.css
+extra:
+  repository:
+    url: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter
+    blob: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter/-/tree/master
+  social:
+    - icon: fontawesome/solid/globe-americas
+      link: https://haeussler.dev
+    - icon: fontawesome/brands/twitter
+      link: https://haeussler.dev/twitter
+    - icon: fontawesome/brands/gitlab
+      link: https://haeussler.dev/gitlab
+    - icon: fontawesome/solid/paper-plane
+      link: https://haeussler.dev/mail
+
+# Plugins and extensions
+plugins:
+  - search
+  - localsearch
+  - git-revision-date
+  - macros
+  - exclude:
+      glob:
+        - build/*
+        - __pycache__/*
+        - hooks.py
+  - mkdocs-simple-hooks:
+      hooks:
+        on_config: 'docs.hooks:apply_copyright_year'
+markdown_extensions:
+  - attr_list
+  - markdown.extensions.admonition
+  - markdown.extensions.toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.details
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tabbed
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      extend_pygments_lang:
+        - name: php
+          lang: php
+          options:
+            startinline: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
