@@ -34,6 +34,8 @@ build:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "pipeline"'
       when: never
+    - if: '$RENDER_DOCS'
+      when: never
     - if: '$CI_COMMIT_BRANCH'
       when: on_success
 
@@ -46,6 +48,8 @@ lint:php:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "pipeline"'
       when: never
+    - if: '$RENDER_DOCS'
+      when: never
     - if: '$CI_COMMIT_BRANCH'
       when: on_success
 
@@ -57,6 +61,8 @@ lint:composer:
     - composer normalize --dry-run
   rules:
     - if: '$CI_PIPELINE_SOURCE == "pipeline"'
+      when: never
+    - if: '$RENDER_DOCS'
       when: never
     - if: '$CI_COMMIT_BRANCH'
       when: on_success
@@ -74,6 +80,8 @@ sca:php:
       codequality: .build/phpstan.json
   rules:
     - if: '$CI_PIPELINE_SOURCE == "pipeline"'
+      when: never
+    - if: '$RENDER_DOCS'
       when: never
     - if: '$CI_COMMIT_BRANCH'
       when: on_success
@@ -134,6 +142,8 @@ test:
     reports:
       junit: .build/coverage/junit.xml
   rules:
+    - if: '$RENDER_DOCS'
+      when: never
     - if: '$CI_COMMIT_BRANCH'
       when: on_success
 
@@ -174,8 +184,8 @@ deploy:docs:
     - 'rsync -avz --chmod=Du=rwx,Dgo=rx,Fu=rw,Fog=r site/ eliashae@cp140.sp-server.net:/home/eliashae/html/docs.elias-haeussler.de/composer-update-reporter/'
   cache: {}
   rules:
-    - if: '$RENDER_DOCS'
-      when: never
+    - if: '$RENDER_DOCS && $DEPLOY_DOCS'
+      when: on_success
     - if: '$CI_COMMIT_BRANCH == "master"'
       when: on_success
 
