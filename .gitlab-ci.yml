@@ -15,6 +15,9 @@ variables:
   MAILHOG_SMTP_PORT: "1025"
   MAILHOG_API_PORT: "8025"
 
+include:
+  local: update-check.gitlab-ci.yml
+
 stages:
   - build
   - lint
@@ -32,7 +35,7 @@ build:
     <<: *cache
     policy: pull-push
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "pipeline"'
+    - if: '$UPDATE_CHECK_REF'
       when: never
     - if: '$RENDER_DOCS'
       when: never
@@ -46,7 +49,7 @@ lint:php:
   script:
     - composer lint -- --dry-run
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "pipeline"'
+    - if: '$UPDATE_CHECK_REF'
       when: never
     - if: '$RENDER_DOCS'
       when: never
@@ -60,7 +63,7 @@ lint:composer:
   script:
     - composer normalize --dry-run
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "pipeline"'
+    - if: '$UPDATE_CHECK_REF'
       when: never
     - if: '$RENDER_DOCS'
       when: never
@@ -79,7 +82,7 @@ sca:php:
     reports:
       codequality: .build/phpstan.json
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "pipeline"'
+    - if: '$UPDATE_CHECK_REF'
       when: never
     - if: '$RENDER_DOCS'
       when: never
@@ -110,10 +113,6 @@ test:
     - php --version
     - composer require --dev "composer/composer:^${COMPOSER_VERSION}.0" --no-progress
     - >
-      if [ "$UPDATE_CHECK_REF" ]; then
-        composer require "eliashaeussler/composer-update-check:$UPDATE_CHECK_REF"
-      fi
-    - >
       if [ "$COVERAGE" == "1" ]; then
         COMPOSER_PROCESS_TIMEOUT=1000 /root/.composer/vendor/bin/paratest --runner=WrapperRunner -c phpunit.coverage.xml --coverage-text
       else
@@ -142,6 +141,8 @@ test:
     reports:
       junit: .build/coverage/junit.xml
   rules:
+    - if: '$UPDATE_CHECK_REF'
+      when: never
     - if: '$RENDER_DOCS'
       when: never
     - if: '$CI_COMMIT_BRANCH'
@@ -162,7 +163,7 @@ docs:
     paths:
       - site/
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "pipeline"'
+    - if: '$UPDATE_CHECK_REF'
       when: never
     - if: '$RENDER_DOCS'
       when: on_success
@@ -186,7 +187,7 @@ deploy:docs:
     - 'rsync -avz --chmod=Du=rwx,Dgo=rx,Fu=rw,Fog=r site/ eliashae@cp140.sp-server.net:/home/eliashae/html/docs.elias-haeussler.de/composer-update-reporter/'
   cache: {}
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "pipeline"'
+    - if: '$UPDATE_CHECK_REF'
       when: never
     - if: '$RENDER_DOCS && $DEPLOY_DOCS'
       when: on_success
@@ -204,6 +205,8 @@ release:
     tag_name: '${CI_COMMIT_TAG}'
     ref: '${CI_COMMIT_TAG}'
   rules:
+    - if: '$UPDATE_CHECK_REF'
+      when: never
     - if: '$RENDER_DOCS'
       when: never
     - if: '$CI_COMMIT_TAG'
