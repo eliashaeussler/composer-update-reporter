@@ -162,6 +162,8 @@ docs:
     paths:
       - site/
   rules:
+    - if: '$CI_PIPELINE_SOURCE == "pipeline"'
+      when: never
     - if: '$RENDER_DOCS'
       when: on_success
     - if: '$CI_COMMIT_BRANCH == "master"'
@@ -184,6 +186,8 @@ deploy:docs:
     - 'rsync -avz --chmod=Du=rwx,Dgo=rx,Fu=rw,Fog=r site/ eliashae@cp140.sp-server.net:/home/eliashae/html/docs.elias-haeussler.de/composer-update-reporter/'
   cache: {}
   rules:
+    - if: '$CI_PIPELINE_SOURCE == "pipeline"'
+      when: never
     - if: '$RENDER_DOCS && $DEPLOY_DOCS'
       when: on_success
     - if: '$CI_COMMIT_BRANCH == "master"'
