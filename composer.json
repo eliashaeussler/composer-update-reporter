@@ -16,7 +16,7 @@
     "php": "^7.1 || 8.0.*",
     "ext-json": "*",
     "composer-plugin-api": "^1.0 || ^2.0",
-    "eliashaeussler/composer-update-check": "^1.0@dev",
+    "eliashaeussler/composer-update-check": "^1.0",
     "nyholm/psr7": "^1.0",
     "psr/http-client": "^1.0",
     "spatie/emoji": "^2.0",
@@ -76,6 +76,7 @@
   "support": {
     "issues": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter/-/issues",
     "source": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter",
+    "docs": "https://docs.elias-haeussler.de/composer-update-reporter/",
     "rss": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter.atom"
   }
 }

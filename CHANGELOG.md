@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2021-04-19
+
 ### Added
 
 - Support for PHP 8.0
@@ -121,7 +123,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial release
 
-[Unreleased]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter/-/compare/0.8.0...develop
+[Unreleased]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter/-/compare/1.0.0...develop
+[1.0.0]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter/-/compare/0.8.0...1.0.0
 [0.8.0]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter/-/compare/0.7.0...0.8.0
 [0.7.0]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter/-/compare/0.6.2...0.7.0
 [0.6.2]: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter/-/compare/0.6.1...0.6.2
