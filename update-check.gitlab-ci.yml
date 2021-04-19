@@ -13,6 +13,7 @@ test:update-check:
     - composer --version
     - php --version
   script:
+    - mkdir -p .build/coverage
     - composer require --dev "composer/composer:^${COMPOSER_VERSION}.0" --no-progress
     - composer require "eliashaeussler/composer-update-check:${UPDATE_CHECK_REF}"
     - /root/.composer/vendor/bin/paratest --runner=WrapperRunner -c phpunit.xml
