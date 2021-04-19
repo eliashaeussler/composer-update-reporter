@@ -110,8 +110,8 @@ test:
     - php --version
     - composer require --dev "composer/composer:^${COMPOSER_VERSION}.0" --no-progress
     - >
-      if [ $UPDATE_CHECK_REF ]; then
-        composer require "eliashaeussler/composer-update-check:dev-master#$UPDATE_CHECK_REF"
+      if [ "$UPDATE_CHECK_REF" ]; then
+        composer require "eliashaeussler/composer-update-check:$UPDATE_CHECK_REF"
       fi
     - >
       if [ "$COVERAGE" == "1" ]; then
