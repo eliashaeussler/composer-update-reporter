@@ -98,7 +98,7 @@ class Slack extends AbstractService
     /**
      * @param OutdatedPackage[] $outdatedPackages
      *
-     * @return array[]
+     * @return array<int, array<string, mixed>>
      */
     private function renderBlocks(array $outdatedPackages): array
     {

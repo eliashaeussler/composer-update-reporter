@@ -330,7 +330,7 @@ class EmailTest extends AbstractTestCase
     }
 
     /**
-     * @return \Generator<string, array>
+     * @return \Generator<string, array{array<string, mixed>}>
      */
     public function fromConfigurationThrowsExceptionIfEmailDsnIsNotSetDataProvider(): \Generator
     {
@@ -353,7 +353,7 @@ class EmailTest extends AbstractTestCase
     }
 
     /**
-     * @return \Generator<string, array>
+     * @return \Generator<string, array{bool, string}>
      */
     public function reportSendsUpdateReportSuccessfullyDataProvider(): \Generator
     {

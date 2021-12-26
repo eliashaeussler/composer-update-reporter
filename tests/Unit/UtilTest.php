@@ -56,7 +56,7 @@ class UtilTest extends AbstractTestCase
     }
 
     /**
-     * @return \Generator<string, array>
+     * @return \Generator<string, array{string, string}>
      */
     public function uppercaseToUnderscoredReturnsUnderscoredStringDataProvider(): \Generator
     {
@@ -75,7 +75,7 @@ class UtilTest extends AbstractTestCase
     }
 
     /**
-     * @return \Generator<string, array>
+     * @return \Generator<string, array<int, array<string, mixed>>>
      */
     public function arrayDiffRecursiveReturnsDiffBetweenArraysDataProvider(): \Generator
     {

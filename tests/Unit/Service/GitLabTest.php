@@ -211,7 +211,7 @@ class GitLabTest extends AbstractTestCase
     }
 
     /**
-     * @return \Generator<string, array>
+     * @return \Generator<string, array{array<string, mixed>}>
      */
     public function fromConfigurationThrowsExceptionIfGitLabUrlIsNotSetDataProvider(): \Generator
     {
@@ -233,7 +233,7 @@ class GitLabTest extends AbstractTestCase
     }
 
     /**
-     * @return \Generator<string, array>
+     * @return \Generator<string, array{bool, string}>
      */
     public function reportSendsUpdateReportSuccessfullyDataProvider(): \Generator
     {

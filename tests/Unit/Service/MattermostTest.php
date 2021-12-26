@@ -226,7 +226,7 @@ class MattermostTest extends AbstractTestCase
     }
 
     /**
-     * @return \Generator<string, array>
+     * @return \Generator<string, array{array<string, mixed>}>
      */
     public function fromConfigurationThrowsExceptionIfMattermostUrlIsNotSetDataProvider(): \Generator
     {
@@ -248,7 +248,7 @@ class MattermostTest extends AbstractTestCase
     }
 
     /**
-     * @return \Generator<string, array>
+     * @return \Generator<string, array{bool, string}>
      */
     public function reportSendsUpdateReportSuccessfullyDataProvider(): \Generator
     {

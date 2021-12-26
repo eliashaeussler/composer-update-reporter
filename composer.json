@@ -34,7 +34,7 @@
     "ergebnis/composer-normalize": "^2.8",
     "friendsofphp/php-cs-fixer": "^2.17 || ^3.0",
     "php-http/mock-client": "^1.0",
-    "phpstan/phpstan": "^0.12.80",
+    "phpstan/phpstan": "^1.2",
     "phpunit/phpunit": "^7.0 || ^8.0 || ^9.0",
     "rpkamp/mailhog-client": "^0.3 || ^0.4 || ^0.5"
   },
