@@ -6,6 +6,16 @@ jobs:
   tests:
     name: PHP ${{ matrix.php-version }} & Composer ${{ matrix.composer-version }}
     runs-on: ubuntu-20.04
+    services:
+      mailhog:
+        image: mailhog/mailhog
+        env:
+          MH_SMTP_BIND_ADDR: 0.0.0.0:2025
+          MH_API_BIND_ADDR: 0.0.0.0:9025
+          MH_UI_BIND_ADDR: 0.0.0.0:9025
+        ports:
+          - 2025:2025
+          - 9025:9025
     strategy:
       fail-fast: false
       matrix:
@@ -65,10 +75,10 @@ jobs:
       - name: Build coverage directory
         run: mkdir -p .build/coverage
       - name: Run tests with coverage
-        run: composer test:coverage
+        run: composer exec phpunit -- -c phpunit.coverage.xml
         if: ${{ matrix.coverage }}
       - name: Run tests without coverage
-        run: composer test
+        run: composer exec phpunit -- -c phpunit.xml
         if: ${{ !matrix.coverage }}
 
       # Report coverage
@@ -87,6 +97,16 @@ jobs:
   tests-lowest:
     name: '[test-lowest] PHP ${{ matrix.php-version }} & Composer ${{ matrix.composer-version }}'
     runs-on: ubuntu-20.04
+    services:
+      mailhog:
+        image: mailhog/mailhog
+        env:
+          MH_SMTP_BIND_ADDR: 0.0.0.0:2025
+          MH_API_BIND_ADDR: 0.0.0.0:9025
+          MH_UI_BIND_ADDR: 0.0.0.0:9025
+        ports:
+          - 2025:2025
+          - 9025:9025
     strategy:
       fail-fast: false
       matrix:
