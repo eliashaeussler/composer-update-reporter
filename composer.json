@@ -49,6 +49,10 @@
     }
   },
   "config": {
+    "allow-plugins": {
+      "eliashaeussler/composer-update-check": true,
+      "ergebnis/composer-normalize": true
+    },
     "sort-packages": true
   },
   "extra": {
