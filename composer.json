@@ -19,7 +19,7 @@
     "rss": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter.atom"
   },
   "require": {
-    "php": "^7.1 || 8.0.*",
+    "php": ">= 7.1 < 8.1",
     "ext-json": "*",
     "composer-plugin-api": "^1.0 || ^2.0",
     "eliashaeussler/composer-update-check": "^1.0",
@@ -27,16 +27,16 @@
     "psr/http-client": "^1.0",
     "spatie/emoji": "^2.0",
     "symfony/http-client": "^4.4.11 || ^5.0.11",
-    "symfony/mailer": "^4.4 || ^5.0"
+    "symfony/mailer": ">= 4.4 < 6.0"
   },
   "require-dev": {
     "composer/composer": "^1.0 || ^2.0",
     "ergebnis/composer-normalize": "^2.8",
-    "friendsofphp/php-cs-fixer": "^2.17 || ^3.0",
+    "friendsofphp/php-cs-fixer": ">= 2.17 < 4.0",
     "php-http/mock-client": "^1.0",
     "phpstan/phpstan": "^1.2",
-    "phpunit/phpunit": "^7.0 || ^8.0 || ^9.0",
-    "rpkamp/mailhog-client": "^0.3 || ^0.4 || ^0.5"
+    "phpunit/phpunit": ">= 7.5 < 10.0",
+    "rpkamp/mailhog-client": ">= 0.3 < 0.6"
   },
   "autoload": {
     "psr-4": {
