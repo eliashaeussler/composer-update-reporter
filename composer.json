@@ -26,7 +26,7 @@
     "nyholm/psr7": "^1.0",
     "psr/http-client": "^1.0",
     "spatie/emoji": "^2.0",
-    "symfony/http-client": "^4.4 || ^5.0",
+    "symfony/http-client": "^4.4.11 || ^5.0.11",
     "symfony/mailer": "^4.4 || ^5.0"
   },
   "require-dev": {
