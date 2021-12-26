@@ -1,9 +1,8 @@
 {
   "name": "eliashaeussler/composer-update-reporter",
-  "type": "composer-plugin",
   "description": "Composer Plugin to report outdated packages to several external services",
-  "homepage": "https://haeussler.dev",
   "license": "GPL-3.0-or-later",
+  "type": "composer-plugin",
   "authors": [
     {
       "name": "Elias Häußler",
@@ -12,6 +11,13 @@
       "role": "Maintainer"
     }
   ],
+  "homepage": "https://haeussler.dev",
+  "support": {
+    "issues": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter/-/issues",
+    "source": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter",
+    "docs": "https://docs.elias-haeussler.de/composer-update-reporter/",
+    "rss": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter.atom"
+  },
   "require": {
     "php": "^7.1 || 8.0.*",
     "ext-json": "*",
@@ -32,12 +38,6 @@
     "phpunit/phpunit": "^7.0 || ^8.0 || ^9.0",
     "rpkamp/mailhog-client": "^0.3 || ^0.4 || ^0.5"
   },
-  "config": {
-    "sort-packages": true
-  },
-  "extra": {
-    "class": "EliasHaeussler\\ComposerUpdateReporter\\Plugin"
-  },
   "autoload": {
     "psr-4": {
       "EliasHaeussler\\ComposerUpdateReporter\\": "src"
@@ -47,6 +47,12 @@
     "psr-4": {
       "EliasHaeussler\\ComposerUpdateReporter\\Tests\\": "tests"
     }
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "extra": {
+    "class": "EliasHaeussler\\ComposerUpdateReporter\\Plugin"
   },
   "scripts": {
     "docs": [
@@ -72,11 +78,5 @@
     "test:docker:start": "docker-compose -f tests/Build/docker-compose.yml up -d",
     "test:docker:stop": "docker-compose -f tests/Build/docker-compose.yml down",
     "test:run": "phpunit -c phpunit.xml"
-  },
-  "support": {
-    "issues": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter/-/issues",
-    "source": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter",
-    "docs": "https://docs.elias-haeussler.de/composer-update-reporter/",
-    "rss": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter.atom"
   }
 }
