@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1d7a749aae0532b15d963ed106874802",
+    "content-hash": "7be4f5d9da49ef800720acc14330ee76",
     "packages": [],
     "packages-dev": [
         {
@@ -83,11 +83,17 @@
         },
         {
             "name": "eliashaeussler/composer-update-check",
-            "version": "1.0.0-rc1",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
-                "url": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check",
-                "reference": "6f4fc411eea6ae62b869025ee5d1fb28a5996d3a"
+                "url": "https://github.com/eliashaeussler/composer-update-check.git",
+                "reference": "8a70adbd4e6cb4ecfb5d19b17e96acd57db99e3a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/eliashaeussler/composer-update-check/zipball/8a70adbd4e6cb4ecfb5d19b17e96acd57db99e3a",
+                "reference": "8a70adbd4e6cb4ecfb5d19b17e96acd57db99e3a",
+                "shasum": ""
             },
             "require": {
                 "composer-plugin-api": "^1.0 || ^2.0",
@@ -101,7 +107,7 @@
             "require-dev": {
                 "composer/composer": "^1.0 || ^2.0",
                 "ergebnis/composer-normalize": "^2.8",
-                "friendsofphp/php-cs-fixer": "^2.14",
+                "friendsofphp/php-cs-fixer": "^2.17",
                 "php-http/mock-client": "^1.0",
                 "phpstan/phpstan": "^0.12.80",
                 "phpunit/phpunit": "^7.0 || ^8.0 || ^9.0"
@@ -135,7 +141,7 @@
                 "rss": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check.atom",
                 "source": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-check"
             },
-            "time": "2021-04-06T11:51:10+00:00"
+            "time": "2021-10-14T10:16:23+00:00"
         },
         {
             "name": "myclabs/deep-copy",
@@ -2396,12 +2402,10 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "eliashaeussler/composer-update-check": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.0.0"
+    "plugin-api-version": "2.1.0"
 }

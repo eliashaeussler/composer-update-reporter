@@ -10,7 +10,7 @@ to file an issue and I will try to assist you wherever needed.
 
 ```bash
 # Clone repository
-git clone https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter.git
+git clone https://github.com/eliashaeussler/composer-update-reporter.git
 cd composer-update-reporter
 
 # Install Composer dependencies

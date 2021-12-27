@@ -5,7 +5,7 @@ site_description: Documentation of Composer Plugin "eliashaeussler/composer-upda
 site_author: Elias Häußler
 
 # Repository configuration
-repo_url: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter
+repo_url: https://github.com/eliashaeussler/composer-update-reporter
 edit_uri: ""
 
 # Copyright
@@ -44,15 +44,15 @@ extra_css:
   - assets/css/theme.css
 extra:
   repository:
-    url: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter
-    blob: https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter/-/tree/master
+    url: https://github.com/eliashaeussler/composer-update-reporter
+    blob: https://github.com/eliashaeussler/composer-update-reporter/tree/master
   social:
     - icon: fontawesome/solid/globe-americas
       link: https://haeussler.dev
     - icon: fontawesome/brands/twitter
       link: https://haeussler.dev/twitter
-    - icon: fontawesome/brands/gitlab
-      link: https://haeussler.dev/gitlab
+    - icon: fontawesome/brands/github
+      link: https://haeussler.dev/github
     - icon: fontawesome/solid/paper-plane
       link: https://haeussler.dev/mail
 
