@@ -106,7 +106,7 @@ class Teams extends AbstractService
     /**
      * @param OutdatedPackage[] $outdatedPackages
      *
-     * @return array[]
+     * @return array<int, array{text: string}>
      */
     private function renderSections(array $outdatedPackages): array
     {

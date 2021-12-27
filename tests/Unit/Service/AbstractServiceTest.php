@@ -119,7 +119,7 @@ class AbstractServiceTest extends AbstractTestCase
     }
 
     /**
-     * @return \Generator<string, array>
+     * @return \Generator<string, array{array<string, mixed>, numeric-string|null, bool}>
      */
     public function isEnabledReturnsStateOfAvailabilityDataProvider(): \Generator
     {

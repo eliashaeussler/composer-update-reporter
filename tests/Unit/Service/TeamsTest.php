@@ -182,7 +182,7 @@ class TeamsTest extends AbstractTestCase
     }
 
     /**
-     * @return \Generator<string, array>
+     * @return \Generator<string, array{array<string, mixed>}>
      */
     public function fromConfigurationThrowsExceptionIfTeamsUrlIsNotSetDataProvider(): \Generator
     {
@@ -204,7 +204,7 @@ class TeamsTest extends AbstractTestCase
     }
 
     /**
-     * @return \Generator<string, array>
+     * @return \Generator<string, array{bool, string}>
      */
     public function reportSendsUpdateReportSuccessfullyDataProvider(): \Generator
     {

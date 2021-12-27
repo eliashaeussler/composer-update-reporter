@@ -1,0 +1,55 @@
+name: Documentation
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  render:
+    runs-on: ubuntu-20.04
+    env:
+      COMPOSE_FILE: docs/build/docker-compose.yaml
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      # Render docs
+      - name: Build container
+        run: docker-compose build --pull
+      - name: Render HTML
+        run: docker-compose run --rm docs build
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: rendered-docs
+          path: site/
+
+  deploy:
+    runs-on: ubuntu-20.04
+    needs: render
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Download artifact
+        id: download
+        uses: actions/download-artifact@v2
+        with:
+          name: rendered-docs
+          path: site/
+
+      # Prepare SSH connection
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+
+      # Upload
+      - name: Deploy
+        run: |
+          rsync -avz --chmod=Du=rwx,Dgo=rx,Fu=rw,Fog=r \
+            ${{ steps.download.outputs.download-path }}/ \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/eliashae/html/docs.elias-haeussler.de/composer-update-check/

@@ -272,7 +272,7 @@ class SlackTest extends AbstractTestCase
     }
 
     /**
-     * @return \Generator<string, array>
+     * @return \Generator<string, array{array<string, mixed>}>
      */
     public function fromConfigurationThrowsExceptionIfSlackUrlIsNotSetDataProvider(): \Generator
     {
@@ -294,7 +294,7 @@ class SlackTest extends AbstractTestCase
     }
 
     /**
-     * @return \Generator<string, array>
+     * @return \Generator<string, array{bool}>
      */
     public function reportSendsUpdateReportSuccessfullyDataProvider(): \Generator
     {
