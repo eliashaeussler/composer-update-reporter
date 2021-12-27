@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2021-12-27
+
 ### Fixed
 
 - Various requirements for dependencies installed with `--prefer-lowest`
@@ -144,7 +146,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial release
 
-[Unreleased]: https://github.com/eliashaeussler/composer-update-reporter/compare/1.0.0...develop
+[Unreleased]: https://github.com/eliashaeussler/composer-update-reporter/compare/1.1.0...develop
+[1.1.0]: https://github.com/eliashaeussler/composer-update-reporter/compare/1.0.0...1.1.0
 [1.0.0]: https://github.com/eliashaeussler/composer-update-reporter/compare/0.8.0...1.0.0
 [0.8.0]: https://github.com/eliashaeussler/composer-update-reporter/compare/0.7.0...0.8.0
 [0.7.0]: https://github.com/eliashaeussler/composer-update-reporter/compare/0.6.2...0.7.0
