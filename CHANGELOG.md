@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Various requirements for dependencies installed with `--prefer-lowest`
+- Requirements for PHP 8.0 compatibility
+
+### Added
+
+- Support for Composer 2.2
+- Code quality assurance with SonarCloud
+
+### Changed
+
+- Migrate project from GitLab to GitHub
+- Upgrade PHP-CS-Fixer to 3.x
+- Upgrade PHPStan to 1.x
+
+### Documentation
+
+- Improved README.md
+- Add logo
+
 ## [1.0.0] - 2021-04-19
 
 ### Added
