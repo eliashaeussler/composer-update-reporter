@@ -2,7 +2,7 @@
 
 ![Logo](docs/assets/img/logo.png)
 
-# Composer update check plugin
+# Composer update reporter plugin
 
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=eliashaeussler_composer-update-reporter&metric=coverage)](https://sonarcloud.io/dashboard?id=eliashaeussler_composer-update-reporter)
 [![Tests](https://github.com/eliashaeussler/composer-update-reporter/actions/workflows/tests.yaml/badge.svg)](https://github.com/eliashaeussler/composer-update-reporter/actions/workflows/tests.yaml)
