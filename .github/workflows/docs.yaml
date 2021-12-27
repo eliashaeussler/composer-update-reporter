@@ -52,4 +52,4 @@ jobs:
         run: |
           rsync -avz --chmod=Du=rwx,Dgo=rx,Fu=rw,Fog=r \
             ${{ steps.download.outputs.download-path }}/ \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/eliashae/html/docs.elias-haeussler.de/composer-update-check/
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/eliashae/html/docs.elias-haeussler.de/composer-update-reporter/
