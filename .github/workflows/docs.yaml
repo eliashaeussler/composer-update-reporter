@@ -34,9 +34,11 @@ jobs:
         with:
           fetch-depth: 0
       - name: Download artifact
+        id: download
         uses: actions/download-artifact@v2
         with:
           name: rendered-docs
+          path: site/
 
       # Prepare SSH connection
       - name: Install SSH key
@@ -47,4 +49,7 @@ jobs:
 
       # Upload
       - name: Deploy
-        run: 'rsync -avz --chmod=Du=rwx,Dgo=rx,Fu=rw,Fog=r site/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/eliashae/html/docs.elias-haeussler.de/composer-update-reporter/'
+        run: |
+          rsync -avz --chmod=Du=rwx,Dgo=rx,Fu=rw,Fog=r \
+            ${{ steps.download.outputs.download-path }}/ \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/eliashae/html/docs.elias-haeussler.de/composer-update-check/
