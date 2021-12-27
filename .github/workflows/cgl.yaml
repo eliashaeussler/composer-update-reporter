@@ -4,8 +4,6 @@ on: [push, pull_request]
 jobs:
   cgl:
     runs-on: ubuntu-20.04
-    strategy:
-      fail-fast: false
     steps:
       - uses: actions/checkout@v2
         with:

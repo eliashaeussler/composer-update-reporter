@@ -7,8 +7,6 @@ on:
 jobs:
   render:
     runs-on: ubuntu-20.04
-    strategy:
-      fail-fast: false
     env:
       COMPOSE_FILE: docs/build/docker-compose.yaml
     steps:
@@ -30,8 +28,6 @@ jobs:
 
   deploy:
     runs-on: ubuntu-20.04
-    strategy:
-      fail-fast: false
     needs: render
     steps:
       - uses: actions/checkout@v2
