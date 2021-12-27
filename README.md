@@ -22,8 +22,8 @@ A Composer plugin for
 [`eliashaeussler/composer-update-check`](https://github.com/eliashaeussler/composer-update-check)
 that can be used to automatically report outdated packages to various services. This allows strong
 automation in the area of quality assurance by reporting outdated packages directly to you, for
-example to Slack, Mattermost or even by mail. In addition, it is possible to implement your own
-services to which reports can be sent at any time.
+example via Slack, Mattermost or by mail. It is even possible to implement your own service to
+which reports can be sent at any time.
 
 ## :rocket: Features
 
