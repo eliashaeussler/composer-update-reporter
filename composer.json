@@ -1,9 +1,8 @@
 {
   "name": "eliashaeussler/composer-update-reporter",
-  "type": "composer-plugin",
   "description": "Composer Plugin to report outdated packages to several external services",
-  "homepage": "https://haeussler.dev",
   "license": "GPL-3.0-or-later",
+  "type": "composer-plugin",
   "authors": [
     {
       "name": "Elias Häußler",
@@ -12,31 +11,32 @@
       "role": "Maintainer"
     }
   ],
+  "homepage": "https://haeussler.dev",
+  "support": {
+    "issues": "https://github.com/eliashaeussler/composer-update-reporter/issues",
+    "source": "https://github.com/eliashaeussler/composer-update-reporter",
+    "docs": "https://docs.elias-haeussler.de/composer-update-reporter/",
+    "rss": "https://github.com/eliashaeussler/composer-update-reporter/releases.atom"
+  },
   "require": {
-    "php": "^7.1 || 8.0.*",
+    "php": ">= 7.1 < 8.1",
     "ext-json": "*",
     "composer-plugin-api": "^1.0 || ^2.0",
     "eliashaeussler/composer-update-check": "^1.0",
     "nyholm/psr7": "^1.0",
     "psr/http-client": "^1.0",
     "spatie/emoji": "^2.0",
-    "symfony/http-client": "^4.4 || ^5.0",
-    "symfony/mailer": "^4.4 || ^5.0"
+    "symfony/http-client": "^4.4.11 || ^5.0.11",
+    "symfony/mailer": ">= 4.4 < 6.0"
   },
   "require-dev": {
     "composer/composer": "^1.0 || ^2.0",
     "ergebnis/composer-normalize": "^2.8",
-    "friendsofphp/php-cs-fixer": "^2.17",
+    "friendsofphp/php-cs-fixer": ">= 2.17 < 4.0",
     "php-http/mock-client": "^1.0",
-    "phpstan/phpstan": "^0.12.80",
-    "phpunit/phpunit": "^7.0 || ^8.0 || ^9.0",
-    "rpkamp/mailhog-client": "^0.3 || ^0.4 || ^0.5"
-  },
-  "config": {
-    "sort-packages": true
-  },
-  "extra": {
-    "class": "EliasHaeussler\\ComposerUpdateReporter\\Plugin"
+    "phpstan/phpstan": "^1.2",
+    "phpunit/phpunit": ">= 7.5 < 10.0",
+    "rpkamp/mailhog-client": ">= 0.3 < 0.6"
   },
   "autoload": {
     "psr-4": {
@@ -47,6 +47,16 @@
     "psr-4": {
       "EliasHaeussler\\ComposerUpdateReporter\\Tests\\": "tests"
     }
+  },
+  "config": {
+    "allow-plugins": {
+      "eliashaeussler/composer-update-check": true,
+      "ergebnis/composer-normalize": true
+    },
+    "sort-packages": true
+  },
+  "extra": {
+    "class": "EliasHaeussler\\ComposerUpdateReporter\\Plugin"
   },
   "scripts": {
     "docs": [
@@ -72,11 +82,5 @@
     "test:docker:start": "docker-compose -f tests/Build/docker-compose.yml up -d",
     "test:docker:stop": "docker-compose -f tests/Build/docker-compose.yml down",
     "test:run": "phpunit -c phpunit.xml"
-  },
-  "support": {
-    "issues": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter/-/issues",
-    "source": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter",
-    "docs": "https://docs.elias-haeussler.de/composer-update-reporter/",
-    "rss": "https://gitlab.elias-haeussler.de/eliashaeussler/composer-update-reporter.atom"
   }
 }

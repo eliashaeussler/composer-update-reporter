@@ -1,0 +1,70 @@
+name: 'Tests for composer-update-check'
+on:
+  workflow_dispatch:
+    inputs:
+      update-check-branch:
+        description: 'Branch name of upstream workflow to test'
+        required: true
+      update-check-sha:
+        description: 'Commit SHA of upstream workflow to test'
+        required: true
+
+jobs:
+  tests:
+    name: '[${{ github.event.inputs.update-check-branch }}] PHP ${{ matrix.php-version }} & Composer ${{ matrix.composer-version }}'
+    runs-on: ubuntu-20.04
+    services:
+      mailhog:
+        image: mailhog/mailhog
+        env:
+          MH_SMTP_BIND_ADDR: 0.0.0.0:2025
+          MH_API_BIND_ADDR: 0.0.0.0:9025
+          MH_UI_BIND_ADDR: 0.0.0.0:9025
+        ports:
+          - 2025:2025
+          - 9025:9025
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ["7.1", "7.2", "7.3", "7.4", "8.0"]
+        composer-version: ["1", "2"]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      # Prepare environment
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          tools: composer:v${{ matrix.composer-version }}
+          coverage: none
+
+      # Define Composer cache
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: |
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
+      - name: Define Composer cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: tests-update-check-${{ github.event.inputs.update-check-sha }}-php-${{ matrix.php-version }}-composer-${{ matrix.composer-version }}
+          restore-keys: |
+            tests-update-check-${{ github.event.inputs.update-check-sha }}-php-${{ matrix.php-version }}-composer-
+            tests-update-check-${{ github.event.inputs.update-check-sha }}-php-
+
+      # Install dependencies
+      - name: Install Composer and dependencies
+        run: composer require --dev --no-progress "composer/composer:^${{ matrix.composer-version }}"
+
+      # Install update check
+      - name: Install eliashaeussler/composer-update-check
+        run: composer require "eliashaeussler/composer-update-check:dev-${{ github.event.inputs.update-check-branch }}#${{ github.event.inputs.update-check-sha }}@dev"
+
+      # Run tests
+      - name: Build coverage directory
+        run: mkdir -p .build/coverage
+      - name: Run tests
+        run: composer exec phpunit -- -c phpunit.xml
