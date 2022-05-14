@@ -28,9 +28,9 @@ jobs:
         php-version: ["7.1", "7.2", "7.3", "7.4"]
         composer-version: ["1", "2"]
         include:
-          - php-version: 8.0
+          - php-version: "8.0"
             composer-version: 1
-          - php-version: 8.0
+          - php-version: "8.0"
             composer-version: 2
             coverage: true
     steps:
