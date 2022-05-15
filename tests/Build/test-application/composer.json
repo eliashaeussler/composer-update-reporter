@@ -5,6 +5,11 @@
     "eliashaeussler/composer-update-check": "^1.0",
     "phpunit/phpunit": "^5.0"
   },
+  "config": {
+    "allow-plugins": {
+      "eliashaeussler/composer-update-check": true
+    }
+  },
   "extra": {
     "update-check": {
       "email": {
