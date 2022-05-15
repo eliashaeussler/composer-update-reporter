@@ -15,7 +15,7 @@
   "support": {
     "issues": "https://github.com/eliashaeussler/composer-update-reporter/issues",
     "source": "https://github.com/eliashaeussler/composer-update-reporter",
-    "docs": "https://docs.elias-haeussler.de/composer-update-reporter/",
+    "docs": "https://composer-update-reporter.elias-haeussler.de/",
     "rss": "https://github.com/eliashaeussler/composer-update-reporter/releases.atom"
   },
   "require": {

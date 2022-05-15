@@ -8,11 +8,11 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/06d55184455feeee3652/maintainability)](https://codeclimate.com/github/eliashaeussler/composer-update-reporter/maintainability)
 [![Tests](https://github.com/eliashaeussler/composer-update-reporter/actions/workflows/tests.yaml/badge.svg)](https://github.com/eliashaeussler/composer-update-reporter/actions/workflows/tests.yaml)
 [![CGL](https://github.com/eliashaeussler/composer-update-reporter/actions/workflows/cgl.yaml/badge.svg)](https://github.com/eliashaeussler/composer-update-reporter/actions/workflows/cgl.yaml)
-[![Latest Stable Version](http://poser.pugx.org/eliashaeussler/composer-update-reporter/v)](https://packagist.org/packages/eliashaeussler/composer-update-reporter)
-[![Total Downloads](http://poser.pugx.org/eliashaeussler/composer-update-reporter/downloads)](https://packagist.org/packages/eliashaeussler/composer-update-reporter)
-[![License](http://poser.pugx.org/eliashaeussler/composer-update-reporter/license)](LICENSE.md)
+[![Latest Stable Version](https://poser.pugx.org/eliashaeussler/composer-update-reporter/v)](https://packagist.org/packages/eliashaeussler/composer-update-reporter)
+[![Total Downloads](https://poser.pugx.org/eliashaeussler/composer-update-reporter/downloads)](https://packagist.org/packages/eliashaeussler/composer-update-reporter)
+[![License](https://poser.pugx.org/eliashaeussler/composer-update-reporter/license)](LICENSE.md)
 
-**:orange_book:&nbsp;[Documentation](https://docs.elias-haeussler.de/composer-update-reporter/)** |
+**:orange_book:&nbsp;[Documentation](https://composer-update-reporter.elias-haeussler.de/)** |
 :package:&nbsp;[Packagist](https://packagist.org/packages/eliashaeussler/composer-update-reporter) |
 :floppy_disk:&nbsp;[Repository](https://github.com/eliashaeussler/composer-update-reporter) |
 :bug:&nbsp;[Issue tracker](https://github.com/eliashaeussler/composer-update-reporter/issues)
