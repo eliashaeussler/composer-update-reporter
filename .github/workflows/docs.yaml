@@ -40,16 +40,10 @@ jobs:
           name: rendered-docs
           path: site/
 
-      # Prepare SSH connection
-      - name: Install SSH key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          known_hosts: ${{ secrets.KNOWN_HOSTS }}
-
       # Upload
       - name: Deploy
-        run: |
-          rsync -avz --chmod=Du=rwx,Dgo=rx,Fu=rw,Fog=r \
-            ${{ steps.download.outputs.download-path }}/ \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/eliashae/html/docs.elias-haeussler.de/composer-update-reporter/
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+          cname: composer-update-reporter.elias-haeussler.de
