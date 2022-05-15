@@ -4,7 +4,7 @@
 
 # Composer update reporter plugin
 
-[![Coverage](https://codecov.io/gh/eliashaeussler/composer-update-reporter/branch/master/graph/badge.svg?token=4GZI1QWP5X)](https://codecov.io/gh/eliashaeussler/composer-update-reporter)
+[![Coverage](https://codecov.io/gh/eliashaeussler/composer-update-reporter/branch/develop/graph/badge.svg?token=4GZI1QWP5X)](https://codecov.io/gh/eliashaeussler/composer-update-reporter)
 [![Maintainability](https://api.codeclimate.com/v1/badges/06d55184455feeee3652/maintainability)](https://codeclimate.com/github/eliashaeussler/composer-update-reporter/maintainability)
 [![Tests](https://github.com/eliashaeussler/composer-update-reporter/actions/workflows/tests.yaml/badge.svg)](https://github.com/eliashaeussler/composer-update-reporter/actions/workflows/tests.yaml)
 [![CGL](https://github.com/eliashaeussler/composer-update-reporter/actions/workflows/cgl.yaml/badge.svg)](https://github.com/eliashaeussler/composer-update-reporter/actions/workflows/cgl.yaml)
