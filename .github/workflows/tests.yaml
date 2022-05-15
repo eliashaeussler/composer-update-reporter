@@ -25,28 +25,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        php-version: ["7.1", "7.2", "7.3", "7.4"]
+        composer-version: ["1", "2"]
         include:
-          - php-version: 7.1
-            composer-version: 1
-          - php-version: 7.1
-            composer-version: 2
-          - php-version: 7.2
-            composer-version: 1
-          - php-version: 7.2
-            composer-version: 2
-          - php-version: 7.3
-            composer-version: 1
-          - php-version: 7.3
-            composer-version: 2
-          - php-version: 7.4
-            composer-version: 1
-          - php-version: 7.4
-            composer-version: 2
-          - php-version: 8.0
-            composer-version: 1
-          - php-version: 8.0
-            composer-version: 2
-            coverage: 1
+          - php-version: "8.0"
+            composer-version: "1"
+          - php-version: "8.0"
+            composer-version: "2"
+            coverage: true
     steps:
       - uses: actions/checkout@v2
         with:
@@ -81,22 +67,31 @@ jobs:
       - name: Build coverage directory
         run: mkdir -p .build/coverage
       - name: Run tests with coverage
-        run: composer exec phpunit -- -c phpunit.coverage.xml
+        run: composer test:coverage
         if: ${{ matrix.coverage }}
       - name: Run tests without coverage
-        run: composer exec phpunit -- -c phpunit.xml
+        run: composer test:run
         if: ${{ !matrix.coverage }}
 
       # Report coverage
       - name: Fix coverage path
         working-directory: .build/coverage
-        run: sed -i 's/\/home\/runner\/work\/composer-update-reporter\/composer-update-reporter\//\/github\/workspace\//g' clover.xml
+        run: sed -i 's#/home/runner/work/composer-update-reporter/composer-update-reporter#${{ github.workspace }}#g' clover.xml
         if: ${{ matrix.coverage }}
-      - name: Run SonarCloud scan
-        uses: SonarSource/sonarcloud-github-action@master
+      - name: CodeClimate report
+        uses: paambaati/codeclimate-action@v3.0.0
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+        with:
+          coverageLocations: |
+            ${{ github.workspace }}/.build/coverage/clover.xml:clover
+        if: ${{ matrix.coverage }}
+      - name: codecov report
+        uses: codecov/codecov-action@v2
+        with:
+          directory: .build/coverage
+          fail_ci_if_error: true
+          verbose: true
         if: ${{ matrix.coverage }}
 
   # Job: Run unit tests with lowest installed dependency versions
@@ -152,4 +147,4 @@ jobs:
       - name: Build coverage directory
         run: mkdir -p .build/coverage
       - name: Run tests
-        run: composer exec phpunit -- -c phpunit.xml
+        run: composer test:run

@@ -1,6 +1,6 @@
 # Site configuration
 site_name: Composer update reporter plugin
-site_url: https://docs.elias-haeussler.de/composer-update-reporter/
+site_url: https://composer-update-reporter.elias-haeussler.de/
 site_description: Documentation of Composer Plugin "eliashaeussler/composer-update-reporter"
 site_author: Elias Häußler
 
@@ -45,7 +45,7 @@ extra_css:
 extra:
   repository:
     url: https://github.com/eliashaeussler/composer-update-reporter
-    blob: https://github.com/eliashaeussler/composer-update-reporter/tree/master
+    blob: https://github.com/eliashaeussler/composer-update-reporter/tree/main
   social:
     - icon: fontawesome/solid/globe-americas
       link: https://haeussler.dev

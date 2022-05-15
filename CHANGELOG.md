@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2022-05-15
+
+### Fixed
+
+- Add missing dependencies to `composer.json`
+- Installation from source when testing `composer-update-check`
+
+### Added
+
+- Code quality assurance with CodeClimate and codecov
+- Various CGL checks
+- Dependabot updates for GitHub Actions
+
+### Changed
+
+- Switch to GitHub Pages for documentation
+- Switch from `master` to `main` branch
+- Switch to GitHub issue forms
+
 ## [1.1.2] - 2022-01-06
 
 ### Added
@@ -158,7 +177,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial release
 
-[Unreleased]: https://github.com/eliashaeussler/composer-update-reporter/compare/1.1.2...develop
+[Unreleased]: https://github.com/eliashaeussler/composer-update-reporter/compare/1.2.0...develop
+[1.2.0]: https://github.com/eliashaeussler/composer-update-reporter/compare/1.1.2...1.2.0
 [1.1.2]: https://github.com/eliashaeussler/composer-update-reporter/compare/1.1.1...1.1.2
 [1.1.1]: https://github.com/eliashaeussler/composer-update-reporter/compare/1.1.0...1.1.1
 [1.1.0]: https://github.com/eliashaeussler/composer-update-reporter/compare/1.0.0...1.1.0

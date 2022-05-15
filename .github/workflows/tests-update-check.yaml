@@ -40,6 +40,8 @@ jobs:
           php-version: ${{ matrix.php-version }}
           tools: composer:v${{ matrix.composer-version }}
           coverage: none
+        env:
+          COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Define Composer cache
       - name: Get Composer cache directory
@@ -61,7 +63,9 @@ jobs:
 
       # Install update check
       - name: Install eliashaeussler/composer-update-check
-        run: composer require "eliashaeussler/composer-update-check:dev-${{ github.event.inputs.update-check-branch }}#${{ github.event.inputs.update-check-sha }}@dev"
+        run: |
+          composer config repositories.composer-update-check vcs https://github.com/eliashaeussler/composer-update-check.git
+          composer require --prefer-source --no-progress "eliashaeussler/composer-update-check:dev-${{ github.event.inputs.update-check-branch }}#${{ github.event.inputs.update-check-sha }}@dev"
 
       # Run tests
       - name: Build coverage directory

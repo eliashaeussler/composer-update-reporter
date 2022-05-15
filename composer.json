@@ -15,19 +15,23 @@
   "support": {
     "issues": "https://github.com/eliashaeussler/composer-update-reporter/issues",
     "source": "https://github.com/eliashaeussler/composer-update-reporter",
-    "docs": "https://docs.elias-haeussler.de/composer-update-reporter/",
+    "docs": "https://composer-update-reporter.elias-haeussler.de/",
     "rss": "https://github.com/eliashaeussler/composer-update-reporter/releases.atom"
   },
   "require": {
     "php": ">= 7.1 < 8.1",
+    "ext-filter": "*",
     "ext-json": "*",
+    "ext-mbstring": "*",
     "composer-plugin-api": "^1.0 || ^2.0",
     "eliashaeussler/composer-update-check": "^1.0",
     "nyholm/psr7": "^1.0",
     "psr/http-client": "^1.0",
+    "psr/http-message": "^1.0",
     "spatie/emoji": "^2.0",
     "symfony/http-client": "^4.4.11 || ^5.0.11 || ^6.0",
-    "symfony/mailer": ">= 4.4 < 7.0"
+    "symfony/mailer": ">= 4.4 < 7.0",
+    "symfony/mime": ">= 4.4 < 7.0"
   },
   "require-dev": {
     "composer/composer": "^1.0 || ^2.0",
@@ -70,8 +74,16 @@
     "docs:open": "open http://$(docker-compose -f docs/build/docker-compose.yaml port docs 8000)",
     "docs:start": "@docs:exec up -d",
     "docs:stop": "@docs:exec down",
-    "lint": "php-cs-fixer fix",
-    "sca": "phpstan analyse -c phpstan.neon",
+    "lint": [
+      "@lint:composer",
+      "@lint:php"
+    ],
+    "lint:composer": "@composer normalize --no-check-lock --no-update-lock",
+    "lint:php": "php-cs-fixer fix",
+    "sca": [
+      "@sca:php"
+    ],
+    "sca:php": "phpstan analyse -c phpstan.neon",
     "simulate": "bin/simulate-application.sh",
     "test": [
       "@test:docker:start",
