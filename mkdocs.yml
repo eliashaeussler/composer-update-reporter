@@ -47,7 +47,7 @@ extra:
     url: https://github.com/eliashaeussler/composer-update-reporter
     blob: https://github.com/eliashaeussler/composer-update-reporter/tree/main
   social:
-    - icon: fontawesome/solid/globe-americas
+    - icon: fontawesome/solid/earth-americas
       link: https://haeussler.dev
     - icon: fontawesome/brands/twitter
       link: https://haeussler.dev/twitter
@@ -79,7 +79,8 @@ markdown_extensions:
   - pymdownx.details
   - pymdownx.tasklist:
       custom_checkbox: true
-  - pymdownx.tabbed
+  - pymdownx.tabbed:
+      alternate_style: true
   - pymdownx.snippets
   - pymdownx.superfences
   - pymdownx.highlight:
