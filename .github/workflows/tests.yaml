@@ -30,7 +30,7 @@ jobs:
         composer-version: ["1", "2"]
         preferred-install: ["stable", "lowest"]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -86,7 +86,7 @@ jobs:
           - 2025:2025
           - 9025:9025
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
