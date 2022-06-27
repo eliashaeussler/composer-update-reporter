@@ -12,7 +12,7 @@ on:
 jobs:
   tests:
     name: '[${{ github.event.inputs.update-check-branch }}] PHP ${{ matrix.php-version }} & Composer ${{ matrix.composer-version }}'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     services:
       mailhog:
         image: mailhog/mailhog
@@ -26,10 +26,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: ["7.1", "7.2", "7.3", "7.4", "8.0"]
+        php-version: ["7.1", "7.2", "7.3", "7.4", "8.0", "8.1"]
         composer-version: ["1", "2"]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -49,7 +49,7 @@ jobs:
         run: |
           echo "::set-output name=dir::$(composer config cache-files-dir)"
       - name: Define Composer cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: tests-update-check-${{ github.event.inputs.update-check-sha }}-php-${{ matrix.php-version }}-composer-${{ matrix.composer-version }}
