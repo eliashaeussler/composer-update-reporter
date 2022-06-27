@@ -12,7 +12,7 @@ jobs:
   # Job: Run unit tests
   tests:
     name: PHP ${{ matrix.php-version }} & Composer ${{ matrix.composer-version }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     services:
       mailhog:
         image: mailhog/mailhog
@@ -102,7 +102,7 @@ jobs:
   # Job: Run unit tests with lowest installed dependency versions
   tests-lowest:
     name: '[test-lowest] PHP ${{ matrix.php-version }} & Composer ${{ matrix.composer-version }}'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     services:
       mailhog:
         image: mailhog/mailhog

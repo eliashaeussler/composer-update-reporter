@@ -12,7 +12,7 @@ on:
 jobs:
   tests:
     name: '[${{ github.event.inputs.update-check-branch }}] PHP ${{ matrix.php-version }} & Composer ${{ matrix.composer-version }}'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     services:
       mailhog:
         image: mailhog/mailhog
