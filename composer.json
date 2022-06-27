@@ -19,7 +19,7 @@
     "rss": "https://github.com/eliashaeussler/composer-update-reporter/releases.atom"
   },
   "require": {
-    "php": ">= 7.1 < 8.1",
+    "php": ">= 7.1 < 8.2",
     "ext-filter": "*",
     "ext-json": "*",
     "ext-mbstring": "*",
@@ -39,7 +39,7 @@
     "friendsofphp/php-cs-fixer": ">= 2.17 < 4.0",
     "php-http/mock-client": "^1.0",
     "phpstan/phpstan": "^1.2",
-    "phpunit/phpunit": ">= 7.5 < 10.0",
+    "phpunit/phpunit": "^7.5 || ^8.5.23 || ^9.0",
     "rpkamp/mailhog-client": ">= 0.3 < 0.6"
   },
   "autoload": {
