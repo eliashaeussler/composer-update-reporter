@@ -44,6 +44,10 @@ composer require eliashaeussler/composer-update-reporter
 
 View all notable release notes in the [Changelog](CHANGELOG.md).
 
+## :technologist: Contributing
+
+Please have a look at [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
 ## :gem: Credits
 
 [Banner vector created by studiogstock - www.freepik.com](https://www.freepik.com/vectors/banner)
