@@ -11,97 +11,7 @@ on:
 jobs:
   # Job: Run unit tests
   tests:
-    name: PHP ${{ matrix.php-version }} & Composer ${{ matrix.composer-version }}
-    runs-on: ubuntu-latest
-    services:
-      mailhog:
-        image: mailhog/mailhog
-        env:
-          MH_SMTP_BIND_ADDR: 0.0.0.0:2025
-          MH_API_BIND_ADDR: 0.0.0.0:9025
-          MH_UI_BIND_ADDR: 0.0.0.0:9025
-        ports:
-          - 2025:2025
-          - 9025:9025
-    strategy:
-      fail-fast: false
-      matrix:
-        php-version: ["7.1", "7.2", "7.3", "7.4"]
-        composer-version: ["1", "2"]
-        include:
-          - php-version: "8.0"
-            composer-version: "1"
-          - php-version: "8.0"
-            composer-version: "2"
-            coverage: true
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      # Prepare environment
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php-version }}
-          tools: composer:v2
-          coverage: pcov
-
-      # Define Composer cache
-      - name: Get Composer cache directory
-        id: composer-cache
-        run: |
-          echo "::set-output name=dir::$(composer config cache-files-dir)"
-      - name: Define Composer cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: tests-php-${{ matrix.php-version }}-composer-${{ matrix.composer-version }}
-          restore-keys: |
-            tests-php-${{ matrix.php-version }}-composer-
-
-      # Install dependencies
-      - name: Install Composer and dependencies
-        run: |
-          composer config platform.composer-plugin-api "${{ matrix.composer-version }}.99"
-          composer config platform.composer-runtime-api "${{ matrix.composer-version }}.99"
-          composer update --no-progress --with "composer/composer:^${{ matrix.composer-version }}"
-          composer self-update --${{ matrix.composer-version }}
-
-      # Run tests
-      - name: Build coverage directory
-        run: mkdir -p .build/coverage
-      - name: Run tests with coverage
-        run: composer test:coverage
-        if: ${{ matrix.coverage }}
-      - name: Run tests without coverage
-        run: composer test:run
-        if: ${{ !matrix.coverage }}
-
-      # Report coverage
-      - name: Fix coverage path
-        working-directory: .build/coverage
-        run: sed -i 's#/home/runner/work/composer-update-reporter/composer-update-reporter#${{ github.workspace }}#g' clover.xml
-        if: ${{ matrix.coverage }}
-      - name: CodeClimate report
-        uses: paambaati/codeclimate-action@v3.0.0
-        env:
-          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-        with:
-          coverageLocations: |
-            ${{ github.workspace }}/.build/coverage/clover.xml:clover
-        if: ${{ matrix.coverage }}
-      - name: codecov report
-        uses: codecov/codecov-action@v2
-        with:
-          directory: .build/coverage
-          fail_ci_if_error: true
-          verbose: true
-        if: ${{ matrix.coverage }}
-
-  # Job: Run unit tests with lowest installed dependency versions
-  tests-lowest:
-    name: '[test-lowest] PHP ${{ matrix.php-version }} & Composer ${{ matrix.composer-version }}'
+    name: Tests (PHP ${{ matrix.php-version }}, Composer ${{ matrix.composer-version }} & ${{ matrix.preferred-install }} dependencies)
     runs-on: ubuntu-latest
     services:
       mailhog:
@@ -118,6 +28,7 @@ jobs:
       matrix:
         php-version: ["7.1", "7.2", "7.3", "7.4", "8.0"]
         composer-version: ["1", "2"]
+        preferred-install: ["stable", "lowest"]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -140,16 +51,18 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: tests-lowest-php-${{ matrix.php-version }}-composer-${{ matrix.composer-version }}
+          key: tests-php-${{ matrix.php-version }}-${{ matrix.composer-version }}-${{ matrix.preferred-install }}
           restore-keys: |
-            tests-lowest-php-${{ matrix.php-version }}-composer-
+            tests-php-${{ matrix.php-version }}-${{ matrix.composer-version }}-
+            tests-php-${{ matrix.php-version }}-
+            tests-php-
 
       # Install dependencies
       - name: Install Composer and dependencies
         run: |
           composer config platform.composer-plugin-api "${{ matrix.composer-version }}.99"
           composer config platform.composer-runtime-api "${{ matrix.composer-version }}.99"
-          composer update --no-progress --prefer-lowest --with "composer/composer:^${{ matrix.composer-version }}"
+          composer update --no-progress --prefer-${{ matrix.preferred-install }} --with "composer/composer:^${{ matrix.composer-version }}"
           composer self-update --${{ matrix.composer-version }}
 
       # Run tests
@@ -157,3 +70,72 @@ jobs:
         run: mkdir -p .build/coverage
       - name: Run tests
         run: composer test:run
+
+  # Job: Collect and report test coverage
+  coverage:
+    name: Test coverage
+    runs-on: ubuntu-latest
+    services:
+      mailhog:
+        image: mailhog/mailhog
+        env:
+          MH_SMTP_BIND_ADDR: 0.0.0.0:2025
+          MH_API_BIND_ADDR: 0.0.0.0:9025
+          MH_UI_BIND_ADDR: 0.0.0.0:9025
+        ports:
+          - 2025:2025
+          - 9025:9025
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      # Prepare environment
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.0
+          tools: composer:v2
+          coverage: pcov
+
+      # Define Composer cache
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: |
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
+      - name: Define Composer cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: tests-php-8.0-stable
+          restore-keys: |
+            tests-php-8.0-
+            tests-php-
+
+      # Install dependencies
+      - name: Install Composer and dependencies
+        run: composer update --no-progress
+
+      # Run tests
+      - name: Build coverage directory
+        run: mkdir -p .build/coverage
+      - name: Run tests with coverage
+        run: composer test:coverage
+
+      # Report coverage
+      - name: Fix coverage path
+        working-directory: .build/coverage
+        run: sed -i 's#/home/runner/work/composer-update-reporter/composer-update-reporter#${{ github.workspace }}#g' clover.xml
+      - name: CodeClimate report
+        uses: paambaati/codeclimate-action@v3.0.0
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+        with:
+          coverageLocations: |
+            ${{ github.workspace }}/.build/coverage/clover.xml:clover
+      - name: codecov report
+        uses: codecov/codecov-action@v3
+        with:
+          directory: .build/coverage
+          fail_ci_if_error: true
+          verbose: true
