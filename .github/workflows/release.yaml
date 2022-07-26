@@ -21,10 +21,17 @@ jobs:
             exit 1
           fi
 
+      # Read changelog
+      - name: Read changelog
+        id: changelog
+        uses: mindsers/changelog-reader-action@v2
+        with:
+          validation_level: warn
+
       # Create release
       - name: Create release
         id: create-release
         uses: softprops/action-gh-release@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          body: 'Release notes are available in the [Changelog](https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/CHANGELOG.md) file.'
+          body: ${{ steps.changelog.outputs.changes }}
