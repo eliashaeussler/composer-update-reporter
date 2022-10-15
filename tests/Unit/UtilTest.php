@@ -35,6 +35,7 @@ class UtilTest extends AbstractTestCase
 {
     /**
      * @test
+     *
      * @dataProvider uppercaseToUnderscoredReturnsUnderscoredStringDataProvider
      */
     public function uppercaseToUnderscoredReturnsUnderscoredString(string $string, string $expected): void
@@ -44,6 +45,7 @@ class UtilTest extends AbstractTestCase
 
     /**
      * @test
+     *
      * @dataProvider arrayDiffRecursiveReturnsDiffBetweenArraysDataProvider
      *
      * @param array<string, mixed> $array1

@@ -55,6 +55,7 @@ class AbstractServiceTest extends AbstractTestCase
 
     /**
      * @test
+     *
      * @dataProvider isEnabledReturnsStateOfAvailabilityDataProvider
      *
      * @param array<string, mixed> $configuration

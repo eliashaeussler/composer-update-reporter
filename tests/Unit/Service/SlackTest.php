@@ -81,6 +81,7 @@ class SlackTest extends AbstractTestCase
 
     /**
      * @test
+     *
      * @dataProvider fromConfigurationThrowsExceptionIfSlackUrlIsNotSetDataProvider
      *
      * @param array<string, mixed> $configuration
@@ -134,6 +135,7 @@ class SlackTest extends AbstractTestCase
 
     /**
      * @dataProvider reportSendsUpdateReportSuccessfullyDataProvider
+     *
      * @test
      */
     public function reportSendsUpdateReportSuccessfully(bool $insecure): void

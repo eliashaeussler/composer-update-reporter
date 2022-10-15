@@ -144,6 +144,7 @@ class EmailTest extends AbstractTestCase
 
     /**
      * @test
+     *
      * @dataProvider fromConfigurationThrowsExceptionIfEmailDsnIsNotSetDataProvider
      *
      * @param array<string, mixed> $configuration
@@ -260,6 +261,7 @@ class EmailTest extends AbstractTestCase
 
     /**
      * @test
+     *
      * @dataProvider reportSendsUpdateReportSuccessfullyDataProvider
      */
     public function reportSendsUpdateReportSuccessfully(bool $insecure, string $expectedSecurityNotice): void

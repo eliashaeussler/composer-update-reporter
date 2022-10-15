@@ -92,6 +92,7 @@ class GitLabTest extends AbstractTestCase
 
     /**
      * @test
+     *
      * @dataProvider fromConfigurationThrowsExceptionIfGitLabUrlIsNotSetDataProvider
      *
      * @param array<string, mixed> $configuration
@@ -168,6 +169,7 @@ class GitLabTest extends AbstractTestCase
 
     /**
      * @test
+     *
      * @dataProvider reportSendsUpdateReportSuccessfullyDataProvider
      */
     public function reportSendsUpdateReportSuccessfully(bool $insecure, string $expectedSecurityNotice): void

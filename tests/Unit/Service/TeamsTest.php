@@ -82,6 +82,7 @@ class TeamsTest extends AbstractTestCase
 
     /**
      * @test
+     *
      * @dataProvider fromConfigurationThrowsExceptionIfTeamsUrlIsNotSetDataProvider
      *
      * @param array<string, mixed> $configuration
@@ -135,6 +136,7 @@ class TeamsTest extends AbstractTestCase
 
     /**
      * @test
+     *
      * @dataProvider reportSendsUpdateReportSuccessfullyDataProvider
      */
     public function reportSendsUpdateReportSuccessfully(bool $insecure, string $expectedSecurityNotice): void

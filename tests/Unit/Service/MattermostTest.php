@@ -92,6 +92,7 @@ class MattermostTest extends AbstractTestCase
 
     /**
      * @test
+     *
      * @dataProvider fromConfigurationThrowsExceptionIfMattermostUrlIsNotSetDataProvider
      *
      * @param array<string, mixed> $configuration
@@ -173,6 +174,7 @@ class MattermostTest extends AbstractTestCase
 
     /**
      * @test
+     *
      * @dataProvider reportSendsUpdateReportSuccessfullyDataProvider
      */
     public function reportSendsUpdateReportSuccessfully(bool $insecure, string $expectedSecurityNotice): void
