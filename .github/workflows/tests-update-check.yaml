@@ -43,23 +43,11 @@ jobs:
         env:
           COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Define Composer cache
-      - name: Get Composer cache directory
-        id: composer-cache
-        run: |
-          echo "::set-output name=dir::$(composer config cache-files-dir)"
-      - name: Define Composer cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: tests-update-check-${{ github.event.inputs.update-check-sha }}-php-${{ matrix.php-version }}-composer-${{ matrix.composer-version }}
-          restore-keys: |
-            tests-update-check-${{ github.event.inputs.update-check-sha }}-php-${{ matrix.php-version }}-composer-
-            tests-update-check-${{ github.event.inputs.update-check-sha }}-php-
-
       # Install dependencies
-      - name: Install Composer and dependencies
-        run: composer require --dev --no-progress "composer/composer:^${{ matrix.composer-version }}"
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v2
+        with:
+          composer-options: --with="composer/composer:^${{ matrix.composer-version }}"
 
       # Install update check
       - name: Install eliashaeussler/composer-update-check
