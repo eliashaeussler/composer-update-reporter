@@ -27,16 +27,18 @@ jobs:
         run: composer validate --no-check-lock
 
       # Install dependencies
+      - name: Add required packages
+        run: composer require composer/composer:"^2.0" --no-update
       - name: Install Composer dependencies
-        run: composer require --no-progress composer/composer:"^2.0"
+        uses: ramsey/composer-install@v2
 
       # Check Composer dependencies
       - name: Check dependencies
         run: composer-require-checker check
       - name: Reset composer.json
-        run: |
-          git checkout composer.json
-          composer update --no-progress
+        run: git checkout composer.json
+      - name: Re-install Composer dependencies
+        uses: ramsey/composer-install@v2
       - name: Check for unused dependencies
         run: composer-unused
 
