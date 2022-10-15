@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "09b4c2f6649915ba8500a5b00ab0510b",
+    "content-hash": "537b1a5efd8ab11e0a88dd14f49de529",
     "packages": [
         {
             "name": "doctrine/lexer",
@@ -663,16 +663,16 @@
         },
         {
             "name": "spatie/emoji",
-            "version": "2.3.1",
+            "version": "4.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/emoji.git",
-                "reference": "f5423bc7764fdd992bb955b6fac5d6675b8969cc"
+                "reference": "aa9b01775ad3ff825914dab77f10fb8aa9aa297e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/emoji/zipball/f5423bc7764fdd992bb955b6fac5d6675b8969cc",
-                "reference": "f5423bc7764fdd992bb955b6fac5d6675b8969cc",
+                "url": "https://api.github.com/repos/spatie/emoji/zipball/aa9b01775ad3ff825914dab77f10fb8aa9aa297e",
+                "reference": "aa9b01775ad3ff825914dab77f10fb8aa9aa297e",
                 "shasum": ""
             },
             "require": {
@@ -713,7 +713,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/emoji/issues",
-                "source": "https://github.com/spatie/emoji/tree/2.3.1"
+                "source": "https://github.com/spatie/emoji/tree/4.0.0"
             },
             "funding": [
                 {
@@ -725,7 +725,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-07-04T14:58:47+00:00"
+            "time": "2022-09-22T07:46:11+00:00"
         },
         {
             "name": "symfony/console",
