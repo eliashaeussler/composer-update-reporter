@@ -40,7 +40,7 @@
     "php-http/mock-client": "^1.0",
     "phpstan/phpstan": "^1.2",
     "phpunit/phpunit": "^7.5 || ^8.5.23 || ^9.0",
-    "rpkamp/mailhog-client": ">= 0.3 < 0.6"
+    "rpkamp/mailhog-client": ">= 0.3 < 1.1"
   },
   "autoload": {
     "psr-4": {

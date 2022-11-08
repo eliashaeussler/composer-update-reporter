@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "537b1a5efd8ab11e0a88dd14f49de529",
+    "content-hash": "0fd492be0e5b6e30a7d22eb46d3cf0ae",
     "packages": [
         {
             "name": "doctrine/lexer",
@@ -4596,16 +4596,16 @@
         },
         {
             "name": "rpkamp/mailhog-client",
-            "version": "0.5.2",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rpkamp/mailhog-client.git",
-                "reference": "519a6cf50a6490f0f43017a1a87b56858133fe33"
+                "reference": "dafb05c6969b83124c4248b85f96fd98266bedf5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rpkamp/mailhog-client/zipball/519a6cf50a6490f0f43017a1a87b56858133fe33",
-                "reference": "519a6cf50a6490f0f43017a1a87b56858133fe33",
+                "url": "https://api.github.com/repos/rpkamp/mailhog-client/zipball/dafb05c6969b83124c4248b85f96fd98266bedf5",
+                "reference": "dafb05c6969b83124c4248b85f96fd98266bedf5",
                 "shasum": ""
             },
             "require": {
@@ -4627,7 +4627,7 @@
                 "phpmd/phpmd": "^2.9.1",
                 "phpstan/phpstan": "^0.12.64",
                 "phpunit/phpunit": "^8.0",
-                "swiftmailer/swiftmailer": "^6.2.3"
+                "symfony/mailer": "^5.0"
             },
             "type": "library",
             "autoload": {
@@ -4648,9 +4648,9 @@
             "description": "Mailhog API Client for PHP",
             "support": {
                 "issues": "https://github.com/rpkamp/mailhog-client/issues",
-                "source": "https://github.com/rpkamp/mailhog-client/tree/0.5.2"
+                "source": "https://github.com/rpkamp/mailhog-client/tree/1.0.0"
             },
-            "time": "2020-12-29T09:26:39+00:00"
+            "time": "2022-02-18T13:52:41+00:00"
         },
         {
             "name": "sebastian/cli-parser",
