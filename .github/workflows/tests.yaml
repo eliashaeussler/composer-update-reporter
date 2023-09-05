@@ -29,7 +29,7 @@ jobs:
         composer-version: ["1", "2"]
         dependencies: ["highest", "lowest"]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -75,7 +75,7 @@ jobs:
           - 2025:2025
           - 9025:9025
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
