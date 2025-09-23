@@ -1,3 +1,10 @@
+# Abandoned!
+
+> [!CAUTION]
+> **This library is abandoned and will no longer receive updates. Please switch to a dedicated alternative.**
+
+---
+
 <div align="center">
 
 ![Logo](docs/assets/img/logo.png)

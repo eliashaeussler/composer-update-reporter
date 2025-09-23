@@ -3,6 +3,7 @@
   "description": "Composer Plugin to report outdated packages to several external services",
   "license": "GPL-3.0-or-later",
   "type": "composer-plugin",
+  "abandoned": true,
   "authors": [
     {
       "name": "Elias Häußler",
